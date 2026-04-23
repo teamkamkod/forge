@@ -14,6 +14,30 @@
     --text: #f0f0f8; --text2: #8888aa; --text3: #4a4a66;
     --card: #13131a; --radius: 16px; --radius-sm: 10px;
   }
+  /* AUTH SCREEN */
+  .auth-screen { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; z-index: 1000; }
+  .auth-screen.hidden { display: none; }
+  .auth-logo { font-family: 'Barlow Condensed', sans-serif; font-size: 52px; font-weight: 900; letter-spacing: -0.03em; color: var(--text); margin-bottom: 4px; }
+  .auth-logo span { color: var(--accent); }
+  .auth-tagline { font-size: 13px; color: var(--text3); margin-bottom: 48px; letter-spacing: 0.08em; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif; }
+  .auth-card { width: 100%; max-width: 360px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
+  .auth-tabs { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
+  .auth-tab { flex: 1; padding: 10px; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.2s; background: none; border-left: none; border-right: none; border-top: none; }
+  .auth-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .auth-field { margin-bottom: 14px; }
+  .auth-field label { font-size: 11px; color: var(--text3); font-family: 'Barlow Condensed', sans-serif; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; display: block; margin-bottom: 6px; }
+  .auth-field input { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 13px 14px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 15px; outline: none; transition: border-color 0.2s; }
+  .auth-field input:focus { border-color: var(--accent2); }
+  .auth-submit { width: 100%; padding: 15px; border-radius: var(--radius-sm); border: none; background: var(--accent); color: var(--bg); font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; margin-top: 6px; transition: all 0.2s; }
+  .auth-submit:active { transform: scale(0.98); }
+  .auth-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .auth-error { font-size: 13px; color: var(--accent3); margin-top: 12px; text-align: center; min-height: 18px; }
+  .auth-success { font-size: 13px; color: var(--accent); margin-top: 12px; text-align: center; min-height: 18px; }
+  /* User badge in header */
+  .user-badge { display: flex; align-items: center; gap: 8px; }
+  .user-badge-name { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; color: var(--text3); }
+  .user-signout-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); background: none; color: var(--text3); cursor: pointer; }
+  .user-signout-btn:active { background: var(--bg3); }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body { font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; max-width: 430px; margin: 0 auto; overflow-x: hidden; padding-bottom: 90px; }
 
@@ -177,10 +201,11 @@
   .ai-wc-block.cooldown { background: rgba(136,136,170,0.07); color: var(--text2); }
 
   /* IA log — done slot */
+  .lia-modify-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(71,200,255,0.3); background: rgba(71,200,255,0.08); color: var(--accent2); cursor: pointer; white-space: nowrap; -webkit-tap-highlight-color: transparent; }
+  .lia-modify-btn:active { background: rgba(71,200,255,0.18); }
   .lia-done-zone { padding: 10px 14px 12px; border-top: 1px solid rgba(232,255,71,0.12); background: rgba(232,255,71,0.03); }
   .lia-done-text { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 8px; white-space: pre-wrap; }
   .lia-done-edit { margin-bottom: 8px; }
-  .lia-done-actions { display: flex; }
   .lia-done-save-row { display: flex; gap: 8px; }
 
   /* IA log — integrated input slot */
@@ -285,6 +310,23 @@
   .streak-day.done.cardio-day { background: var(--accent2); border-color: var(--accent2); }
   .streak-day-label { font-family: 'Barlow Condensed', sans-serif; font-size: 9px; color: var(--text3); text-align: center; margin-top: 4px; text-transform: uppercase; }
 
+  /* Profile view mode */
+  .pcard { cursor: pointer; transition: border-color 0.2s; position: relative; }
+  .pcard:active { border-color: var(--accent2); }
+  .pcard-edit-hint { position: absolute; top: 14px; right: 16px; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: var(--text3); }
+  .pcard-hero { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 900; color: var(--text); margin-bottom: 12px; }
+  .pcard-row { display: flex; gap: 16px; margin-bottom: 12px; }
+  .pcard-stat { text-align: center; }
+  .pcard-val { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .pcard-lbl { font-size: 10px; color: var(--text3); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .pcard-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pcard-tag { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; background: var(--bg3); border: 1px solid var(--border); color: var(--text2); }
+  .pcard-tag.accent { background: rgba(232,255,71,0.1); border-color: rgba(232,255,71,0.3); color: var(--accent); }
+  .pcard-text { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  /* History toggle */
+  .hist-toggle-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg3); color: var(--text2); cursor: pointer; transition: all 0.2s; }
+  .hist-toggle-btn.open { color: var(--accent2); border-color: rgba(71,200,255,0.3); }
+
   /* CONFIG BANNER */
   .config-banner { background: rgba(255,107,71,0.1); border: 1px solid rgba(255,107,71,0.3); border-radius: var(--radius-sm); padding: 12px 16px; font-size: 13px; color: var(--accent3); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
   .config-banner a { color: var(--accent); text-decoration: underline; cursor: pointer; }
@@ -357,8 +399,37 @@
   input:focus { border-color: var(--accent); }
   .divider { height: 1px; background: var(--border); margin: 16px 0; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
 </head>
 <body>
+
+<!-- ═══ AUTH SCREEN ═══ -->
+<div class="auth-screen" id="auth-screen">
+  <div class="auth-logo">FOR<span>GE</span></div>
+  <div class="auth-tagline">Training OS</div>
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')" type="button">Connexion</button>
+      <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')" type="button">Créer un compte</button>
+    </div>
+    <div id="auth-login-form">
+      <div class="auth-field"><label>Email</label><input type="email" id="auth-email" placeholder="ton@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')authLogin()"></div>
+      <div class="auth-field"><label>Mot de passe</label><input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')authLogin()"></div>
+      <button type="button" class="auth-submit" id="auth-submit-btn" onclick="authLogin()">Se connecter</button>
+    </div>
+    <div id="auth-signup-form" style="display:none">
+      <div class="auth-field"><label>Email</label><input type="email" id="auth-email-signup" placeholder="ton@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')authSignUp()"></div>
+      <div class="auth-field"><label>Mot de passe</label><input type="password" id="auth-password-signup" placeholder="Min. 6 caractères" autocomplete="new-password" onkeydown="if(event.key==='Enter')authSignUp()"></div>
+      <button type="button" class="auth-submit" id="auth-submit-signup-btn" onclick="authSignUp()">Créer mon compte</button>
+    </div>
+    <div class="auth-error" id="auth-error"></div>
+    <div class="auth-success" id="auth-success"></div>
+  </div>
+</div>
+
+<!-- ═══ APP (hidden until authenticated) ═══ -->
+<div id="app-wrapper" style="display:none">
 
 <div class="toast" id="toast"></div>
 
@@ -448,10 +519,11 @@
 
     <!-- HISTORIQUE -->
     <div style="margin-top:8px; padding-bottom:8px">
-      <div class="card-label" style="margin-bottom:10px">Historique des séances</div>
-      <div id="hist-list">
-        <div class="loading visible"><div class="spinner"></div>Chargement...</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div class="card-label" style="margin-bottom:0">Historique des séances</div>
+        <button class="hist-toggle-btn" id="hist-toggle-btn" onclick="toggleHistorique()">Voir l'historique ↓</button>
       </div>
+      <div id="hist-list" style="display:none"></div>
     </div>
 
   </div>
@@ -664,39 +736,108 @@
 
 <!-- ═══ VIEW: PROFILE ═══ -->
 <div class="view" id="view-profile">
-  <div class="header"><div><div class="header-title">PROFIL</div><div class="header-sub">Objectifs & configuration</div></div></div>
-  <div class="card">
-    <div class="card-label">🔧 Webhook Make</div>
-    <div class="profile-field"><label class="input-label">URL Webhook (unique)</label><input type="text" id="wh-url" placeholder="https://hook.eu1.make.com/..."></div>
-    <button class="btn btn-primary" onclick="saveWebhooks()" style="margin-top:8px">Sauvegarder</button>
-  </div>
-  <div class="card">
-    <div class="card-label">👤 Profil Sportif</div>
-    <div class="profile-field"><label class="input-label">Prénom</label><input type="text" id="p-name" placeholder="Ton prénom"></div>
-    <div class="input-row">
-      <div><label class="input-label">Âge</label><input type="number" id="p-age" placeholder="—"></div>
-      <div><label class="input-label">Poids (kg)</label><input type="number" id="p-weight" placeholder="—"></div>
+  <div class="header">
+    <div><div class="header-title">PROFIL</div><div class="header-sub">Identité & objectifs</div></div>
+    <div class="user-badge">
+      <span class="user-badge-name" id="user-badge-email"></span>
+      <button class="user-signout-btn" onclick="authSignOut()">Déconnexion</button>
     </div>
-    <div class="input-row">
-      <div><label class="input-label">Taille (cm)</label><input type="number" id="p-height" placeholder="—"></div>
-      <div><label class="input-label">Niveau</label>
-        <select id="p-level"><option value="confirmé">Confirmé 3+ ans</option><option value="intermédiaire">Intermédiaire</option><option value="débutant">Débutant</option></select>
+  </div>
+
+  <!-- VIEW MODE -->
+  <div id="profile-view-mode">
+    <!-- Identité -->
+    <div class="card pcard" onclick="openProfileEdit()">
+      <div class="pcard-edit-hint">Modifier ✎</div>
+      <div class="pcard-hero" id="pv-hero">—</div>
+      <div class="pcard-row">
+        <div class="pcard-stat"><div class="pcard-val" id="pv-age">—</div><div class="pcard-lbl">ans</div></div>
+        <div class="pcard-stat"><div class="pcard-val" id="pv-weight">—</div><div class="pcard-lbl">kg</div></div>
+        <div class="pcard-stat"><div class="pcard-val" id="pv-height">—</div><div class="pcard-lbl">cm</div></div>
+      </div>
+      <div class="pcard-tags">
+        <span class="pcard-tag" id="pv-level"></span>
+        <span class="pcard-tag accent" id="pv-goal"></span>
+        <span class="pcard-tag" id="pv-sessions"></span>
+        <span class="pcard-tag" id="pv-equipment"></span>
+      </div>
+    </div>
+    <!-- Contraintes & contexte -->
+    <div class="card pcard" onclick="openProfileEdit()" style="margin-bottom:8px">
+      <div class="pcard-edit-hint">Modifier ✎</div>
+      <div class="card-label">Pour l'IA</div>
+      <div class="pcard-text" id="pv-constraints-text"></div>
+      <div class="pcard-text" id="pv-context-text" style="margin-top:6px;color:var(--text3)"></div>
+    </div>
+    <!-- Poids cible -->
+    <div class="card pcard" onclick="openProfileEdit()" style="margin-bottom:24px">
+      <div class="pcard-edit-hint">Modifier ✎</div>
+      <div class="card-label">Objectif poids</div>
+      <div style="display:flex;align-items:baseline;gap:6px">
+        <span class="pcard-val" id="pv-weight-target">—</span>
+        <span style="font-size:12px;color:var(--text2)">kg cible</span>
       </div>
     </div>
   </div>
-  <div class="card">
-    <div class="card-label">🎯 Objectifs</div>
-    <div class="profile-field"><label class="input-label">Objectif principal</label>
-      <select id="p-goal"><option value="prise de masse">Prise de masse</option><option value="force">Force / Performance</option><option value="sèche">Sèche / Définition</option><option value="endurance">Endurance</option><option value="santé">Santé générale</option></select>
-    </div>
-    <div class="profile-field"><label class="input-label">Séances / semaine cible</label><input type="number" id="p-sessions-week" placeholder="4" min="1" max="7"></div>
-    <div class="profile-field"><label class="input-label">Contraintes / blessures</label><textarea id="p-constraints" placeholder="Épaule fragile..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;outline:none;resize:none;min-height:80px;line-height:1.6"></textarea></div>
-    <div class="profile-field"><label class="input-label">Contexte pour l'IA</label><textarea id="p-context" placeholder="Programme actuel, équipements..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;outline:none;resize:none;min-height:80px;line-height:1.6"></textarea></div>
-  </div>
 
-  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:24px">
-    <button class="btn btn-secondary" onclick="loadProfile()">Charger Make</button>
-    <button class="btn btn-primary" onclick="saveProfile()">Sauvegarder</button>
+  <!-- EDIT MODE (hidden by default) -->
+  <div id="profile-edit-mode" style="display:none">
+    <div class="card">
+      <div class="card-label">👤 Identité</div>
+      <div class="profile-field"><label class="input-label">Prénom</label><input type="text" id="p-name" placeholder="Ton prénom"></div>
+      <div class="input-row">
+        <div><label class="input-label">Âge</label><input type="number" id="p-age" placeholder="—"></div>
+        <div><label class="input-label">Poids actuel (kg)</label><input type="number" id="p-weight" placeholder="—" step="0.1"></div>
+      </div>
+      <div class="input-row">
+        <div><label class="input-label">Taille (cm)</label><input type="number" id="p-height" placeholder="—"></div>
+        <div><label class="input-label">Niveau</label>
+          <select id="p-level">
+            <option value="débutant">Débutant</option>
+            <option value="intermédiaire">Intermédiaire</option>
+            <option value="confirmé">Confirmé 3+ ans</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-label">🎯 Objectifs</div>
+      <div class="profile-field"><label class="input-label">Objectif principal</label>
+        <select id="p-goal">
+          <option value="prise de masse">Prise de masse</option>
+          <option value="force">Force / Performance</option>
+          <option value="sèche">Sèche / Définition</option>
+          <option value="endurance">Endurance</option>
+          <option value="santé">Santé générale</option>
+        </select>
+      </div>
+      <div class="input-row">
+        <div><label class="input-label">Séances / semaine</label><input type="number" id="p-sessions-week" placeholder="4" min="1" max="7"></div>
+        <div><label class="input-label">Poids cible (kg)</label><input type="number" id="p-weight-target" placeholder="—" step="0.1"></div>
+      </div>
+      <div class="profile-field"><label class="input-label">Équipements</label>
+        <select id="p-equipment">
+          <option value="salle complète">Salle complète</option>
+          <option value="salle standard">Salle standard</option>
+          <option value="home gym complet">Home gym complet</option>
+          <option value="home gym basique">Home gym basique (haltères, barre)</option>
+          <option value="poids de corps">Poids de corps uniquement</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-label">🧠 Contexte IA</div>
+      <div class="profile-field"><label class="input-label">Contraintes / blessures</label>
+        <textarea id="p-constraints" placeholder="Épaule fragile, genoux sensibles..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;outline:none;resize:none;min-height:80px;line-height:1.6"></textarea>
+      </div>
+      <div class="profile-field"><label class="input-label">Contexte & notes pour l'IA</label>
+        <textarea id="p-context" placeholder="Programme actuel, habitudes, préférences..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;outline:none;resize:none;min-height:80px;line-height:1.6"></textarea>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px">
+      <button class="btn btn-secondary" onclick="cancelProfileEdit()">Annuler</button>
+      <button class="btn btn-primary" onclick="saveProfile()">Sauvegarder</button>
+    </div>
   </div>
 </div>
 
@@ -719,14 +860,86 @@
 
 <script>
 // ══════════════════════════════════════════════════════════════════
+// SUPABASE — init & auth (must be at top of script for onclick refs)
+// ══════════════════════════════════════════════════════════════════
+const SUPABASE_URL  = 'https://rfrajisqwhfojemswph.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmcmFqaXNxd2hmb2plbXNzd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5Mzg2MDMsImV4cCI6MjA5MjUxNDYwM30.MOUmhKWbeIY_NRh-5NBOkGTpghGnESsAVfurodnVkpk';
+// Use window.sb to avoid conflict with supabase SDK global
+let sb;
+try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON); }
+catch(e) { console.error('Supabase init failed:', e); }
+
+// ══════════════════════════════════════════════════════════════════
 // STATE & CONSTANTS
 // ══════════════════════════════════════════════════════════════════
-const CONFIG_KEY  = 'forge_config';
-const PROFILE_KEY = 'forge_profile';
-const SESSION_KEY = 'forge_current_session';
+let CURRENT_USER_ID = null;
+let CONFIG_KEY  = 'forge_config';
+let PROFILE_KEY = 'forge_profile';
+let SESSION_KEY = 'forge_current_session';
 
-let config  = { webhook: 'https://hook.eu1.make.com/al8v39pzju7ngrcv59g3clfjq14c0u54' };
-let profile = { name:'', age:'', weight:'', height:'', level:'confirmé', goal:'prise de masse', sessions_week:4, constraints:'', context:'' };
+const WEBHOOK_URL = 'https://hook.eu1.make.com/al8v39pzju7ngrcv59g3clfjq14c0u54';
+let config  = { webhook: WEBHOOK_URL };
+let profile = { name:'', age:'', weight:'', height:'', level:'confirmé', goal:'prise de masse', sessions_week:4, constraints:'', context:'', weight_target:'', equipment:'salle complète' };
+
+// ── AUTH FUNCTIONS ────────────────────────────────────────────────
+// Exposed on window so inline onclick handlers work before full parse
+window.switchAuthTab = function(tab) {
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+  document.getElementById('auth-login-form').style.display  = tab === 'login'  ? 'block' : 'none';
+  document.getElementById('auth-signup-form').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('auth-error').textContent = '';
+  document.getElementById('auth-success').textContent = '';
+};
+
+window.authLogin = async function() {
+  if (!sb) { document.getElementById('auth-error').textContent = 'Service indisponible'; return; }
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const btn = document.getElementById('auth-submit-btn');
+  const errEl = document.getElementById('auth-error');
+  if (!email || !password) { errEl.textContent = 'Remplis tous les champs'; return; }
+  btn.disabled = true; btn.textContent = 'Connexion...'; errEl.textContent = '';
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  btn.disabled = false; btn.textContent = 'Se connecter';
+  if (error) errEl.textContent = error.message === 'Invalid login credentials'
+    ? 'Email ou mot de passe incorrect' : error.message;
+};
+
+window.authSignUp = async function() {
+  if (!sb) { document.getElementById('auth-error').textContent = 'Service indisponible'; return; }
+  const email = document.getElementById('auth-email-signup').value.trim();
+  const password = document.getElementById('auth-password-signup').value;
+  const btn = document.getElementById('auth-submit-signup-btn');
+  const errEl = document.getElementById('auth-error');
+  const okEl  = document.getElementById('auth-success');
+  if (!email || !password) { errEl.textContent = 'Remplis tous les champs'; return; }
+  if (password.length < 6) { errEl.textContent = 'Mot de passe trop court (6 min)'; return; }
+  btn.disabled = true; btn.textContent = 'Création...';
+  errEl.textContent = ''; okEl.textContent = '';
+  const { error } = await sb.auth.signUp({ email, password });
+  btn.disabled = false; btn.textContent = 'Créer mon compte';
+  if (error) errEl.textContent = error.message;
+  else okEl.textContent = 'Compte créé ✓ — connecte-toi maintenant';
+};
+
+window.authSignOut = async function() {
+  if (supabase) await sb.auth.signOut();
+};
+
+
+
+// ── AUTH FUNCTIONS ───────────────────────────────────────────────
+
+
+
+
+
+// ══════════════════════════════════════════════════════════════════
+// SUPABASE CONFIG — replace with your project values
+// ══════════════════════════════════════════════════════════════════
+
+// STATE & CONSTANTS defined above
 
 // Session courante
 let currentSession = {
@@ -750,33 +963,79 @@ let exoRecog = null, exoRecording = false;
 let notesRecog = null, notesRecording = false;
 
 // ── INIT ──────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+async function onAuthSuccess(user) {
+  CURRENT_USER_ID = user.id;
+  CONFIG_KEY  = 'forge_config_'  + user.id;
+  PROFILE_KEY = 'forge_profile_' + user.id;
+  SESSION_KEY = 'forge_current_session_' + user.id;
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-wrapper').style.display = 'block';
+  const badge = document.getElementById('user-badge-email');
+  if (badge) badge.textContent = user.email;
   loadConfig();
   loadLocalProfile();
+  loadProfileFields();
+  loadDashboard();
+  checkSessionInProgress();
+}
+
+function onAuthSignOut() {
+  CURRENT_USER_ID = null;
+  CONFIG_KEY  = 'forge_config';
+  PROFILE_KEY = 'forge_profile';
+  SESSION_KEY = 'forge_current_session';
+  profile = { name:'', age:'', weight:'', height:'', level:'confirmé', goal:'prise de masse', sessions_week:4, constraints:'', context:'', weight_target:'', equipment:'salle complète' };
+  allSessions = [];
+  document.getElementById('app-wrapper').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('auth-error').textContent = '';
+  document.getElementById('auth-success').textContent = '';
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  initChart();
   setHeaderDate();
   buildStreakBar([0,0,0,0,0,0,0],[]);
-  initChart();
-  loadDashboard();
-  loadProfileFields();
-  checkSessionInProgress();
+
+  // Check existing Supabase session
+  if (!sb) {
+    // Supabase failed to load — show auth screen anyway (will show error on submit)
+    return;
+  }
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      await onAuthSuccess(session.user);
+    }
+    // If no session, auth-screen is already visible
+    sb.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        await onAuthSuccess(session.user);
+      } else if (event === 'SIGNED_OUT') {
+        onAuthSignOut();
+      }
+    });
+  } catch(e) {
+    console.error('Supabase session check failed:', e);
+    // Auth screen stays visible, user can try to log in
+  }
 });
+
+// Called when user is authenticated
+
 
 // ── CONFIG ────────────────────────────────────────────────────────
 function loadConfig() {
   const s = localStorage.getItem(CONFIG_KEY);
   if (s) config = { ...config, ...JSON.parse(s) };
-  document.getElementById('wh-url').value = config.webhook || '';
   document.getElementById('config-warning').style.display = config.webhook ? 'none' : 'flex';
 }
-function saveWebhooks() {
-  config.webhook = document.getElementById('wh-url').value.trim();
-  localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
-  showToast('Webhook sauvegardé ✓');
-  document.getElementById('config-warning').style.display = config.webhook ? 'none' : 'flex';
-}
+function saveWebhooks() { /* webhook form removed */ }
 async function callMake(payload) {
+  // Always include user_id for Make-side data isolation
+  const enriched = { ...payload, user_id: CURRENT_USER_ID };
   const res = await fetch(config.webhook, {
-    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
+    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(enriched)
   });
   const text = await res.text();
   try {
@@ -1003,17 +1262,15 @@ function progClass(prog) {
 function buildLiaSlotHtml(slot, state, slotIdx, loggedExo) {
   const isCurrent = state === 'current';
   const isDone    = state === 'done';
-  const openClass = (isCurrent || isDone) ? ' open' : '';
+  // Done slots start closed, current starts open
+  const openClass = isCurrent ? ' open' : '';
   const prefilled = isCurrent ? formatSlotAsText(slot) : '';
 
-  // Done zone — logged text + edit button (replaces input zone)
+  // Done zone — logged text + edit (lives in the body, hidden by default)
   const doneZone = isDone && loggedExo ? `
     <div class="lia-done-zone">
       <div class="lia-done-text" id="lia-done-text-${slotIdx}">${loggedExo.text.replace(/\n/g, '<br>')}</div>
       <textarea class="lia-textarea lia-done-edit" id="lia-done-edit-${slotIdx}" style="display:none" rows="3">${loggedExo.text}</textarea>
-      <div class="lia-done-actions" id="lia-done-actions-${slotIdx}">
-        <button class="exo-card-btn edit" onclick="editDoneSlot(${slotIdx})">Modifier</button>
-      </div>
       <div class="lia-done-save-row" id="lia-done-save-${slotIdx}" style="display:none">
         <button class="exo-card-btn save" onclick="saveDoneSlot(${slotIdx})" style="flex:1">✓ Enregistrer</button>
         <button class="exo-card-btn cancel" onclick="cancelDoneSlot(${slotIdx})" style="flex:1">Annuler</button>
@@ -1050,17 +1307,22 @@ function buildLiaSlotHtml(slot, state, slotIdx, loggedExo) {
       const noteHtml = s.note ? `<span class="ai-set-note">${s.note}</span>` : '';
       return `<div class="ai-set-row"><span class="ai-set-reps">${s.reps} reps</span><span class="ai-set-load">${loadStr}${noteHtml}</span></div>`;
     }).join('');
-    const progBodyHtml = ex.progression_note ? `<div class="ai-exo-prog ${pc}">${ex.progression_note}</div>` : '';
     const tipHtml = ex.coaching_tip ? `<div class="ai-exo-tip">💡 ${ex.coaching_tip}</div>` : '';
     const restHtml = ex.rest_seconds ? `<div class="ai-exo-rest" style="padding:0 14px 8px;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--text3)">⏱ repos ${ex.rest_seconds}s</div>` : '';
-    const body = buildBody(`${progBodyHtml}<div class="ai-exo-sets">${setsHtml}</div>${tipHtml}`, restHtml, doneZone);
+    const body = buildBody(`<div class="ai-exo-sets">${setsHtml}</div>${tipHtml}`, restHtml, doneZone);
+    const doneHeaderBtn = isDone && loggedExo
+      ? `<button class="lia-modify-btn" onclick="event.stopPropagation();editDoneSlot(${slotIdx});toggleLiaSlot(document.getElementById('lia-slot-${slotIdx}'))">Modifier</button>`
+      : '';
     return `<div class="log-ia-exo-block ${state}${openClass}" id="lia-slot-${slotIdx}">
       <div class="lia-header" onclick="toggleLiaSlot(this.parentElement)">
         <div class="lia-header-left">
           <div class="lia-name">${ex.name}</div>
           ${progMini}
         </div>
-        <div class="lia-chevron">▼</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${doneHeaderBtn}
+          <div class="lia-chevron">▼</div>
+        </div>
       </div>
       ${body}
     </div>`;
@@ -1088,13 +1350,19 @@ function buildLiaSlotHtml(slot, state, slotIdx, loggedExo) {
     const restHtml = lastMember?.rest_seconds
       ? `<div class="ai-exo-rest" style="padding:0 14px 8px;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--text3)">⏱ repos ${lastMember.rest_seconds}s</div>` : '';
     const body = buildBody(`<div class="ai-superset-label" style="margin:0">⚡ Superset</div>${innerHtml}`, restHtml, doneZone);
+    const doneSsHeaderBtn = isDone && loggedExo
+      ? `<button class="lia-modify-btn" onclick="event.stopPropagation();editDoneSlot(${slotIdx});toggleLiaSlot(document.getElementById('lia-slot-${slotIdx}'))">Modifier</button>`
+      : '';
     return `<div class="log-ia-ss-block ${state}${openClass}" id="lia-slot-${slotIdx}">
       <div class="lia-header" onclick="toggleLiaSlot(this.parentElement)">
         <div class="lia-header-left">
           <div class="lia-name">⚡ ${ssNames}</div>
           ${progMini}
         </div>
-        <div class="lia-chevron">▼</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${doneSsHeaderBtn}
+          <div class="lia-chevron">▼</div>
+        </div>
       </div>
       ${body}
     </div>`;
@@ -1133,7 +1401,6 @@ function renderIAPlanInLog() {
 function editDoneSlot(slotIdx) {
   document.getElementById(`lia-done-text-${slotIdx}`).style.display = 'none';
   document.getElementById(`lia-done-edit-${slotIdx}`).style.display = 'block';
-  document.getElementById(`lia-done-actions-${slotIdx}`).style.display = 'none';
   document.getElementById(`lia-done-save-${slotIdx}`).style.display = 'flex';
   document.getElementById(`lia-done-edit-${slotIdx}`).focus();
 }
@@ -1143,7 +1410,6 @@ function cancelDoneSlot(slotIdx) {
   if (edit && exo) edit.value = exo.text;
   document.getElementById(`lia-done-text-${slotIdx}`).style.display = 'block';
   document.getElementById(`lia-done-edit-${slotIdx}`).style.display = 'none';
-  document.getElementById(`lia-done-actions-${slotIdx}`).style.display = 'flex';
   document.getElementById(`lia-done-save-${slotIdx}`).style.display = 'none';
 }
 function saveDoneSlot(slotIdx) {
@@ -1670,6 +1936,17 @@ async function submitSession() {
     document.getElementById('final-notes').value = '';
     document.querySelectorAll('.feeling-btn').forEach(b => b.classList.remove('selected'));
     showSeanceStep(0);
+    showView('dashboard');
+    // Refresh dashboard after Make has processed the session
+    // force_refresh: true bypasses the Make cache (node 34 filter)
+    // 8s delay to ensure Make has finished writing the session to datastore
+    setTimeout(async () => {
+      try {
+        const dashData = await callMake({ event: 'get_dashboard', force_refresh: true });
+        renderDashboardData(dashData);
+        showToast('Dashboard mis à jour ✓');
+      } catch(e) { /* silent fail */ }
+    }, 8000);
   } catch(e) {
     hideOverlay();
     document.getElementById('submit-session-btn').disabled = false;
@@ -1796,7 +2073,8 @@ function buildStreakBar(streak, types) {
 }
 
 function renderInsights(insights) {
-  document.getElementById('insights-loading').style.display='none';
+  const loader = document.getElementById('insights-loading');
+  if (loader) loader.style.display = 'none';
   document.getElementById('insights-list').innerHTML = insights.map(ins=>`
     <div class="insight-item">
       <div class="insight-dot" style="background:${ins.color}"></div>
@@ -1951,37 +2229,87 @@ function loadLocalProfile() {
   const s=localStorage.getItem(PROFILE_KEY);
   if(s) profile={...profile,...JSON.parse(s)};
 }
-function loadProfileFields() {
-  document.getElementById('p-name').value          = profile.name;
-  document.getElementById('p-age').value           = profile.age;
-  document.getElementById('p-weight').value        = profile.weight;
-  document.getElementById('p-height').value        = profile.height;
-  document.getElementById('p-level').value         = profile.level;
-  document.getElementById('p-goal').value          = profile.goal;
-  document.getElementById('p-sessions-week').value = profile.sessions_week;
-  document.getElementById('p-constraints').value   = profile.constraints;
-  document.getElementById('p-context').value       = profile.context;
+function loadProfileFields() { renderProfileView(); }
 
+function renderProfileView() {
+  // Hero
+  document.getElementById('pv-hero').textContent = profile.name || 'Mon profil';
+  // Stats
+  document.getElementById('pv-age').textContent    = profile.age    || '—';
+  document.getElementById('pv-weight').textContent = profile.weight || '—';
+  document.getElementById('pv-height').textContent = profile.height || '—';
+  // Tags
+  const LEVEL_LABEL = { confirmé:'Confirmé', intermédiaire:'Intermédiaire', débutant:'Débutant' };
+  document.getElementById('pv-level').textContent    = LEVEL_LABEL[profile.level] || profile.level || '';
+  document.getElementById('pv-goal').textContent     = profile.goal || '';
+  document.getElementById('pv-sessions').textContent = profile.sessions_week ? profile.sessions_week + 'x/sem' : '';
+  document.getElementById('pv-equipment').textContent= profile.equipment || '';
+  // Texts
+  document.getElementById('pv-constraints-text').textContent = profile.constraints || 'Aucune contrainte renseignée';
+  document.getElementById('pv-context-text').textContent     = profile.context || '';
+  // Weight target
+  document.getElementById('pv-weight-target').textContent = profile.weight_target || '—';
+  // Hide empty tags
+  ['pv-level','pv-goal','pv-sessions','pv-equipment'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = el.textContent ? 'inline-block' : 'none';
+  });
 }
-async function loadProfile() {
-  if (!config.webhook) { showToast('Configure le webhook d\'abord', true); return; }
-  try { const data=await callMake({event:'get_profile'}); profile={...profile,...data}; loadProfileFields(); showToast('Profil chargé ✓'); }
-  catch(e) { showToast('Erreur chargement profil', true); }
+
+function fillEditForm() {
+  document.getElementById('p-name').value          = profile.name          || '';
+  document.getElementById('p-age').value           = profile.age           || '';
+  document.getElementById('p-weight').value        = profile.weight        || '';
+  document.getElementById('p-height').value        = profile.height        || '';
+  document.getElementById('p-level').value         = profile.level         || 'confirmé';
+  document.getElementById('p-goal').value          = profile.goal          || 'prise de masse';
+  document.getElementById('p-sessions-week').value = profile.sessions_week || 4;
+  document.getElementById('p-weight-target').value = profile.weight_target || '';
+  document.getElementById('p-equipment').value     = profile.equipment     || 'salle complète';
+  document.getElementById('p-constraints').value   = profile.constraints   || '';
+  document.getElementById('p-context').value       = profile.context       || '';
 }
+
+function openProfileEdit() {
+  fillEditForm();
+  document.getElementById('profile-view-mode').style.display = 'none';
+  document.getElementById('profile-edit-mode').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function cancelProfileEdit() {
+  document.getElementById('profile-edit-mode').style.display = 'none';
+  document.getElementById('profile-view-mode').style.display = 'block';
+}
+
+function toggleHistorique() {
+  const list = document.getElementById('hist-list');
+  const btn  = document.getElementById('hist-toggle-btn');
+  const isOpen = list.style.display !== 'none';
+  list.style.display = isOpen ? 'none' : 'block';
+  btn.textContent = isOpen ? "Voir l'historique ↓" : 'Masquer ↑';
+  btn.classList.toggle('open', !isOpen);
+  if (!isOpen && allSessions.length) renderHistCards(allSessions);
+}
+
 async function saveProfile() {
   profile = {
-    name: document.getElementById('p-name').value,
-    age: document.getElementById('p-age').value,
-    weight: document.getElementById('p-weight').value,
-    height: document.getElementById('p-height').value,
-    level: document.getElementById('p-level').value,
-    goal: document.getElementById('p-goal').value,
-    sessions_week: document.getElementById('p-sessions-week').value,
-    constraints: document.getElementById('p-constraints').value,
-    context: document.getElementById('p-context').value,
+    name:           document.getElementById('p-name').value,
+    age:            document.getElementById('p-age').value,
+    weight:         document.getElementById('p-weight').value,
+    height:         document.getElementById('p-height').value,
+    level:          document.getElementById('p-level').value,
+    goal:           document.getElementById('p-goal').value,
+    sessions_week:  document.getElementById('p-sessions-week').value,
+    weight_target:  document.getElementById('p-weight-target').value,
+    equipment:      document.getElementById('p-equipment').value,
+    constraints:    document.getElementById('p-constraints').value,
+    context:        document.getElementById('p-context').value,
   };
   localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
   if (config.webhook) { try { await callMake({event:'save_profile', profile}); } catch(e){} }
+  cancelProfileEdit();
+  renderProfileView();
   showToast('Profil sauvegardé ✓');
 }
 
@@ -2065,5 +2393,7 @@ function showToast(msg,isError=false) {
   setTimeout(()=>t.classList.remove('show'),2800);
 }
 </script>
+</div><!-- /app-wrapper -->
+
 </body>
 </html>
