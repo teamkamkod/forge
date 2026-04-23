@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/libheif-js@1.17.1/libheif-bundle.js"></script>
 <style>
   :root {
     --bg: #0a0a0c; --bg2: #111116; --bg3: #1a1a22; --border: #2a2a36;
@@ -236,6 +237,24 @@
   .hist-raw { font-size: 13px; color: var(--text2); line-height: 1.6; background: var(--bg3); border-radius: 6px; padding: 8px 10px; white-space: pre-wrap; }
   .hist-notes-txt { font-size: 12px; color: var(--text2); line-height: 1.5; font-style: italic; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
   .hist-section-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text3); margin-bottom: 8px; margin-top: 4px; }
+
+  /* BODYFAT SCAN */
+  .bf-card { background: linear-gradient(135deg, rgba(232,255,71,0.05), rgba(71,200,255,0.04)); border: 1px solid rgba(232,255,71,0.2); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; }
+  .bf-result { display: flex; align-items: center; gap: 16px; padding: 14px 0 10px; }
+  .bf-percent { font-family: 'Barlow Condensed', sans-serif; font-size: 52px; font-weight: 900; line-height: 1; color: var(--accent); }
+  .bf-percent span { font-size: 22px; color: var(--text2); }
+  .bf-details { flex: 1; }
+  .bf-range { font-size: 13px; color: var(--text2); margin-bottom: 4px; }
+  .bf-note { font-size: 12px; color: var(--text3); line-height: 1.5; }
+  .bf-date { font-size: 11px; color: var(--text3); margin-top: 8px; }
+  .photo-preview { width: 100%; max-height: 220px; object-fit: cover; border-radius: var(--radius-sm); margin-bottom: 12px; display: none; }
+  .photo-preview.visible { display: block; }
+  .bf-history-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .bf-history-item:last-child { border-bottom: none; }
+  .bf-history-val { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; color: var(--accent); font-size: 16px; }
+  .bf-trend-up { color: var(--accent3); }
+  .bf-trend-down { color: var(--accent2); }
+  input[type="file"] { display: none; }
 
   select { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 14px; outline: none; appearance: none; -webkit-appearance: none; }
   .profile-field { margin-bottom: 10px; }
@@ -494,6 +513,58 @@
     <div class="profile-field"><label class="input-label">Contraintes / blessures</label><textarea id="p-constraints" placeholder="Épaule fragile..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;outline:none;resize:none;min-height:80px;line-height:1.6"></textarea></div>
     <div class="profile-field"><label class="input-label">Contexte pour l'IA</label><textarea id="p-context" placeholder="Programme actuel, équipements..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;outline:none;resize:none;min-height:80px;line-height:1.6"></textarea></div>
   </div>
+  <!-- BODYFAT SCAN -->
+  <div class="bf-card">
+    <div class="card-label">📸 Analyse Body Fat par IA</div>
+
+    <!-- Résultat actuel -->
+    <div id="bf-current" style="display:none">
+      <div class="bf-result">
+        <div class="bf-percent" id="bf-value">—<span>%</span></div>
+        <div class="bf-details">
+          <div class="bf-range" id="bf-range"></div>
+          <div class="bf-note" id="bf-note"></div>
+        </div>
+      </div>
+      <div class="bf-date" id="bf-date"></div>
+    </div>
+
+    <!-- Pas encore de scan -->
+    <div id="bf-empty" style="font-size:13px;color:var(--text2);margin-bottom:12px">
+      Prends une photo de face ou de profil — torse visible. L'IA estime ton % de masse grasse.
+    </div>
+
+    <!-- Preview photo -->
+    <img id="photo-preview" class="photo-preview" alt="Preview">
+
+    <!-- Bouton capture -->
+    <input type="file" id="photo-input" accept="image/*" capture="environment" onchange="handlePhotoSelected(this)">
+    <button class="btn btn-secondary" onclick="document.getElementById('photo-input').click()" id="bf-capture-btn" style="margin-bottom:8px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+      Prendre une photo
+    </button>
+    <button class="btn btn-primary" onclick="analyzeBF()" id="bf-analyze-btn" style="display:none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Analyser avec l'IA
+    </button>
+    <div class="loading" id="bf-loading" style="margin-top:8px"><div class="spinner"></div>Analyse en cours...</div>
+
+    <!-- Historique -->
+    <div id="bf-history-section" style="display:none; margin-top:14px">
+      <div class="card-label" style="margin-bottom:8px">Historique</div>
+      <div id="bf-history-list"></div>
+    </div>
+  </div>
+
+  <!-- BF% dans le profil sportif — champ manuel -->
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-label">⚖️ Composition corporelle</div>
+    <div class="input-row">
+      <div><label class="input-label">Body Fat % (dernière mesure)</label><input type="number" id="p-bodyfat" placeholder="—" step="0.1" min="3" max="50"></div>
+      <div><label class="input-label">Masse musculaire (kg)</label><input type="number" id="p-muscle-mass" placeholder="—" step="0.1"></div>
+    </div>
+  </div>
+
   <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:24px">
     <button class="btn btn-secondary" onclick="loadProfile()">Charger Make</button>
     <button class="btn btn-primary" onclick="saveProfile()">Sauvegarder</button>
@@ -526,7 +597,7 @@ const PROFILE_KEY = 'forge_profile';
 const SESSION_KEY = 'forge_current_session';
 
 let config  = { webhook: 'https://hook.eu1.make.com/al8v39pzju7ngrcv59g3clfjq14c0u54' };
-let profile = { name:'', age:'', weight:'', height:'', level:'confirmé', goal:'prise de masse', sessions_week:4, constraints:'', context:'' };
+let profile = { name:'', age:'', weight:'', height:'', level:'confirmé', goal:'prise de masse', sessions_week:4, constraints:'', context:'', bodyfat:'', muscle_mass:'' };
 
 // Session courante
 let currentSession = {
@@ -539,6 +610,8 @@ let currentSession = {
 };
 
 let allSessions = [];   // 100 dernières séances — chargées avec le dashboard
+let bfHistory = [];         // historique des scans bodyfat
+let pendingPhotoB64 = null; // photo en attente d'analyse
 let mainChart = null;
 let currentChartType = 'volume';
 let chartDataFromAPI = null;
@@ -1275,15 +1348,23 @@ function loadLocalProfile() {
   if(s) profile={...profile,...JSON.parse(s)};
 }
 function loadProfileFields() {
-  document.getElementById('p-name').value=profile.name;
-  document.getElementById('p-age').value=profile.age;
-  document.getElementById('p-weight').value=profile.weight;
-  document.getElementById('p-height').value=profile.height;
-  document.getElementById('p-level').value=profile.level;
-  document.getElementById('p-goal').value=profile.goal;
-  document.getElementById('p-sessions-week').value=profile.sessions_week;
-  document.getElementById('p-constraints').value=profile.constraints;
-  document.getElementById('p-context').value=profile.context;
+  document.getElementById('p-name').value          = profile.name;
+  document.getElementById('p-age').value           = profile.age;
+  document.getElementById('p-weight').value        = profile.weight;
+  document.getElementById('p-height').value        = profile.height;
+  document.getElementById('p-level').value         = profile.level;
+  document.getElementById('p-goal').value          = profile.goal;
+  document.getElementById('p-sessions-week').value = profile.sessions_week;
+  document.getElementById('p-constraints').value   = profile.constraints;
+  document.getElementById('p-context').value       = profile.context;
+  document.getElementById('p-bodyfat').value       = profile.bodyfat || '';
+  document.getElementById('p-muscle-mass').value   = profile.muscle_mass || '';
+  // Restore BF history from profile
+  if (profile.bf_history && profile.bf_history.length) {
+    bfHistory = profile.bf_history;
+    renderBFHistory();
+    renderBFCurrent();
+  }
 }
 async function loadProfile() {
   if (!config.webhook) { showToast('Configure le webhook d\'abord', true); return; }
@@ -1291,9 +1372,22 @@ async function loadProfile() {
   catch(e) { showToast('Erreur chargement profil', true); }
 }
 async function saveProfile() {
-  profile = { name:document.getElementById('p-name').value, age:document.getElementById('p-age').value, weight:document.getElementById('p-weight').value, height:document.getElementById('p-height').value, level:document.getElementById('p-level').value, goal:document.getElementById('p-goal').value, sessions_week:document.getElementById('p-sessions-week').value, constraints:document.getElementById('p-constraints').value, context:document.getElementById('p-context').value };
+  profile = {
+    name: document.getElementById('p-name').value,
+    age: document.getElementById('p-age').value,
+    weight: document.getElementById('p-weight').value,
+    height: document.getElementById('p-height').value,
+    level: document.getElementById('p-level').value,
+    goal: document.getElementById('p-goal').value,
+    sessions_week: document.getElementById('p-sessions-week').value,
+    constraints: document.getElementById('p-constraints').value,
+    context: document.getElementById('p-context').value,
+    bodyfat: document.getElementById('p-bodyfat').value,
+    muscle_mass: document.getElementById('p-muscle-mass').value,
+    bf_history: bfHistory
+  };
   localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
-  if (config.webhook) { try { await callMake({event:'save_profile',profile}); } catch(e){} }
+  if (config.webhook) { try { await callMake({event:'save_profile', profile}); } catch(e){} }
   showToast('Profil sauvegardé ✓');
 }
 
@@ -1362,6 +1456,216 @@ function hideOverlay() {
   clearInterval(overlayInterval);
   overlayInterval = null;
   document.getElementById('forge-overlay').classList.remove('visible');
+}
+
+
+// ── BODY FAT ANALYSIS ─────────────────────────────────────────────
+// ── HEIC CONVERSION (libheif-js WASM) ────────────────────────────
+// Lit le fichier HEIC, extrait le premier frame via libheif,
+// le peint sur canvas et retourne un data URL JPEG.
+// Fonctionne sur Chrome/Mac/Safari indépendamment du décodeur système.
+async function heicToJpegDataUrl(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  const uint8 = new Uint8Array(arrayBuffer);
+
+  const heif = new libheif.HeifDecoder();
+  const decoded = heif.decode(uint8);
+
+  if (!decoded || decoded.length === 0) throw new Error('No HEIF image decoded');
+
+  const img = decoded[0];
+  const w   = img.get_width();
+  const h   = img.get_height();
+
+  // Alloue un buffer RGBA et demande le rendu
+  const canvas = document.createElement('canvas');
+  const MAX = 1600;
+  let dw = w, dh = h;
+  if (dw > MAX || dh > MAX) {
+    if (dw >= dh) { dh = Math.round(dh * MAX / dw); dw = MAX; }
+    else          { dw = Math.round(dw * MAX / dh); dh = MAX; }
+  }
+
+  // Decode full resolution d'abord dans un ImageData
+  const imageData = new ImageData(w, h);
+  await new Promise((resolve, reject) => {
+    img.display(imageData, (result) => {
+      if (!result) reject(new Error('libheif display failed'));
+      else resolve();
+    });
+  });
+
+  // Resize si nécessaire via canvas intermédiaire
+  const srcCanvas = document.createElement('canvas');
+  srcCanvas.width = w; srcCanvas.height = h;
+  srcCanvas.getContext('2d').putImageData(imageData, 0, 0);
+
+  canvas.width = dw; canvas.height = dh;
+  canvas.getContext('2d').drawImage(srcCanvas, 0, 0, dw, dh);
+
+  return canvas.toDataURL('image/jpeg', 0.88);
+}
+
+// Resize JPEG/PNG/WebP via canvas (max 1600px)
+function resizeToJpegDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 1600;
+      let w = img.naturalWidth, h = img.naturalHeight;
+      if (w > MAX || h > MAX) {
+        if (w >= h) { h = Math.round(h * MAX / w); w = MAX; }
+        else        { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', 0.88));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('decode failed')); };
+    img.src = url;
+  });
+}
+
+async function handlePhotoSelected(input) {
+  const file = input.files?.[0];
+  if (!file) return;
+
+  const isHeic =
+    file.type === 'image/heic' ||
+    file.type === 'image/heif' ||
+    file.name.toLowerCase().endsWith('.heic') ||
+    file.name.toLowerCase().endsWith('.heif');
+
+  try {
+    let dataUrl;
+
+    if (isHeic) {
+      showToast('Conversion HEIC en cours...');
+      try {
+        dataUrl = await heicToJpegDataUrl(file);
+      } catch (e) {
+        console.error('libheif decode failed:', e);
+        showToast('Impossible de lire ce fichier HEIC. Essaie de partager la photo depuis Photos → Envoyer → choisir JPEG.', true);
+        return;
+      }
+    } else {
+      try { dataUrl = await resizeToJpegDataUrl(file); }
+      catch (e) {
+        // Fallback FileReader brut
+        dataUrl = await new Promise((res, rej) => {
+          const r = new FileReader();
+          r.onload  = e => res(e.target.result);
+          r.onerror = () => rej(new Error('read error'));
+          r.readAsDataURL(file);
+        });
+      }
+    }
+
+    pendingPhotoB64 = dataUrl;
+
+    const preview = document.getElementById('photo-preview');
+    if (preview) { preview.src = dataUrl; preview.classList.add('visible'); }
+    const analyzeBtn = document.getElementById('bf-analyze-btn');
+    if (analyzeBtn) analyzeBtn.style.display = 'flex';
+    const emptyState = document.getElementById('bf-empty');
+    if (emptyState) emptyState.style.display = 'none';
+
+    showToast('Photo prête ✓');
+
+  } catch (err) {
+    console.error('Photo handler error:', err);
+    showToast('Erreur chargement image', true);
+  }
+}
+
+async function analyzeBF() {
+  if (!pendingPhotoB64) return;
+  if (!config.webhook) { showToast('Configure le webhook Make', true); return; }
+  document.getElementById('bf-loading').classList.add('visible');
+  document.getElementById('bf-analyze-btn').disabled = true;
+  try {
+    const payload = {
+      event: 'analyze_body',
+      image: pendingPhotoB64.split(',')[1],
+      profile: {
+        age: profile.age,
+        weight: profile.weight,
+        height: profile.height,
+        gender: 'male',
+        level: profile.level,
+        goal: profile.goal
+      },
+      date: new Date().toISOString()
+    };
+    const data = await callMake(payload);
+    document.getElementById('bf-loading').classList.remove('visible');
+    document.getElementById('bf-analyze-btn').disabled = false;
+    if (data && data.bf_estimate) {
+      const entry = {
+        date: new Date().toISOString().split('T')[0],
+        bf_estimate: data.bf_estimate,
+        bf_range: data.bf_range || null,
+        muscle_def: data.muscle_definition || null,
+        coach_note: data.coach_note || null
+      };
+      bfHistory.unshift(entry);
+      if (bfHistory.length > 12) bfHistory = bfHistory.slice(0, 12);
+      // Update profile fields
+      if (data.bf_estimate) {
+        const num = parseFloat(data.bf_estimate);
+        if (!isNaN(num)) document.getElementById('p-bodyfat').value = num;
+      }
+      renderBFCurrent();
+      renderBFHistory();
+      // Auto-save
+      await saveProfile();
+      showToast('Analyse terminée ✓');
+    } else {
+      showToast('Réponse inattendue de Make', true);
+    }
+  } catch(e) {
+    document.getElementById('bf-loading').classList.remove('visible');
+    document.getElementById('bf-analyze-btn').disabled = false;
+    showToast('Erreur analyse', true);
+  }
+}
+
+function renderBFCurrent() {
+  if (!bfHistory.length) return;
+  const last = bfHistory[0];
+  document.getElementById('bf-current').style.display = 'block';
+  document.getElementById('bf-empty').style.display = 'none';
+  document.getElementById('bf-value').innerHTML = last.bf_estimate + '<span>%</span>';
+  document.getElementById('bf-range').textContent = last.bf_range ? 'Fourchette : ' + last.bf_range : '';
+  document.getElementById('bf-note').textContent = last.muscle_def || last.coach_note || '';
+  document.getElementById('bf-date').textContent = 'Dernière mesure : ' + last.date;
+}
+
+function renderBFHistory() {
+  if (bfHistory.length < 2) {
+    document.getElementById('bf-history-section').style.display = 'none';
+    return;
+  }
+  document.getElementById('bf-history-section').style.display = 'block';
+  document.getElementById('bf-history-list').innerHTML = bfHistory.map((entry, i) => {
+    let trend = '';
+    if (i < bfHistory.length - 1) {
+      const diff = parseFloat(entry.bf_estimate) - parseFloat(bfHistory[i+1].bf_estimate);
+      if (!isNaN(diff)) {
+        const cls = diff > 0 ? 'bf-trend-up' : 'bf-trend-down';
+        const arrow = diff > 0 ? '▲' : '▼';
+        trend = `<span class="${cls}">${arrow} ${Math.abs(diff).toFixed(1)}%</span>`;
+      }
+    }
+    return `<div class="bf-history-item">
+      <span style="color:var(--text2)">${entry.date}</span>
+      <span>${trend}</span>
+      <span class="bf-history-val">${entry.bf_estimate}%</span>
+    </div>`;
+  }).join('');
 }
 
 // ── TOAST ─────────────────────────────────────────────────────────
