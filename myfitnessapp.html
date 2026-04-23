@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>FORGE — Training</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0c; --bg2: #111116; --bg3: #1a1a22; --border: #2a2a36;
+    --accent: #e8ff47; --accent2: #47c8ff; --accent3: #ff6b47;
+    --text: #f0f0f8; --text2: #8888aa; --text3: #4a4a66;
+    --card: #13131a; --radius: 16px; --radius-sm: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; max-width: 430px; margin: 0 auto; overflow-x: hidden; padding-bottom: 90px; }
+
+  /* NAV — 3 onglets */
+  .nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: rgba(10,10,14,0.95); backdrop-filter: blur(20px); border-top: 1px solid var(--border); display: flex; z-index: 100; padding: 6px 0 20px; }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0; cursor: pointer; transition: all 0.2s; color: var(--text3); font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; border: none; background: none; position: relative; }
+  .nav-item.active { color: var(--accent); }
+  .nav-item svg { width: 22px; height: 22px; stroke-width: 1.8; }
+  .nav-item.active svg { stroke: var(--accent); }
+  .nav-badge { position: absolute; top: 4px; right: calc(50% - 18px); width: 8px; height: 8px; border-radius: 50%; background: var(--accent3); border: 2px solid var(--bg); display: none; }
+  .nav-badge.visible { display: block; }
+
+  /* VIEWS */
+  .view { display: none; padding: 0 16px; animation: fadeIn 0.25s ease; }
+  .view.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+  /* HEADER */
+  .header { padding: 20px 0 16px; display: flex; justify-content: space-between; align-items: flex-end; }
+  .header-title { font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 900; letter-spacing: -0.02em; line-height: 1; }
+  .header-sub { font-size: 13px; color: var(--text2); font-weight: 300; }
+  .header-date { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; color: var(--text2); text-align: right; line-height: 1.5; }
+
+  /* CARDS */
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; }
+  .card-label { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; }
+
+  /* STATS */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 12px; text-align: center; }
+  .stat-val { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 900; line-height: 1; color: var(--accent); }
+  .stat-val.blue { color: var(--accent2); }
+  .stat-val.red { color: var(--accent3); }
+  .stat-lbl { font-size: 11px; color: var(--text2); margin-top: 4px; font-weight: 300; }
+
+  /* CHART */
+  .chart-wrap { position: relative; height: 180px; margin-top: 8px; }
+  .chart-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+  .chart-tab { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); background: none; color: var(--text2); cursor: pointer; transition: all 0.2s; }
+  .chart-tab.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+  /* SESSION HISTORY */
+  .session-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .session-item:last-child { border-bottom: none; }
+  .session-type { display: inline-block; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; margin-bottom: 4px; }
+  .type-musculation { background: rgba(232,255,71,0.15); color: var(--accent); }
+  .type-running { background: rgba(71,200,255,0.15); color: var(--accent2); }
+  .type-cardio { background: rgba(255,107,71,0.15); color: var(--accent3); }
+  .type-autre { background: rgba(136,136,170,0.15); color: var(--text2); }
+  .session-name { font-size: 14px; font-weight: 500; }
+  .session-date-lbl { font-size: 12px; color: var(--text2); }
+  .session-right { text-align: right; }
+  .session-metric { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; }
+
+  /* BUTTONS */
+  .btn { width: 100%; padding: 16px; border-radius: var(--radius-sm); border: none; font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-primary { background: var(--accent); color: var(--bg); }
+  .btn-primary:active { background: #d4eb30; transform: scale(0.98); }
+  .btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:active { background: var(--border); transform: scale(0.98); }
+  .btn-danger { background: rgba(255,107,71,0.12); color: var(--accent3); border: 1px solid rgba(255,107,71,0.3); }
+  .btn-record { background: var(--accent3); color: white; border-radius: var(--radius-sm); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .btn-record.recording { background: #cc3300; animation: pulse-red 1s infinite; }
+  @keyframes pulse-red { 0%,100% { box-shadow: 0 0 0 0 rgba(255,107,71,0.4); } 50% { box-shadow: 0 0 0 10px rgba(255,107,71,0); } }
+
+  /* ── SÉANCE VIEW ── */
+
+  /* Step 0 — choix entrée */
+  .seance-entry { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 8px 0 20px; }
+  .entry-btn { padding: 24px 12px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; text-align: center; transition: all 0.25s; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .entry-btn:active { transform: scale(0.97); }
+  .entry-btn.ia { border-color: var(--accent2); }
+  .entry-btn.ia:hover, .entry-btn.ia:active { background: rgba(71,200,255,0.08); }
+  .entry-btn.libre { border-color: var(--accent3); }
+  .entry-btn.libre:hover, .entry-btn.libre:active { background: rgba(255,107,71,0.08); }
+  .entry-btn-icon { font-size: 32px; }
+  .entry-btn-label { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .entry-btn-sub { font-size: 11px; color: var(--text2); font-weight: 300; line-height: 1.4; }
+  .entry-btn.ia .entry-btn-label { color: var(--accent2); }
+  .entry-btn.libre .entry-btn-label { color: var(--accent3); }
+
+  /* Session en cours banner */
+  .session-resume-banner { background: rgba(232,255,71,0.07); border: 1px solid rgba(232,255,71,0.25); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 14px; display: none; cursor: pointer; }
+  .session-resume-banner.visible { display: flex; align-items: center; justify-content: space-between; }
+  .resume-left { display: flex; flex-direction: column; gap: 2px; }
+  .resume-title { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.06em; }
+  .resume-sub { font-size: 12px; color: var(--text2); }
+  .resume-arrow { font-size: 20px; color: var(--accent); }
+
+  /* Step IA — vocal + prompt */
+  .voice-orb { width: 100px; height: 100px; border-radius: 50%; margin: 16px auto 16px; display: flex; align-items: center; justify-content: center; background: var(--bg3); border: 2px solid var(--border); transition: all 0.3s; cursor: pointer; }
+  .voice-orb.listening { border-color: var(--accent3); background: rgba(255,107,71,0.1); animation: pulse-orb 1.5s infinite; }
+  @keyframes pulse-orb { 0%,100% { box-shadow: 0 0 0 0 rgba(255,107,71,0.3); } 50% { box-shadow: 0 0 0 18px rgba(255,107,71,0); } }
+  .voice-status { text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-bottom: 12px; }
+  .voice-status.active { color: var(--accent3); }
+
+  /* AI planning card */
+  .ai-plan-card { background: linear-gradient(135deg, rgba(71,200,255,0.06), rgba(232,255,71,0.04)); border: 1px solid rgba(71,200,255,0.2); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; display: none; }
+  .ai-plan-card.visible { display: block; animation: fadeIn 0.3s ease; }
+  .ai-plan-title { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .ai-plan-meta { font-size: 12px; color: var(--text2); margin-bottom: 12px; }
+  .ai-plan-note { font-size: 13px; color: var(--text2); background: var(--bg3); border-radius: 8px; padding: 10px; margin-bottom: 12px; line-height: 1.5; }
+  .ai-plan-exercise { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .ai-plan-exercise:last-child { border-bottom: none; }
+  .ai-plan-ex-name { font-size: 13px; font-weight: 500; }
+  .ai-plan-ex-sets { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; color: var(--accent2); font-weight: 700; }
+
+  /* Log zone */
+  .log-zone { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+  .log-zone-title { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text3); margin-bottom: 12px; }
+
+  /* Input + mic row */
+  .input-mic-row { display: grid; grid-template-columns: 1fr 48px; gap: 8px; margin-bottom: 10px; }
+  textarea.log-input { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 14px; outline: none; resize: none; transition: border-color 0.2s; min-height: 72px; line-height: 1.6; width: 100%; }
+  textarea.log-input:focus { border-color: var(--accent); }
+  input.log-input-line { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; width: 100%; }
+  input.log-input-line:focus { border-color: var(--accent); }
+
+  /* Exo cards */
+  .exo-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 8px; position: relative; }
+  .exo-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+  .exo-card-num { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text3); }
+  .exo-card-delete { background: none; border: none; color: var(--text3); font-size: 18px; cursor: pointer; padding: 0; line-height: 1; }
+  .exo-card-content { font-size: 14px; line-height: 1.6; color: var(--text); white-space: pre-wrap; }
+  .exo-card-time { font-size: 11px; color: var(--text3); margin-top: 6px; }
+
+  /* Type selector */
+  .type-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .type-chip { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: none; color: var(--text2); cursor: pointer; transition: all 0.2s; }
+  .type-chip.active-musculation { border-color: var(--accent); color: var(--accent); background: rgba(232,255,71,0.08); }
+  .type-chip.active-running { border-color: var(--accent2); color: var(--accent2); background: rgba(71,200,255,0.08); }
+  .type-chip.active-cardio { border-color: var(--accent3); color: var(--accent3); background: rgba(255,107,71,0.08); }
+  .type-chip.active-autre { border-color: var(--text2); color: var(--text); background: rgba(136,136,170,0.08); }
+
+  /* Feeling */
+  .feeling-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .feeling-btn { flex: 1; padding: 10px 4px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg3); font-size: 18px; cursor: pointer; text-align: center; transition: all 0.2s; }
+  .feeling-btn.selected { border-color: var(--accent); background: rgba(232,255,71,0.1); }
+
+  /* Step indicators */
+  .step-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .step-back { background: none; border: none; color: var(--text2); cursor: pointer; font-size: 22px; padding: 0; line-height: 1; }
+  .step-title { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; }
+  .step-badge { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; }
+  .badge-ia { background: rgba(71,200,255,0.15); color: var(--accent2); }
+  .badge-libre { background: rgba(255,107,71,0.15); color: var(--accent3); }
+
+  /* INSIGHTS */
+  .insight-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .insight-item:last-child { border-bottom: none; }
+  .insight-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+  .insight-text { font-size: 13px; color: var(--text2); line-height: 1.5; }
+  .insight-text strong { color: var(--text); font-weight: 500; }
+
+  /* STREAK */
+  .streak-bar { display: flex; gap: 4px; margin-top: 10px; }
+  .streak-day { flex: 1; height: 28px; border-radius: 4px; background: var(--bg3); border: 1px solid var(--border); }
+  .streak-day.done { background: var(--accent); border-color: var(--accent); }
+  .streak-day.done.cardio-day { background: var(--accent2); border-color: var(--accent2); }
+  .streak-day-label { font-family: 'Barlow Condensed', sans-serif; font-size: 9px; color: var(--text3); text-align: center; margin-top: 4px; text-transform: uppercase; }
+
+  /* CONFIG BANNER */
+  .config-banner { background: rgba(255,107,71,0.1); border: 1px solid rgba(255,107,71,0.3); border-radius: var(--radius-sm); padding: 12px 16px; font-size: 13px; color: var(--accent3); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .config-banner a { color: var(--accent); text-decoration: underline; cursor: pointer; }
+
+  /* EMPTY STATE */
+  .empty-state { text-align: center; padding: 32px 20px; color: var(--text3); font-size: 14px; line-height: 1.6; }
+  .empty-state-icon { font-size: 32px; margin-bottom: 10px; }
+
+  /* TOAST */
+  .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-80px); background: var(--accent); color: var(--bg); padding: 10px 20px; border-radius: 30px; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; z-index: 999; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--accent3); color: white; }
+
+  /* LOADING */
+  .loading { display: none; text-align: center; padding: 24px; color: var(--text2); font-size: 14px; }
+  .loading.visible { display: block; }
+  .spinner { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  select { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 14px; outline: none; appearance: none; -webkit-appearance: none; }
+  .profile-field { margin-bottom: 10px; }
+  .input-label { font-size: 12px; color: var(--text2); margin-bottom: 6px; display: block; }
+  .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  input[type="text"], input[type="number"] { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
+  input:focus { border-color: var(--accent); }
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- ═══ VIEW: DASHBOARD ═══ -->
+<div class="view active" id="view-dashboard">
+  <div class="header">
+    <div><div class="header-title">FORGE</div><div class="header-sub">Training Dashboard</div></div>
+    <div class="header-date" id="header-date"></div>
+  </div>
+  <div id="config-warning" class="config-banner" style="display:none">
+    ⚙️ Webhook non configuré — <a onclick="showView('profile')">configure dans Profil</a>
+  </div>
+  <div class="card">
+    <div class="card-label">Streak — 7 derniers jours</div>
+    <div class="streak-bar" id="streak-bar"></div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-val" id="stat-sessions">—</div><div class="stat-lbl">séances / mois</div></div>
+    <div class="stat-card"><div class="stat-val blue" id="stat-volume">—</div><div class="stat-lbl">volume kg/sem</div></div>
+    <div class="stat-card"><div class="stat-val red" id="stat-cardio">—</div><div class="stat-lbl">km ce mois</div></div>
+  </div>
+  <div class="card">
+    <div class="card-label">Progression</div>
+    <div class="chart-tabs">
+      <button class="chart-tab active" onclick="switchChart('volume',this)">Volume</button>
+      <button class="chart-tab" onclick="switchChart('cardio',this)">Cardio</button>
+      <button class="chart-tab" onclick="switchChart('freq',this)">Fréquence</button>
+    </div>
+    <div class="chart-wrap"><canvas id="mainChart"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-label">Insights IA</div>
+    <div id="insights-list"><div class="loading visible" id="insights-loading"><div class="spinner"></div>Analyse en cours...</div></div>
+  </div>
+  <div class="card">
+    <div class="card-label">Sessions récentes</div>
+    <div id="session-history"><div class="loading visible"><div class="spinner"></div>Chargement...</div></div>
+  </div>
+  <button class="btn btn-secondary" onclick="loadDashboard()" style="margin-bottom:16px">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+    Actualiser
+  </button>
+</div>
+
+<!-- ═══ VIEW: SÉANCE (IA + Log fusionnés) ═══ -->
+<div class="view" id="view-seance">
+
+  <!-- STEP 0 — Choix entrée -->
+  <div id="seance-step-0">
+    <div class="header">
+      <div><div class="header-title">SÉANCE</div><div class="header-sub">Génère ou logge</div></div>
+      <div class="header-date" id="header-date-2"></div>
+    </div>
+
+    <!-- Banner session en cours -->
+    <div class="session-resume-banner" id="resume-banner" onclick="resumeSession()">
+      <div class="resume-left">
+        <div class="resume-title">⚡ Session en cours</div>
+        <div class="resume-sub" id="resume-sub">Reprendre là où tu t'es arrêté</div>
+      </div>
+      <div class="resume-arrow">→</div>
+    </div>
+
+    <div class="seance-entry">
+      <button class="entry-btn ia" onclick="startSeanceIA()">
+        <div class="entry-btn-icon">⚡</div>
+        <div class="entry-btn-label">Séance IA</div>
+        <div class="entry-btn-sub">Génère un planning adapté à ton état du jour</div>
+      </button>
+      <button class="entry-btn libre" onclick="startSeanceLibre()">
+        <div class="entry-btn-icon">📝</div>
+        <div class="entry-btn-label">Séance libre</div>
+        <div class="entry-btn-sub">Logge au fil de l'eau, texte ou vocal</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 1 IA — vocal + génération -->
+  <div id="seance-step-ia" style="display:none">
+    <div class="step-header">
+      <button class="step-back" onclick="backToStep0()">←</button>
+      <div class="step-title">SÉANCE IA</div>
+      <span class="step-badge badge-ia">IA</span>
+    </div>
+    <div class="card">
+      <div class="card-label">Décris ta demande</div>
+      <div class="voice-orb" id="ia-orb" onclick="toggleIAMic()">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+      </div>
+      <div class="voice-status" id="ia-mic-status">Appuie pour parler</div>
+      <div class="input-mic-row" style="margin-top:8px">
+        <textarea class="log-input" id="ia-prompt" placeholder="Ex: séance dos/biceps, 1h, un peu fatigué..." rows="2" style="min-height:52px"></textarea>
+        <button class="btn-record" id="ia-mic-btn" onclick="toggleIAMic()" style="height:52px; width:48px; border-radius:var(--radius-sm)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+        </button>
+      </div>
+      <button class="btn btn-primary" onclick="generatePlanIA()" id="ia-gen-btn" style="margin-top:4px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Générer ma séance
+      </button>
+    </div>
+    <div class="loading" id="ia-loading"><div class="spinner" style="border-top-color:var(--accent2)"></div>L'IA prépare ton planning...</div>
+    <div class="ai-plan-card" id="ai-plan-card">
+      <div class="ai-plan-title" id="ai-plan-title"></div>
+      <div class="ai-plan-meta" id="ai-plan-meta"></div>
+      <div class="ai-plan-note" id="ai-plan-note" style="display:none"></div>
+      <div id="ai-plan-exercises"></div>
+    </div>
+    <button class="btn btn-primary" id="ia-start-log-btn" style="display:none; margin-bottom:12px" onclick="startLogFromIA()">
+      ✓ Commencer cette séance
+    </button>
+  </div>
+
+  <!-- STEP 2 — Log en cours (IA ou Libre) -->
+  <div id="seance-step-log" style="display:none">
+    <div class="step-header">
+      <button class="step-back" onclick="confirmAbandon()">←</button>
+      <div class="step-title" id="log-step-title">LOG</div>
+      <span class="step-badge" id="log-step-badge"></span>
+    </div>
+
+    <!-- Type de séance -->
+    <div class="card-label" style="margin-bottom:8px">Type</div>
+    <div class="type-chips" id="type-chips">
+      <button class="type-chip" onclick="setSessionType('musculation',this)">💪 Muscu</button>
+      <button class="type-chip" onclick="setSessionType('running',this)">🏃 Running</button>
+      <button class="type-chip" onclick="setSessionType('cardio',this)">🚴 Cardio</button>
+      <button class="type-chip" onclick="setSessionType('autre',this)">🎾 Autre</button>
+    </div>
+
+    <!-- Planning IA (si dispo) -->
+    <div id="log-ia-ref" style="display:none">
+      <div class="card-label" style="margin-bottom:6px">Planning IA — référence</div>
+      <div id="log-ia-ref-content" style="font-size:12px; color:var(--text2); background:var(--bg3); border-radius:8px; padding:10px; margin-bottom:12px; line-height:1.8;"></div>
+    </div>
+
+    <!-- Zone saisie exo -->
+    <div class="log-zone">
+      <div class="log-zone-title">Ajouter un exercice / note</div>
+      <div class="input-mic-row">
+        <textarea class="log-input" id="exo-input" placeholder="Ex: Rowing poulie 4x8 à 40kg, drop 2x12 à 25kg..." rows="3"></textarea>
+        <button class="btn-record" id="exo-mic-btn" onclick="toggleExoMic()" style="height:80px; width:48px; border-radius:var(--radius-sm)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+        </button>
+      </div>
+      <button class="btn btn-secondary" onclick="saveExo()" style="font-size:14px; padding:12px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Enregistrer l'exo
+      </button>
+    </div>
+
+    <!-- Liste exos loggués -->
+    <div id="exo-cards-container"></div>
+    <div class="empty-state" id="exo-empty" style="display:none">
+      <div class="empty-state-icon">🏋️</div>
+      Aucun exercice encore — commence à dicter !
+    </div>
+
+    <!-- Finir la séance -->
+    <div class="log-zone" style="margin-top:4px">
+      <div class="log-zone-title">Clôturer la séance</div>
+      <div style="margin-bottom:10px">
+        <label class="input-label">Notes finales (texte ou vocal)</label>
+        <div class="input-mic-row">
+          <textarea class="log-input" id="final-notes" placeholder="Ressenti global, douleurs, PR..." rows="2" style="min-height:60px"></textarea>
+          <button class="btn-record" id="notes-mic-btn" onclick="toggleNotesMic()" style="height:60px; width:48px; border-radius:var(--radius-sm)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+          </button>
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <label class="input-label">Ressenti</label>
+        <div class="feeling-row">
+          <button class="feeling-btn" onclick="setFeeling(1,this)">💀</button>
+          <button class="feeling-btn" onclick="setFeeling(2,this)">😓</button>
+          <button class="feeling-btn" onclick="setFeeling(3,this)">😐</button>
+          <button class="feeling-btn" onclick="setFeeling(4,this)">💪</button>
+          <button class="feeling-btn" onclick="setFeeling(5,this)">🔥</button>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="submitSession()" id="submit-session-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Envoyer à Make
+      </button>
+      <div class="loading" id="submit-loading" style="margin-top:10px"><div class="spinner"></div>Enregistrement...</div>
+      <button class="btn btn-danger" onclick="confirmAbandon()" style="margin-top:10px; font-size:13px; padding:10px">
+        Abandonner la séance
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ VIEW: PROFILE ═══ -->
+<div class="view" id="view-profile">
+  <div class="header"><div><div class="header-title">PROFIL</div><div class="header-sub">Objectifs & configuration</div></div></div>
+  <div class="card">
+    <div class="card-label">🔧 Webhook Make</div>
+    <div class="profile-field"><label class="input-label">URL Webhook (unique)</label><input type="text" id="wh-url" placeholder="https://hook.eu1.make.com/..."></div>
+    <button class="btn btn-primary" onclick="saveWebhooks()" style="margin-top:8px">Sauvegarder</button>
+  </div>
+  <div class="card">
+    <div class="card-label">👤 Profil Sportif</div>
+    <div class="profile-field"><label class="input-label">Prénom</label><input type="text" id="p-name" placeholder="Ton prénom"></div>
+    <div class="input-row">
+      <div><label class="input-label">Âge</label><input type="number" id="p-age" placeholder="—"></div>
+      <div><label class="input-label">Poids (kg)</label><input type="number" id="p-weight" placeholder="—"></div>
+    </div>
+    <div class="input-row">
+      <div><label class="input-label">Taille (cm)</label><input type="number" id="p-height" placeholder="—"></div>
+      <div><label class="input-label">Niveau</label>
+        <select id="p-level"><option value="confirmé">Confirmé 3+ ans</option><option value="intermédiaire">Intermédiaire</option><option value="débutant">Débutant</option></select>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label">🎯 Objectifs</div>
+    <div class="profile-field"><label class="input-label">Objectif principal</label>
+      <select id="p-goal"><option value="prise de masse">Prise de masse</option><option value="force">Force / Performance</option><option value="sèche">Sèche / Définition</option><option value="endurance">Endurance</option><option value="santé">Santé générale</option></select>
+    </div>
+    <div class="profile-field"><label class="input-label">Séances / semaine cible</label><input type="number" id="p-sessions-week" placeholder="4" min="1" max="7"></div>
+    <div class="profile-field"><label class="input-label">Contraintes / blessures</label><textarea id="p-constraints" placeholder="Épaule fragile..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;outline:none;resize:none;min-height:80px;line-height:1.6"></textarea></div>
+    <div class="profile-field"><label class="input-label">Contexte pour l'IA</label><textarea id="p-context" placeholder="Programme actuel, équipements..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;outline:none;resize:none;min-height:80px;line-height:1.6"></textarea></div>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:24px">
+    <button class="btn btn-secondary" onclick="loadProfile()">Charger Make</button>
+    <button class="btn btn-primary" onclick="saveProfile()">Sauvegarder</button>
+  </div>
+</div>
+
+<!-- NAV — 3 onglets -->
+<nav class="nav">
+  <button class="nav-item active" id="nav-dashboard" onclick="showView('dashboard')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Dashboard
+  </button>
+  <button class="nav-item" id="nav-seance" onclick="showView('seance')">
+    <div class="nav-badge" id="seance-badge"></div>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    Séance
+  </button>
+  <button class="nav-item" id="nav-profile" onclick="showView('profile')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profil
+  </button>
+</nav>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// STATE & CONSTANTS
+// ══════════════════════════════════════════════════════════════════
+const CONFIG_KEY  = 'forge_config';
+const PROFILE_KEY = 'forge_profile';
+const SESSION_KEY = 'forge_current_session';
+
+let config  = { webhook: 'https://hook.eu1.make.com/al8v39pzju7ngrcv59g3clfjq14c0u54' };
+let profile = { name:'', age:'', weight:'', height:'', level:'confirmé', goal:'prise de masse', sessions_week:4, constraints:'', context:'' };
+
+// Session courante
+let currentSession = {
+  mode: null,          // 'ia' | 'libre'
+  type: 'musculation', // musculation | running | cardio | autre
+  startedAt: null,
+  exos: [],            // [{id, text, savedAt}]
+  iaPlan: null,        // plan IA si mode ia
+  feeling: null
+};
+
+let mainChart = null;
+let currentChartType = 'volume';
+let chartDataFromAPI = null;
+
+// Micro state
+let iaRecog = null, iaRecording = false;
+let exoRecog = null, exoRecording = false;
+let notesRecog = null, notesRecording = false;
+
+// ── INIT ──────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  loadConfig();
+  loadLocalProfile();
+  setHeaderDate();
+  buildStreakBar([0,0,0,0,0,0,0],[]);
+  initChart();
+  loadDashboard();
+  loadProfileFields();
+  checkSessionInProgress();
+});
+
+// ── CONFIG ────────────────────────────────────────────────────────
+function loadConfig() {
+  const s = localStorage.getItem(CONFIG_KEY);
+  if (s) config = { ...config, ...JSON.parse(s) };
+  document.getElementById('wh-url').value = config.webhook || '';
+  document.getElementById('config-warning').style.display = config.webhook ? 'none' : 'flex';
+}
+function saveWebhooks() {
+  config.webhook = document.getElementById('wh-url').value.trim();
+  localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+  showToast('Webhook sauvegardé ✓');
+  document.getElementById('config-warning').style.display = config.webhook ? 'none' : 'flex';
+}
+async function callMake(payload) {
+  const res = await fetch(config.webhook, {
+    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
+  });
+  return res.json();
+}
+
+// ── NAV ───────────────────────────────────────────────────────────
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+}
+
+// ── HEADER DATE ───────────────────────────────────────────────────
+function setHeaderDate() {
+  const now = new Date();
+  const D = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+  const M = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+  const txt = `${D[now.getDay()]}<br>${now.getDate()} ${M[now.getMonth()]}`;
+  document.getElementById('header-date').innerHTML = txt;
+  document.getElementById('header-date-2').innerHTML = txt;
+}
+
+// ── SESSION PERSISTENCE ───────────────────────────────────────────
+function saveSessionToLS() {
+  localStorage.setItem(SESSION_KEY, JSON.stringify(currentSession));
+  updateSessionBadge();
+}
+
+function loadSessionFromLS() {
+  const s = localStorage.getItem(SESSION_KEY);
+  if (s) { currentSession = JSON.parse(s); return true; }
+  return false;
+}
+
+function clearSessionLS() {
+  localStorage.removeItem(SESSION_KEY);
+  currentSession = { mode:null, type:'musculation', startedAt:null, exos:[], iaPlan:null, feeling:null };
+  updateSessionBadge();
+}
+
+function updateSessionBadge() {
+  const badge = document.getElementById('seance-badge');
+  const hasSession = currentSession.exos && currentSession.exos.length > 0;
+  badge.classList.toggle('visible', hasSession);
+}
+
+function checkSessionInProgress() {
+  if (loadSessionFromLS() && currentSession.exos && currentSession.exos.length > 0) {
+    updateSessionBadge();
+    const banner = document.getElementById('resume-banner');
+    banner.classList.add('visible');
+    document.getElementById('resume-sub').textContent =
+      `${currentSession.exos.length} exo(s) · ${currentSession.type} · commencée à ${new Date(currentSession.startedAt).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`;
+  }
+}
+
+function resumeSession() {
+  goToLogStep();
+}
+
+// ── SÉANCE — NAVIGATION INTERNE ───────────────────────────────────
+function showSeanceStep(step) {
+  document.getElementById('seance-step-0').style.display  = step === 0 ? 'block' : 'none';
+  document.getElementById('seance-step-ia').style.display  = step === 'ia' ? 'block' : 'none';
+  document.getElementById('seance-step-log').style.display = step === 'log' ? 'block' : 'none';
+}
+
+function backToStep0() {
+  showSeanceStep(0);
+}
+
+function startSeanceIA() {
+  showSeanceStep('ia');
+}
+
+function startSeanceLibre() {
+  currentSession = { mode:'libre', type:'musculation', startedAt: new Date().toISOString(), exos:[], iaPlan:null, feeling:null };
+  saveSessionToLS();
+  document.getElementById('log-step-title').textContent = 'SÉANCE LIBRE';
+  document.getElementById('log-step-badge').textContent = 'LIBRE';
+  document.getElementById('log-step-badge').className = 'step-badge badge-libre';
+  document.getElementById('log-ia-ref').style.display = 'none';
+  setSessionType('musculation', document.querySelector('.type-chip'));
+  renderExoCards();
+  showSeanceStep('log');
+}
+
+function startLogFromIA() {
+  currentSession.mode = 'ia';
+  currentSession.startedAt = new Date().toISOString();
+  saveSessionToLS();
+  document.getElementById('log-step-title').textContent = 'SÉANCE IA';
+  document.getElementById('log-step-badge').textContent = 'IA';
+  document.getElementById('log-step-badge').className = 'step-badge badge-ia';
+  // Afficher ref planning IA
+  if (currentSession.iaPlan) {
+    document.getElementById('log-ia-ref').style.display = 'block';
+    const plan = currentSession.iaPlan;
+    document.getElementById('log-ia-ref-content').innerHTML =
+      (plan.exercises || []).map(ex => {
+        const setsStr = (ex.sets||[]).map(s => `${s.reps}×${s.load > 0 ? s.load+'kg' : 'PC'}${s.note ? ' ('+s.note+')' : ''}`).join(' · ');
+        return `<div style="margin-bottom:6px"><span style="color:var(--text);font-weight:500">${ex.name}</span><br><span style="color:var(--accent2);font-size:11px">${setsStr}</span></div>`;
+      }).join('');
+  }
+  setSessionType('musculation', document.querySelector('.type-chip'));
+  renderExoCards();
+  showSeanceStep('log');
+}
+
+function goToLogStep() {
+  document.getElementById('log-step-title').textContent = currentSession.mode === 'ia' ? 'SÉANCE IA' : 'SÉANCE LIBRE';
+  document.getElementById('log-step-badge').textContent = currentSession.mode === 'ia' ? 'IA' : 'LIBRE';
+  document.getElementById('log-step-badge').className = 'step-badge badge-' + (currentSession.mode || 'libre');
+  if (currentSession.iaPlan && currentSession.mode === 'ia') {
+    document.getElementById('log-ia-ref').style.display = 'block';
+    const plan = currentSession.iaPlan;
+    document.getElementById('log-ia-ref-content').innerHTML =
+      (plan.exercises || []).map(ex => {
+        const setsStr = (ex.sets||[]).map(s => `${s.reps}×${s.load > 0 ? s.load+'kg' : 'PC'}${s.note ? ' ('+s.note+')' : ''}`).join(' · ');
+        return `<div style="margin-bottom:6px"><span style="color:var(--text);font-weight:500">${ex.name}</span><br><span style="color:var(--accent2);font-size:11px">${setsStr}</span></div>`;
+      }).join('');
+  }
+  // Reselect type chip
+  document.querySelectorAll('.type-chip').forEach(c => c.className = 'type-chip');
+  const activeChip = document.querySelector(`.type-chip[onclick*="${currentSession.type}"]`);
+  if (activeChip) activeChip.classList.add('active-' + currentSession.type);
+  renderExoCards();
+  showSeanceStep('log');
+}
+
+// ── TYPE SÉANCE ───────────────────────────────────────────────────
+function setSessionType(type, btn) {
+  currentSession.type = type;
+  saveSessionToLS();
+  document.querySelectorAll('.type-chip').forEach(c => c.className = 'type-chip');
+  btn.classList.add('active-' + type);
+}
+
+// ── FEELING ───────────────────────────────────────────────────────
+function setFeeling(val, btn) {
+  currentSession.feeling = val;
+  document.querySelectorAll('.feeling-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+// ── EXO MANAGEMENT ───────────────────────────────────────────────
+function saveExo() {
+  const input = document.getElementById('exo-input');
+  const text = input.value.trim();
+  if (!text) { showToast('Saisis un exercice d\'abord', true); return; }
+  const exo = { id: Date.now(), text, savedAt: new Date().toISOString() };
+  currentSession.exos.push(exo);
+  saveSessionToLS();
+  input.value = '';
+  renderExoCards();
+  showToast('Exo enregistré ✓');
+}
+
+function deleteExo(id) {
+  currentSession.exos = currentSession.exos.filter(e => e.id !== id);
+  saveSessionToLS();
+  renderExoCards();
+}
+
+function renderExoCards() {
+  const container = document.getElementById('exo-cards-container');
+  const empty = document.getElementById('exo-empty');
+  if (!currentSession.exos || currentSession.exos.length === 0) {
+    container.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  container.innerHTML = currentSession.exos.map((exo, i) => `
+    <div class="exo-card">
+      <div class="exo-card-header">
+        <div class="exo-card-num">Exercice ${i + 1}</div>
+        <button class="exo-card-delete" onclick="deleteExo(${exo.id})">×</button>
+      </div>
+      <div class="exo-card-content">${exo.text}</div>
+      <div class="exo-card-time">${new Date(exo.savedAt).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div>
+    </div>`).join('');
+}
+
+// ── ABANDON ───────────────────────────────────────────────────────
+function confirmAbandon() {
+  if (currentSession.exos && currentSession.exos.length > 0) {
+    if (!confirm(`Abandonner la séance ? (${currentSession.exos.length} exo(s) seront perdus)`)) return;
+  }
+  clearSessionLS();
+  document.getElementById('resume-banner').classList.remove('visible');
+  document.getElementById('final-notes').value = '';
+  document.querySelectorAll('.feeling-btn').forEach(b => b.classList.remove('selected'));
+  showSeanceStep(0);
+}
+
+// ── IA — GÉNÉRATION ───────────────────────────────────────────────
+function toggleIAMic() {
+  if (iaRecording) stopIAMic(); else startIAMic();
+}
+function startIAMic() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { showToast('Vocal non supporté', true); return; }
+  iaRecog = new SR(); iaRecog.lang='fr-FR'; iaRecog.continuous=true; iaRecog.interimResults=true;
+  iaRecog.onstart = () => {
+    iaRecording = true;
+    document.getElementById('ia-orb').classList.add('listening');
+    document.getElementById('ia-mic-status').textContent='En écoute...';
+    document.getElementById('ia-mic-status').classList.add('active');
+    document.getElementById('ia-mic-btn').classList.add('recording');
+  };
+  iaRecog.onresult = e => {
+    let t=''; for(let i=0;i<e.results.length;i++) t+=e.results[i][0].transcript;
+    document.getElementById('ia-prompt').value = t;
+  };
+  iaRecog.onend = () => stopIAMic();
+  iaRecog.onerror = () => { stopIAMic(); showToast('Erreur micro', true); };
+  iaRecog.start();
+}
+function stopIAMic() {
+  if (iaRecog) iaRecog.stop();
+  iaRecording = false;
+  document.getElementById('ia-orb').classList.remove('listening');
+  document.getElementById('ia-mic-status').textContent='Appuie pour parler';
+  document.getElementById('ia-mic-status').classList.remove('active');
+  document.getElementById('ia-mic-btn').classList.remove('recording');
+}
+
+async function generatePlanIA() {
+  const prompt = document.getElementById('ia-prompt').value.trim();
+  if (!prompt) { showToast('Décris ta demande d\'abord !', true); return; }
+  document.getElementById('ia-loading').classList.add('visible');
+  document.getElementById('ai-plan-card').classList.remove('visible');
+  document.getElementById('ia-start-log-btn').style.display = 'none';
+  document.getElementById('ia-gen-btn').disabled = true;
+  if (!config.webhook) {
+    setTimeout(() => renderIAPlan(getDemoPlan()), 1800);
+    return;
+  }
+  try {
+    const data = await callMake({ event:'generate_session', message:prompt, profile, date:new Date().toISOString() });
+    renderIAPlan(data);
+  } catch(e) {
+    document.getElementById('ia-loading').classList.remove('visible');
+    document.getElementById('ia-gen-btn').disabled = false;
+    showToast('Erreur IA', true);
+  }
+}
+
+function getDemoPlan() {
+  return {
+    type: 'musculation', name: 'Pull — Dos / Biceps / Deltoïdes post.', duration: 75,
+    coach_note: 'On équilibre avec la séance push récente. Vise une progression sur le rowing poulie et les tractions.',
+    warmup: '5-10 min cardio léger + séries légères de rowing pour activer le dos.',
+    cooldown: 'Étirements dorsaux et biceps.',
+    exercises: [
+      { name: 'Rowing poulie neutre', coaching_tip: 'Concentre-toi sur la contraction des omoplates.',
+        sets: [{reps:12,load:32,note:'échauffement'},{reps:8,load:42,note:null},{reps:6,load:47,note:null},{reps:4,load:52,note:null},{reps:12,load:32,note:'DROP - sans pause'},{reps:8,load:27,note:'sans pause'},{reps:6,load:22,note:'sans pause'}] },
+      { name: 'Reverse fly machine', coaching_tip: 'Contrôle le mouvement, isole les deltoïdes post.',
+        sets: [{reps:15,load:32,note:null},{reps:12,load:37,note:null},{reps:12,load:37,note:null}] },
+      { name: 'Face pull', coaching_tip: null,
+        sets: [{reps:15,load:37,note:null},{reps:10,load:42,note:null},{reps:6,load:47,note:null},{reps:20,load:32,note:'Back-off'}] },
+      { name: 'Curl barre EZ', coaching_tip: 'Évite de balancer le corps.',
+        sets: [{reps:12,load:32,note:null},{reps:10,load:37,note:null},{reps:8,load:39,note:null},{reps:12,load:27,note:'DROP'}] },
+      { name: 'Traction pronation', coaching_tip: 'Tire avec le dos, pas les bras.',
+        sets: [{reps:8,load:0,note:'poids de corps'},{reps:7,load:0,note:'poids de corps'},{reps:6,load:5,note:'lesté'}] }
+    ]
+  };
+}
+
+// Formate les séries d'un exercice en string lisible : "4×8 | 6×47 | DROP 8×39"
+function formatSets(sets) {
+  if (!sets || !sets.length) return '';
+  return sets.map(s => {
+    let str = `${s.reps}×${s.load > 0 ? s.load + 'kg' : 'PC'}`;
+    if (s.note) str = `<span style="color:var(--accent3);font-size:10px">${s.note}</span> ${str}`;
+    return str;
+  }).join('  ·  ');
+}
+
+function renderIAPlan(data) {
+  document.getElementById('ia-loading').classList.remove('visible');
+  document.getElementById('ia-gen-btn').disabled = false;
+  currentSession.iaPlan = data;
+
+  // Header
+  document.getElementById('ai-plan-title').textContent = data.name || 'Séance du jour';
+  document.getElementById('ai-plan-meta').textContent  = `Durée estimée : ${data.duration || '60'} min`;
+
+  // Coach note (remplace ancien "note")
+  const noteEl = document.getElementById('ai-plan-note');
+  const noteText = data.coach_note || data.note || null;
+  if (noteText) { noteEl.innerHTML = `💬 ${noteText}`; noteEl.style.display = 'block'; }
+  else noteEl.style.display = 'none';
+
+  // Exercices avec séries détaillées
+  const exosHtml = (data.exercises || []).map(ex => {
+    const setsHtml = (ex.sets || []).map(s => {
+      const loadStr = s.load > 0 ? `${s.load} kg` : 'Poids de corps';
+      const noteStr = s.note ? `<span style="font-size:10px;color:var(--accent3);margin-left:4px">${s.note}</span>` : '';
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--accent2)">${s.reps} reps</span>
+        <span style="font-size:13px;color:var(--text2)">${loadStr}${noteStr}</span>
+      </div>`;
+    }).join('');
+    const tipHtml = ex.coaching_tip
+      ? `<div style="font-size:11px;color:var(--text3);margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.04);line-height:1.5">💡 ${ex.coaching_tip}</div>`
+      : '';
+    return `<div style="margin-bottom:14px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px;color:var(--text)">${ex.name}</div>
+      ${setsHtml}${tipHtml}
+    </div>`;
+  }).join('');
+
+  // Warmup / cooldown
+  const wcHtml = [
+    data.warmup   ? `<div style="padding:8px 10px;background:rgba(71,200,255,0.07);border-radius:8px;font-size:12px;color:var(--accent2);margin-bottom:6px">🔥 <strong>Échauffement</strong> — ${data.warmup}</div>` : '',
+    data.cooldown ? `<div style="padding:8px 10px;background:rgba(136,136,170,0.07);border-radius:8px;font-size:12px;color:var(--text2)">🧘 <strong>Retour au calme</strong> — ${data.cooldown}</div>` : ''
+  ].filter(Boolean).join('');
+
+  document.getElementById('ai-plan-exercises').innerHTML = (wcHtml ? wcHtml + '<div style="height:12px"></div>' : '') + exosHtml;
+  document.getElementById('ai-plan-card').classList.add('visible');
+  document.getElementById('ia-start-log-btn').style.display = 'flex';
+}
+
+// ── MICRO EXO ─────────────────────────────────────────────────────
+function toggleExoMic() {
+  if (exoRecording) stopExoMic(); else startExoMic();
+}
+function startExoMic() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { showToast('Vocal non supporté', true); return; }
+  exoRecog = new SR(); exoRecog.lang='fr-FR'; exoRecog.continuous=true; exoRecog.interimResults=true;
+  exoRecog.onstart = () => { exoRecording=true; document.getElementById('exo-mic-btn').classList.add('recording'); };
+  exoRecog.onresult = e => { let t=''; for(let i=0;i<e.results.length;i++) t+=e.results[i][0].transcript; document.getElementById('exo-input').value=t; };
+  exoRecog.onend = () => { exoRecording=false; document.getElementById('exo-mic-btn').classList.remove('recording'); };
+  exoRecog.onerror = () => { stopExoMic(); showToast('Erreur micro', true); };
+  exoRecog.start();
+}
+function stopExoMic() {
+  if (exoRecog) exoRecog.stop();
+  exoRecording=false;
+  document.getElementById('exo-mic-btn').classList.remove('recording');
+}
+
+// ── MICRO NOTES ───────────────────────────────────────────────────
+function toggleNotesMic() {
+  if (notesRecording) stopNotesMic(); else startNotesMic();
+}
+function startNotesMic() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { showToast('Vocal non supporté', true); return; }
+  notesRecog = new SR(); notesRecog.lang='fr-FR'; notesRecog.continuous=true; notesRecog.interimResults=true;
+  notesRecog.onstart = () => { notesRecording=true; document.getElementById('notes-mic-btn').classList.add('recording'); };
+  notesRecog.onresult = e => { let t=''; for(let i=0;i<e.results.length;i++) t+=e.results[i][0].transcript; document.getElementById('final-notes').value=t; };
+  notesRecog.onend = () => { notesRecording=false; document.getElementById('notes-mic-btn').classList.remove('recording'); };
+  notesRecog.onerror = () => { stopNotesMic(); showToast('Erreur micro', true); };
+  notesRecog.start();
+}
+function stopNotesMic() {
+  if (notesRecog) notesRecog.stop();
+  notesRecording=false;
+  document.getElementById('notes-mic-btn').classList.remove('recording');
+}
+
+// ── SUBMIT SESSION ────────────────────────────────────────────────
+async function submitSession() {
+  if (!currentSession.exos || currentSession.exos.length === 0) {
+    showToast('Ajoute au moins un exercice', true); return;
+  }
+  const payload = {
+    event: 'log_session',
+    session_type: currentSession.type,
+    mode: currentSession.mode,
+    started_at: currentSession.startedAt,
+    ended_at: new Date().toISOString(),
+    exos: currentSession.exos,           // texte brut — Make/IA parse
+    ia_plan: currentSession.iaPlan,
+    notes: document.getElementById('final-notes').value,
+    feeling: currentSession.feeling,
+    profile_id: profile.name || 'default'
+  };
+  document.getElementById('submit-loading').classList.add('visible');
+  document.getElementById('submit-session-btn').disabled = true;
+  if (!config.webhook) {
+    setTimeout(() => {
+      document.getElementById('submit-loading').classList.remove('visible');
+      document.getElementById('submit-session-btn').disabled = false;
+      showToast('Séance envoyée ✓ (démo)');
+      clearSessionLS();
+      document.getElementById('resume-banner').classList.remove('visible');
+      showSeanceStep(0);
+    }, 1200);
+    return;
+  }
+  try {
+    await callMake(payload);
+    document.getElementById('submit-loading').classList.remove('visible');
+    document.getElementById('submit-session-btn').disabled = false;
+    showToast('Séance enregistrée ✓');
+    clearSessionLS();
+    document.getElementById('resume-banner').classList.remove('visible');
+    document.getElementById('final-notes').value = '';
+    document.querySelectorAll('.feeling-btn').forEach(b => b.classList.remove('selected'));
+    showSeanceStep(0);
+  } catch(e) {
+    document.getElementById('submit-loading').classList.remove('visible');
+    document.getElementById('submit-session-btn').disabled = false;
+    showToast('Erreur envoi Make', true);
+  }
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────
+async function loadDashboard() {
+  if (!config.webhook) { renderDemoData(); return; }
+  try {
+    const data = await callMake({ event:'get_dashboard' });
+    renderDashboardData(data);
+  } catch(e) { renderDemoData(); showToast('Erreur chargement — démo', true); }
+}
+
+function renderDashboardData(data) {
+  if (data.stats) {
+    document.getElementById('stat-sessions').textContent = data.stats.sessions_month ?? '—';
+    document.getElementById('stat-volume').textContent   = data.stats.volume_week   ?? '—';
+    document.getElementById('stat-cardio').textContent   = data.stats.cardio_km     ?? '—';
+  }
+  if (data.streak)   buildStreakBar(data.streak, data.streak_types||[]);
+  if (data.insights) renderInsights(data.insights);
+  if (data.sessions) renderHistory(data.sessions);
+  if (data.chart_data) { chartDataFromAPI = data.chart_data; applyChartData(currentChartType); }
+}
+
+function renderDemoData() {
+  document.getElementById('stat-sessions').textContent='12';
+  document.getElementById('stat-volume').textContent='24k';
+  document.getElementById('stat-cardio').textContent='28';
+  buildStreakBar([1,1,0,1,1,1,0],['m','m','','r','m','c','']);
+  renderInsights([
+    {color:'var(--accent)',  text:'<strong>Volume pectoraux</strong> en hausse de 18% sur 4 semaines.'},
+    {color:'var(--accent2)', text:'<strong>Récupération</strong> : 2 jours de repos cette semaine.'},
+    {color:'var(--accent3)', text:'<strong>Running</strong> : allure stable à 5\'45\"/km.'},
+    {color:'var(--text2)',   text:'Séance <strong>dos/biceps</strong> non réalisée depuis 8 jours.'},
+  ]);
+  renderHistory([
+    {date:'Hier',      type:'musculation',name:'Push — Pectoraux / Épaules',metric:'18 450 kg'},
+    {date:'Il y a 2j', type:'running',    name:'Sortie footing',             metric:'8.2 km'},
+    {date:'Il y a 3j', type:'musculation',name:'Pull — Dos / Biceps',        metric:'15 200 kg'},
+    {date:'Il y a 5j', type:'cardio',     name:'Padel',                      metric:'90 min'},
+  ]);
+  chartDataFromAPI = {
+    volume:{labels:['S-8','S-7','S-6','S-5','S-4','S-3','S-2','S-1','Cette sem.'],datasets:[{data:[0,0,0,0,57,75300,75500,101600,111250],borderColor:'#e8ff47',backgroundColor:'#e8ff4718',fill:true,tension:0.4}]},
+    cardio:{labels:['S-8','S-7','S-6','S-5','S-4','S-3','S-2','S-1','Cette sem.'],datasets:[{data:[0,0,0,0,5.5,6,16.3,7.2,0],borderColor:'#47c8ff',backgroundColor:'#47c8ff18',fill:true,tension:0.4}]},
+    freq:  {labels:['S-8','S-7','S-6','S-5','S-4','S-3','S-2','S-1','Cette sem.'],datasets:[{data:[0,0,0,0,2,3,5,6,7],borderColor:'#ff6b47',backgroundColor:'#ff6b4718',fill:true,tension:0.4}]}
+  };
+  applyChartData(currentChartType);
+}
+
+function buildStreakBar(streak, types) {
+  const bar = document.getElementById('streak-bar');
+  const days = ['L','M','M','J','V','S','D'];
+  bar.innerHTML = days.map((d,i) => {
+    const isCardio = types[i]==='r'||types[i]==='c';
+    return `<div style="flex:1;text-align:center">
+      <div class="streak-day ${streak[i]?(isCardio?'done cardio-day':'done'):''}"></div>
+      <div class="streak-day-label">${d}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderInsights(insights) {
+  document.getElementById('insights-loading').style.display='none';
+  document.getElementById('insights-list').innerHTML = insights.map(ins=>`
+    <div class="insight-item">
+      <div class="insight-dot" style="background:${ins.color}"></div>
+      <div class="insight-text">${ins.text}</div>
+    </div>`).join('');
+}
+
+function renderHistory(sessions) {
+  const el = document.getElementById('session-history');
+  if (!sessions||!sessions.length) { el.innerHTML='<div class="empty-state"><div class="empty-state-icon">📋</div>Aucune séance enregistrée</div>'; return; }
+  el.innerHTML = sessions.map(s=>`
+    <div class="session-item">
+      <div>
+        <span class="session-type type-${s.type}">${s.type}</span>
+        <div class="session-name">${s.name}</div>
+        <div class="session-date-lbl">${s.date}</div>
+      </div>
+      <div class="session-right"><div class="session-metric">${s.metric}</div></div>
+    </div>`).join('');
+}
+
+// ── CHARTS ────────────────────────────────────────────────────────
+function initChart() {
+  const ctx = document.getElementById('mainChart').getContext('2d');
+  Chart.defaults.color='#8888aa'; Chart.defaults.borderColor='#2a2a36';
+  mainChart = new Chart(ctx, {
+    type:'line', data:{labels:[],datasets:[]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{grid:{color:'#2a2a36'},ticks:{font:{family:'Barlow Condensed',size:11}}},y:{grid:{color:'#1a1a22'},ticks:{font:{family:'Barlow Condensed',size:11}}}},
+      elements:{point:{radius:3,hoverRadius:6}},interaction:{intersect:false,mode:'index'}}
+  });
+}
+function switchChart(type,el) {
+  document.querySelectorAll('.chart-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active'); currentChartType=type; applyChartData(type);
+}
+function applyChartData(type) {
+  if (!mainChart||!chartDataFromAPI||!chartDataFromAPI[type]) return;
+  const d=chartDataFromAPI[type];
+  mainChart.data.labels=d.labels; mainChart.data.datasets=d.datasets; mainChart.update('active');
+}
+
+// ── PROFILE ───────────────────────────────────────────────────────
+function loadLocalProfile() {
+  const s=localStorage.getItem(PROFILE_KEY);
+  if(s) profile={...profile,...JSON.parse(s)};
+}
+function loadProfileFields() {
+  document.getElementById('p-name').value=profile.name;
+  document.getElementById('p-age').value=profile.age;
+  document.getElementById('p-weight').value=profile.weight;
+  document.getElementById('p-height').value=profile.height;
+  document.getElementById('p-level').value=profile.level;
+  document.getElementById('p-goal').value=profile.goal;
+  document.getElementById('p-sessions-week').value=profile.sessions_week;
+  document.getElementById('p-constraints').value=profile.constraints;
+  document.getElementById('p-context').value=profile.context;
+}
+async function loadProfile() {
+  if (!config.webhook) { showToast('Configure le webhook d\'abord', true); return; }
+  try { const data=await callMake({event:'get_profile'}); profile={...profile,...data}; loadProfileFields(); showToast('Profil chargé ✓'); }
+  catch(e) { showToast('Erreur chargement profil', true); }
+}
+async function saveProfile() {
+  profile = { name:document.getElementById('p-name').value, age:document.getElementById('p-age').value, weight:document.getElementById('p-weight').value, height:document.getElementById('p-height').value, level:document.getElementById('p-level').value, goal:document.getElementById('p-goal').value, sessions_week:document.getElementById('p-sessions-week').value, constraints:document.getElementById('p-constraints').value, context:document.getElementById('p-context').value };
+  localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+  if (config.webhook) { try { await callMake({event:'save_profile',profile}); } catch(e){} }
+  showToast('Profil sauvegardé ✓');
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────
+function showToast(msg,isError=false) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast'+(isError?' error':''); t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+</script>
+</body>
+</html>
