@@ -188,11 +188,54 @@
   .toast.show { transform: translateX(-50%) translateY(0); }
   .toast.error { background: var(--accent3); color: white; }
 
-  /* LOADING */
+  /* LOADING inline */
   .loading { display: none; text-align: center; padding: 24px; color: var(--text2); font-size: 14px; }
   .loading.visible { display: block; }
   .spinner { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* LOADING OVERLAY plein écran */
+  .forge-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(10,10,12,0.93); backdrop-filter: blur(14px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 40px; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+  .forge-overlay.visible { opacity: 1; pointer-events: all; }
+  .overlay-ring { position: relative; width: 80px; height: 80px; }
+  .overlay-ring svg { width: 80px; height: 80px; transform: rotate(-90deg); }
+  .ring-track { fill: none; stroke: var(--bg3); stroke-width: 3; }
+  .ring-progress { fill: none; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 220; stroke-dashoffset: 220; animation: ring-spin 1.8s ease-in-out infinite; }
+  @keyframes ring-spin { 0%{stroke-dashoffset:220;opacity:1} 65%{stroke-dashoffset:28;opacity:1} 100%{stroke-dashoffset:28;opacity:0.15} }
+  .overlay-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+  .overlay-message { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 0.03em; text-align: center; color: var(--text); line-height: 1.3; min-height: 60px; transition: all 0.35s ease; }
+  .overlay-message.changing { opacity: 0; transform: translateY(8px); }
+  .overlay-sub { font-size: 12px; color: var(--text3); text-align: center; font-weight: 300; letter-spacing: 0.04em; text-transform: uppercase; }
+  .overlay-dots { display: flex; gap: 6px; }
+  .overlay-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text3); animation: dot-pulse 1.4s ease-in-out infinite; }
+  .overlay-dot:nth-child(2) { animation-delay: 0.2s; }
+  .overlay-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes dot-pulse { 0%,80%,100%{opacity:0.3;transform:scale(1)} 40%{opacity:1;transform:scale(1.5)} }
+
+  /* HISTORY CARDS */
+  .hist-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 8px; overflow: hidden; transition: border-color 0.2s; }
+  .hist-card.expanded { border-color: rgba(71,200,255,0.35); }
+  .hist-card-header { display: flex; align-items: center; gap: 12px; padding: 14px; cursor: pointer; user-select: none; -webkit-user-select: none; }
+  .hist-date { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; color: var(--text3); min-width: 52px; line-height: 1.4; text-align: center; }
+  .hist-date-day { font-size: 20px; font-weight: 700; color: var(--text2); display: block; }
+  .hist-main { flex: 1; min-width: 0; }
+  .hist-name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hist-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .hist-right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
+  .hist-metric { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; }
+  .hist-chevron { font-size: 10px; color: var(--text3); transition: transform 0.25s; }
+  .hist-card.expanded .hist-chevron { transform: rotate(180deg); }
+  .hist-body { display: none; padding: 12px 14px 14px; border-top: 1px solid var(--border); }
+  .hist-card.expanded .hist-body { display: block; animation: fadeIn 0.2s ease; }
+  .hist-feeling { font-size: 12px; color: var(--text2); margin-bottom: 10px; }
+  .hist-exo { margin-bottom: 10px; }
+  .hist-exo-name { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text); margin-bottom: 5px; }
+  .hist-sets { display: flex; flex-wrap: wrap; gap: 4px; }
+  .hist-set { font-size: 11px; background: var(--bg3); border: 1px solid var(--border); border-radius: 4px; padding: 3px 7px; color: var(--text2); line-height: 1.4; }
+  .hist-set.drop { border-color: rgba(255,107,71,0.35); color: var(--accent3); }
+  .hist-raw { font-size: 13px; color: var(--text2); line-height: 1.6; background: var(--bg3); border-radius: 6px; padding: 8px 10px; white-space: pre-wrap; }
+  .hist-notes-txt { font-size: 12px; color: var(--text2); line-height: 1.5; font-style: italic; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .hist-section-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text3); margin-bottom: 8px; margin-top: 4px; }
 
   select { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 14px; outline: none; appearance: none; -webkit-appearance: none; }
   .profile-field { margin-bottom: 10px; }
@@ -206,6 +249,17 @@
 <body>
 
 <div class="toast" id="toast"></div>
+
+<!-- FORGE LOADING OVERLAY -->
+<div class="forge-overlay" id="forge-overlay">
+  <div class="overlay-ring">
+    <svg viewBox="0 0 80 80"><circle class="ring-track" cx="40" cy="40" r="35"/><circle class="ring-progress" id="overlay-ring-color" cx="40" cy="40" r="35"/></svg>
+    <div class="overlay-icon" id="overlay-icon">⚡</div>
+  </div>
+  <div class="overlay-message" id="overlay-message">Chargement...</div>
+  <div class="overlay-dots"><div class="overlay-dot"></div><div class="overlay-dot"></div><div class="overlay-dot"></div></div>
+  <div class="overlay-sub" id="overlay-sub">FORGE — Training OS</div>
+</div>
 
 <!-- ═══ VIEW: DASHBOARD ═══ -->
 <div class="view active" id="view-dashboard">
@@ -279,6 +333,15 @@
         <div class="entry-btn-sub">Logge au fil de l'eau, texte ou vocal</div>
       </button>
     </div>
+
+    <!-- HISTORIQUE -->
+    <div style="margin-top:8px; padding-bottom:8px">
+      <div class="card-label" style="margin-bottom:10px">Historique des séances</div>
+      <div id="hist-list">
+        <div class="loading visible"><div class="spinner"></div>Chargement...</div>
+      </div>
+    </div>
+
   </div>
 
   <!-- STEP 1 IA — vocal + génération -->
@@ -475,6 +538,7 @@ let currentSession = {
   feeling: null
 };
 
+let allSessions = [];   // 100 dernières séances — chargées avec le dashboard
 let mainChart = null;
 let currentChartType = 'volume';
 let chartDataFromAPI = null;
@@ -513,7 +577,19 @@ async function callMake(payload) {
   const res = await fetch(config.webhook, {
     method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
   });
-  return res.json();
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch(e) {
+    try {
+      const nl = String.fromCharCode(10);
+      const t2 = text.split('}' + nl + '"').join('},' + nl + '"');
+      return JSON.parse(t2);
+    } catch(e2) {
+      console.warn('Make JSON parse failed');
+      throw e2;
+    }
+  }
 }
 
 // ── NAV ───────────────────────────────────────────────────────────
@@ -743,19 +819,20 @@ function stopIAMic() {
 async function generatePlanIA() {
   const prompt = document.getElementById('ia-prompt').value.trim();
   if (!prompt) { showToast('Décris ta demande d\'abord !', true); return; }
-  document.getElementById('ia-loading').classList.add('visible');
   document.getElementById('ai-plan-card').classList.remove('visible');
   document.getElementById('ia-start-log-btn').style.display = 'none';
   document.getElementById('ia-gen-btn').disabled = true;
+  showOverlay('generate');
   if (!config.webhook) {
-    setTimeout(() => renderIAPlan(getDemoPlan()), 1800);
+    setTimeout(() => { hideOverlay(); renderIAPlan(getDemoPlan()); }, 2000);
     return;
   }
   try {
     const data = await callMake({ event:'generate_session', message:prompt, profile, date:new Date().toISOString() });
+    hideOverlay();
     renderIAPlan(data);
   } catch(e) {
-    document.getElementById('ia-loading').classList.remove('visible');
+    hideOverlay();
     document.getElementById('ia-gen-btn').disabled = false;
     showToast('Erreur IA', true);
   }
@@ -793,7 +870,6 @@ function formatSets(sets) {
 }
 
 function renderIAPlan(data) {
-  document.getElementById('ia-loading').classList.remove('visible');
   document.getElementById('ia-gen-btn').disabled = false;
   currentSession.iaPlan = data;
 
@@ -894,22 +970,22 @@ async function submitSession() {
     feeling: currentSession.feeling,
     profile_id: profile.name || 'default'
   };
-  document.getElementById('submit-loading').classList.add('visible');
   document.getElementById('submit-session-btn').disabled = true;
+  showOverlay('log');
   if (!config.webhook) {
     setTimeout(() => {
-      document.getElementById('submit-loading').classList.remove('visible');
+      hideOverlay();
       document.getElementById('submit-session-btn').disabled = false;
       showToast('Séance envoyée ✓ (démo)');
       clearSessionLS();
       document.getElementById('resume-banner').classList.remove('visible');
       showSeanceStep(0);
-    }, 1200);
+    }, 2000);
     return;
   }
   try {
     await callMake(payload);
-    document.getElementById('submit-loading').classList.remove('visible');
+    hideOverlay();
     document.getElementById('submit-session-btn').disabled = false;
     showToast('Séance enregistrée ✓');
     clearSessionLS();
@@ -918,7 +994,7 @@ async function submitSession() {
     document.querySelectorAll('.feeling-btn').forEach(b => b.classList.remove('selected'));
     showSeanceStep(0);
   } catch(e) {
-    document.getElementById('submit-loading').classList.remove('visible');
+    hideOverlay();
     document.getElementById('submit-session-btn').disabled = false;
     showToast('Erreur envoi Make', true);
   }
@@ -927,22 +1003,79 @@ async function submitSession() {
 // ── DASHBOARD ─────────────────────────────────────────────────────
 async function loadDashboard() {
   if (!config.webhook) { renderDemoData(); return; }
+  showOverlay('dashboard');
   try {
     const data = await callMake({ event:'get_dashboard' });
+    hideOverlay();
     renderDashboardData(data);
-  } catch(e) { renderDemoData(); showToast('Erreur chargement — démo', true); }
+  } catch(e) {
+    hideOverlay();
+    renderDemoData();
+    showToast('Erreur chargement — démo', true);
+  }
 }
 
 function renderDashboardData(data) {
-  if (data.stats) {
-    document.getElementById('stat-sessions').textContent = data.stats.sessions_month ?? '—';
-    document.getElementById('stat-volume').textContent   = data.stats.volume_week   ?? '—';
-    document.getElementById('stat-cardio').textContent   = data.stats.cardio_km     ?? '—';
+  // Nouvelle structure Make : { ai_data: {...}, sessions_database: {...} }
+  // On normalise pour accepter les deux formats
+  const ai   = data.ai_data   || data;           // nouveau format ou ancien
+  const dbRaw = data.sessions_database || null;   // sessions brutes Make
+
+  // ── Stats ──
+  if (ai.stats) {
+    document.getElementById('stat-sessions').textContent = ai.stats.sessions_month ?? '—';
+    document.getElementById('stat-volume').textContent   = ai.stats.volume_week    ?? '—';
+    document.getElementById('stat-cardio').textContent   = ai.stats.cardio_km      ?? '—';
   }
-  if (data.streak)   buildStreakBar(data.streak, data.streak_types||[]);
-  if (data.insights) renderInsights(data.insights);
-  if (data.sessions) renderHistory(data.sessions);
-  if (data.chart_data) { chartDataFromAPI = data.chart_data; applyChartData(currentChartType); }
+
+  // ── Streak ──
+  if (ai.streak) {
+    const streak = Array.isArray(ai.streak)
+      ? ai.streak
+      : String(ai.streak).split(',').map(v => parseInt(v.trim()) || 0);
+    const streakTypes = Array.isArray(ai.streak_types)
+      ? ai.streak_types
+      : String(ai.streak_types || '').split(',').map(v => v.trim());
+    buildStreakBar(streak, streakTypes);
+  }
+
+  // ── Insights ──
+  if (ai.insights && Array.isArray(ai.insights) && ai.insights.length) {
+    renderInsights(ai.insights);
+  }
+
+  // ── Chart ──
+  if (ai.chart_data) { chartDataFromAPI = ai.chart_data; applyChartData(currentChartType); }
+
+  // ── Sessions — plusieurs cas possibles ──
+  let sessions = [];
+
+  if (dbRaw) {
+    // Make envoie sessions_database : peut être array, objet unique, ou string JSON
+    if (Array.isArray(dbRaw)) {
+      sessions = dbRaw;
+    } else if (typeof dbRaw === 'string') {
+      try { const parsed = JSON.parse(dbRaw); sessions = Array.isArray(parsed) ? parsed : [parsed]; }
+      catch(e) { console.warn('sessions_database parse error', e); }
+    } else if (typeof dbRaw === 'object') {
+      // Make agrège parfois les bundles en objet indexé {0:{...},1:{...}} ou objet unique
+      const vals = Object.values(dbRaw);
+      if (vals.length && typeof vals[0] === 'object' && vals[0].key) {
+        sessions = vals;  // objet indexé → array
+      } else if (dbRaw.key) {
+        sessions = [dbRaw]; // objet unique
+      }
+    }
+  } else if (ai.sessions && Array.isArray(ai.sessions)) {
+    // ancien format : sessions dans ai_data
+    sessions = ai.sessions;
+  }
+
+  if (sessions.length) {
+    allSessions = sessions;
+    renderHistory(sessions.slice(0, 5));
+    renderHistCards(sessions);
+  }
 }
 
 function renderDemoData() {
@@ -956,12 +1089,15 @@ function renderDemoData() {
     {color:'var(--accent3)', text:'<strong>Running</strong> : allure stable à 5\'45\"/km.'},
     {color:'var(--text2)',   text:'Séance <strong>dos/biceps</strong> non réalisée depuis 8 jours.'},
   ]);
-  renderHistory([
-    {date:'Hier',      type:'musculation',name:'Push — Pectoraux / Épaules',metric:'18 450 kg'},
-    {date:'Il y a 2j', type:'running',    name:'Sortie footing',             metric:'8.2 km'},
-    {date:'Il y a 3j', type:'musculation',name:'Pull — Dos / Biceps',        metric:'15 200 kg'},
-    {date:'Il y a 5j', type:'cardio',     name:'Padel',                      metric:'90 min'},
-  ]);
+  const demoSessions = [
+    {date:'Hier',      type:'musculation',name:'Push — Pectoraux / Épaules',metric:'18 450 kg',duration:65,feeling:4,exercises:[{name:'Développé couché barre',sets:[{reps:8,load:80,note:null},{reps:6,load:90,note:null},{reps:5,load:95,note:null}]},{name:'Élévations latérales',sets:[{reps:15,load:10,note:null},{reps:12,load:12,note:'DROP'},{reps:15,load:8,note:'sans pause'}]}],notes:'Bonne séance, pump pec ++'},
+    {date:'Il y a 2j', type:'running',    name:'Footing endurance',          metric:'8.2 km',  duration:48,feeling:4,exercises:[],notes:'Sortie tranquille'},
+    {date:'Il y a 3j', type:'musculation',name:'Pull — Dos / Biceps',        metric:'15 200 kg',duration:70,feeling:5,exercises:[{name:'Rowing poulie neutre',sets:[{reps:12,load:30,note:'échauffement'},{reps:8,load:40,note:null},{reps:6,load:45,note:null},{reps:12,load:25,note:'DROP - sans pause'}]},{name:'Curl barre EZ',sets:[{reps:12,load:32,note:null},{reps:10,load:37,note:null}]}],notes:'PR rowing poulie'},
+    {date:'Il y a 5j', type:'cardio',     name:'Padel',                      metric:'90 min',  duration:90,feeling:5,exercises:[],notes:'Match intense, victoire'},
+  ];
+  allSessions = demoSessions;
+  renderHistory(demoSessions);
+  renderHistCards(demoSessions);
   chartDataFromAPI = {
     volume:{labels:['S-8','S-7','S-6','S-5','S-4','S-3','S-2','S-1','Cette sem.'],datasets:[{data:[0,0,0,0,57,75300,75500,101600,111250],borderColor:'#e8ff47',backgroundColor:'#e8ff4718',fill:true,tension:0.4}]},
     cardio:{labels:['S-8','S-7','S-6','S-5','S-4','S-3','S-2','S-1','Cette sem.'],datasets:[{data:[0,0,0,0,5.5,6,16.3,7.2,0],borderColor:'#47c8ff',backgroundColor:'#47c8ff18',fill:true,tension:0.4}]},
@@ -991,6 +1127,27 @@ function renderInsights(insights) {
     </div>`).join('');
 }
 
+function sessionMetric(s) {
+  if (s.metric) return s.metric; // démo ou GPT-formaté
+  if (s.type === 'musculation' && s.volume_total)
+    return Number(s.volume_total).toLocaleString('fr-FR') + ' kg';
+  if (s.distance) return s.distance + ' km';
+  if (s.duration) return s.duration + ' min';
+  return '';
+}
+
+function sessionDateLabel(s) {
+  if (!s.date || !s.date.match(/\d{4}-\d{2}-\d{2}/)) return s.date || '';
+  const d    = new Date(s.date + 'T12:00:00');
+  const now  = new Date();
+  const diff = Math.floor((now - d) / 86400000);
+  if (diff === 0) return "Aujourd\'hui";
+  if (diff === 1) return 'Hier';
+  if (diff < 7)   return 'Il y a ' + diff + 'j';
+  const months = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
+  return d.getDate() + ' ' + months[d.getMonth()];
+}
+
 function renderHistory(sessions) {
   const el = document.getElementById('session-history');
   if (!sessions||!sessions.length) { el.innerHTML='<div class="empty-state"><div class="empty-state-icon">📋</div>Aucune séance enregistrée</div>'; return; }
@@ -998,11 +1155,97 @@ function renderHistory(sessions) {
     <div class="session-item">
       <div>
         <span class="session-type type-${s.type}">${s.type}</span>
-        <div class="session-name">${s.name}</div>
-        <div class="session-date-lbl">${s.date}</div>
+        <div class="session-name">${s.name || s.type}</div>
+        <div class="session-date-lbl">${sessionDateLabel(s)}</div>
       </div>
-      <div class="session-right"><div class="session-metric">${s.metric}</div></div>
+      <div class="session-right"><div class="session-metric">${sessionMetric(s)}</div></div>
     </div>`).join('');
+}
+
+// ── HISTORY CARDS ────────────────────────────────────────────────
+const FEELING_LABEL = {1:'💀 Épuisé',2:'😓 Difficile',3:'😐 Correcte',4:'💪 Bonne séance',5:'🔥 En feu'};
+const TYPE_COLOR    = {musculation:'var(--accent)',running:'var(--accent2)',cardio:'var(--accent3)',autre:'var(--text2)'};
+
+function renderHistCards(sessions) {
+  const el = document.getElementById('hist-list');
+  if (!sessions || !sessions.length) {
+    el.innerHTML = '<div class="empty-state" style="padding:20px 0"><div class="empty-state-icon">📋</div>Aucune séance</div>';
+    return;
+  }
+  el.innerHTML = sessions.map((s, i) => buildHistCard(s, i)).join('');
+}
+
+function buildHistCard(s, idx) {
+  const color = TYPE_COLOR[s.type] || 'var(--accent)';
+
+  // Date — via helper partagé
+  const dateDisplay = sessionDateLabel(s);
+
+  // Metric — via helper partagé
+  const metric = sessionMetric(s);
+
+  // Meta
+  const meta = [s.duration ? s.duration+' min' : null, s.distance ? s.distance+' km' : null].filter(Boolean).join(' · ');
+
+  // Feeling
+  const feelingHtml = s.feeling ? `<div class="hist-feeling">${FEELING_LABEL[s.feeling]||''}</div>` : '';
+
+  // Exercises — structure réelle : exercises[].sets[].{reps, load, note?}
+  let exosHtml = '';
+  if (s.exercises && s.exercises.length) {
+    exosHtml = '<div class="hist-section-label">Exercices</div>' +
+      s.exercises.map(ex => {
+        const setsHtml = (ex.sets||[]).map(set => {
+          const loadStr = (set.load && set.load > 0) ? set.load+'kg' : 'PC';
+          const note = set.note || null;
+          const isDrop = note && note.toLowerCase().includes('drop');
+          const noteStr = note ? ' · '+note : '';
+          return `<span class="hist-set${isDrop?' drop':''}">${set.reps}×${loadStr}${noteStr}</span>`;
+        }).join('');
+        return `<div class="hist-exo">
+          <div class="hist-exo-name">${ex.name}</div>
+          <div class="hist-sets">${setsHtml}</div>
+        </div>`;
+      }).join('');
+  } else if (s.exos && s.exos.length) {
+    // Texte brut (séances libres non parsées)
+    const rawText = s.exos.map(e => typeof e === 'object' ? (e.text||'') : e).filter(Boolean).join('\n');
+    if (rawText) exosHtml = '<div class="hist-section-label">Exercices</div><div class="hist-raw">'+rawText+'</div>';
+  }
+
+  // Notes
+  const notesHtml = s.notes ? `<div class="hist-notes-txt">💬 ${s.notes}</div>` : '';
+
+  return `<div class="hist-card" id="hc-${idx}">
+    <div class="hist-card-header" onclick="toggleHist(${idx})">
+      <div class="hist-date">
+        <span class="hist-date-day">${dateDisplay}</span>
+      </div>
+      <div class="hist-main">
+        <div class="hist-name">${s.name || s.type}</div>
+        ${meta ? '<div class="hist-meta">'+meta+'</div>' : ''}
+      </div>
+      <div class="hist-right">
+        <div class="hist-metric" style="color:${color}">${metric}</div>
+        <div class="hist-chevron">▼</div>
+      </div>
+    </div>
+    <div class="hist-body">
+      ${feelingHtml}
+      ${exosHtml}
+      ${notesHtml}
+    </div>
+  </div>`;
+}
+
+function toggleHist(idx) {
+  const card = document.getElementById('hc-'+idx);
+  if (!card) return;
+  const wasOpen = card.classList.contains('expanded');
+  // Close all
+  document.querySelectorAll('.hist-card.expanded').forEach(c => c.classList.remove('expanded'));
+  // Open if was closed
+  if (!wasOpen) card.classList.add('expanded');
 }
 
 // ── CHARTS ────────────────────────────────────────────────────────
@@ -1052,6 +1295,73 @@ async function saveProfile() {
   localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
   if (config.webhook) { try { await callMake({event:'save_profile',profile}); } catch(e){} }
   showToast('Profil sauvegardé ✓');
+}
+
+
+// ══════════════════════════════════════════════════════════════════
+// LOADING OVERLAY
+// ══════════════════════════════════════════════════════════════════
+const OVERLAY_MESSAGES = {
+  dashboard: [
+    "Chargement du dashboard...",
+    "Récupération des séances...",
+    "Analyse de tes données...",
+    "Calcul des progressions...",
+    "Génération des insights...",
+    "Presque prêt..."
+  ],
+  log: [
+    "Envoi de ta séance...",
+    "Structure des exercices...",
+    "Calcul du volume total...",
+    "Sauvegarde en cours...",
+    "Mise à jour de ton historique..."
+  ],
+  generate: [
+    "Analyse de ton historique...",
+    "Calcul de la récupération...",
+    "Sélection des exercices...",
+    "Optimisation des charges...",
+    "Finalisation du programme...",
+    "Derniers ajustements..."
+  ]
+};
+
+const OVERLAY_CONFIG = {
+  dashboard: { icon: '📊', color: '#e8ff47', sub: 'ANALYSE EN COURS' },
+  log:       { icon: '💾', color: '#ff6b47', sub: 'ENREGISTREMENT' },
+  generate:  { icon: '⚡', color: '#47c8ff', sub: 'GÉNÉRATION IA' }
+};
+
+let overlayInterval = null;
+let overlayMsgIndex = 0;
+
+function showOverlay(type) {
+  const cfg = OVERLAY_CONFIG[type] || OVERLAY_CONFIG.dashboard;
+  const msgs = OVERLAY_MESSAGES[type] || OVERLAY_MESSAGES.dashboard;
+  overlayMsgIndex = 0;
+
+  document.getElementById('overlay-icon').textContent = cfg.icon;
+  document.getElementById('overlay-ring-color').style.stroke = cfg.color;
+  document.getElementById('overlay-sub').textContent = cfg.sub;
+  document.getElementById('overlay-message').textContent = msgs[0];
+  document.getElementById('forge-overlay').classList.add('visible');
+
+  overlayInterval = setInterval(() => {
+    overlayMsgIndex = (overlayMsgIndex + 1) % msgs.length;
+    const el = document.getElementById('overlay-message');
+    el.classList.add('changing');
+    setTimeout(() => {
+      el.textContent = msgs[overlayMsgIndex];
+      el.classList.remove('changing');
+    }, 350);
+  }, 2200);
+}
+
+function hideOverlay() {
+  clearInterval(overlayInterval);
+  overlayInterval = null;
+  document.getElementById('forge-overlay').classList.remove('visible');
 }
 
 // ── TOAST ─────────────────────────────────────────────────────────
