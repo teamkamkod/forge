@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/libheif-js@1.17.1/libheif-bundle.js"></script>
 <style>
   :root {
     --bg: #0a0a0c; --bg2: #111116; --bg3: #1a1a22; --border: #2a2a36;
@@ -80,6 +79,39 @@
   .btn-record.recording { background: #cc3300; animation: pulse-red 1s infinite; }
   @keyframes pulse-red { 0%,100% { box-shadow: 0 0 0 0 rgba(255,107,71,0.4); } 50% { box-shadow: 0 0 0 10px rgba(255,107,71,0); } }
 
+  /* ── IA FORM ── */
+  .ia-form-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 10px; }
+  .ia-form-label { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text3); margin-bottom: 12px; }
+  /* Duration pills */
+  .ia-duration-row { display: flex; gap: 6px; }
+  .ia-dur-btn { flex: 1; padding: 10px 4px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg3); color: var(--text2); font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.18s; letter-spacing: 0.04em; }
+  .ia-dur-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .ia-dur-btn:active { transform: scale(0.96); }
+  /* Energy emojis */
+  .ia-energy-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .ia-energy-btn { flex: 1; padding: 10px 4px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg3); font-size: 22px; cursor: pointer; text-align: center; transition: all 0.18s; line-height: 1; }
+  .ia-energy-btn.active { border-color: var(--accent); background: rgba(232,255,71,0.1); transform: scale(1.08); }
+  .ia-energy-btn:active { transform: scale(0.94); }
+  .ia-energy-label { text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; color: var(--text2); letter-spacing: 0.08em; text-transform: uppercase; min-height: 16px; }
+  /* Focus grid */
+  .ia-focus-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ia-focus-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg3); cursor: pointer; transition: all 0.18s; text-align: center; }
+  .ia-focus-btn:active { transform: scale(0.96); }
+  .ia-focus-btn.active { border-color: var(--accent2); background: rgba(71,200,255,0.08); }
+  .ia-focus-btn--ai.active { border-color: var(--accent); background: rgba(232,255,71,0.08); }
+  .ia-focus-icon { font-size: 22px; line-height: 1; }
+  .ia-focus-name { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); letter-spacing: 0.04em; }
+  .ia-focus-sub { font-size: 10px; color: var(--text3); font-weight: 300; line-height: 1.3; }
+  .ia-focus-btn.active .ia-focus-name { color: var(--accent2); }
+  .ia-focus-btn--ai.active .ia-focus-name { color: var(--accent); }
+
+  /* IA form collapse */
+  #ia-form-wrapper { transition: all 0.25s ease; overflow: hidden; }
+  #ia-form-wrapper.collapsed { display: none; }
+  .ia-form-summary-btn { width: 100%; display: flex; justify-content: space-between; align-items: center; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; cursor: pointer; font-family: 'Barlow', sans-serif; font-size: 13px; color: var(--text2); transition: background 0.15s; }
+  .ia-form-summary-btn:active { background: var(--border); }
+  .ia-form-summary-edit { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: var(--accent2); white-space: nowrap; }
+
   /* ── SÉANCE VIEW ── */
 
   /* Step 0 — choix entrée */
@@ -112,15 +144,82 @@
   .voice-status.active { color: var(--accent3); }
 
   /* AI planning card */
-  .ai-plan-card { background: linear-gradient(135deg, rgba(71,200,255,0.06), rgba(232,255,71,0.04)); border: 1px solid rgba(71,200,255,0.2); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; display: none; }
+  .ai-plan-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; display: none; }
   .ai-plan-card.visible { display: block; animation: fadeIn 0.3s ease; }
-  .ai-plan-title { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .ai-plan-meta { font-size: 12px; color: var(--text2); margin-bottom: 12px; }
-  .ai-plan-note { font-size: 13px; color: var(--text2); background: var(--bg3); border-radius: 8px; padding: 10px; margin-bottom: 12px; line-height: 1.5; }
-  .ai-plan-exercise { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-  .ai-plan-exercise:last-child { border-bottom: none; }
-  .ai-plan-ex-name { font-size: 13px; font-weight: 500; }
-  .ai-plan-ex-sets { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; color: var(--accent2); font-weight: 700; }
+  .ai-plan-title { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 900; letter-spacing: -0.01em; margin-bottom: 2px; }
+  .ai-plan-meta { font-size: 12px; color: var(--text2); margin-bottom: 10px; }
+  .ai-plan-note { font-size: 13px; color: var(--text2); background: var(--bg3); border-left: 2px solid var(--accent2); border-radius: 0 8px 8px 0; padding: 10px 12px; margin-bottom: 14px; line-height: 1.6; }
+  /* Exercice block */
+  .ai-exo-block { margin-bottom: 12px; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border); }
+  .ai-exo-block.superset { border-color: rgba(232,255,71,0.25); }
+  .ai-exo-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 11px 14px 8px; background: var(--bg3); gap: 8px; }
+  .ai-exo-name { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); line-height: 1.2; flex: 1; }
+  .ai-exo-rest { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; color: var(--text3); white-space: nowrap; padding-top: 2px; }
+  .ai-exo-prog { font-size: 11px; padding: 4px 14px 8px; background: var(--bg3); border-top: 1px solid rgba(255,255,255,0.04); }
+  .ai-exo-prog.up   { color: var(--accent); }
+  .ai-exo-prog.down { color: var(--accent3); }
+  .ai-exo-prog.eq   { color: var(--text3); }
+  .ai-exo-prog.new  { color: var(--text3); }
+  .ai-exo-sets { padding: 8px 14px; }
+  .ai-set-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .ai-set-row:last-child { border-bottom: none; }
+  .ai-set-reps { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; color: var(--accent2); }
+  .ai-set-load { font-size: 13px; color: var(--text2); }
+  .ai-set-note { font-size: 10px; color: var(--accent3); margin-left: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .ai-exo-tip { font-size: 11px; color: var(--text3); padding: 7px 14px 10px; line-height: 1.5; border-top: 1px solid rgba(255,255,255,0.04); }
+  /* Superset label */
+  .ai-superset-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); background: rgba(232,255,71,0.08); padding: 4px 14px; border-bottom: 1px solid rgba(232,255,71,0.15); }
+  /* Rest divider between superset exercises */
+  .ai-superset-rest { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; color: var(--text3); text-align: center; padding: 5px; background: rgba(232,255,71,0.04); border-top: 1px solid rgba(232,255,71,0.1); border-bottom: 1px solid rgba(232,255,71,0.1); letter-spacing: 0.06em; }
+  /* Warmup/cooldown */
+  .ai-wc-block { font-size: 12px; line-height: 1.6; border-radius: 8px; padding: 9px 12px; margin-bottom: 8px; }
+  .ai-wc-block.warmup   { background: rgba(71,200,255,0.07); color: var(--accent2); }
+  .ai-wc-block.cooldown { background: rgba(136,136,170,0.07); color: var(--text2); }
+
+  /* IA log — done slot */
+  .lia-done-zone { padding: 10px 14px 12px; border-top: 1px solid rgba(232,255,71,0.12); background: rgba(232,255,71,0.03); }
+  .lia-done-text { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 8px; white-space: pre-wrap; }
+  .lia-done-edit { margin-bottom: 8px; }
+  .lia-done-actions { display: flex; }
+  .lia-done-save-row { display: flex; gap: 8px; }
+
+  /* IA log — integrated input slot */
+  .lia-input-zone { padding: 10px 14px 14px; border-top: 1px solid rgba(71,200,255,0.15); background: rgba(71,200,255,0.03); }
+  .lia-input-row { display: grid; grid-template-columns: 1fr 44px; gap: 8px; margin-bottom: 8px; }
+  .lia-textarea { width: 100%; background: var(--bg2); border: 1px solid rgba(71,200,255,0.3); border-radius: var(--radius-sm); padding: 10px 12px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 14px; outline: none; resize: none; line-height: 1.6; min-height: 64px; }
+  .lia-textarea:focus { border-color: var(--accent2); }
+  .lia-validate-btn { width: 100%; padding: 13px; border-radius: var(--radius-sm); border: none; background: var(--accent2); color: var(--bg); font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 0.06em; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .lia-validate-btn:active { transform: scale(0.97); background: #35b8f0; }
+
+  /* IA Plan in log — accordion */
+  .log-ia-exo-block { margin-bottom: 6px; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border); transition: opacity 0.2s, border-color 0.2s; }
+  .log-ia-exo-block.current { border-color: var(--accent2); }
+  .log-ia-exo-block.done    { opacity: 0.35; }
+  .log-ia-exo-block.upcoming { opacity: 0.5; }
+  .log-ia-exo-block.done .lia-name::after { content: " ✓"; color: var(--accent); font-size: 11px; }
+  /* Accordion header — always visible */
+  .lia-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; cursor: pointer; background: var(--bg3); user-select: none; -webkit-user-select: none; gap: 8px; }
+  .lia-header-left { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+  .lia-name { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .log-ia-exo-block.current .lia-name { color: var(--accent2); }
+  .lia-prog-mini { font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lia-prog-mini.up   { color: var(--accent); }
+  .lia-prog-mini.down { color: var(--accent3); }
+  .lia-prog-mini.eq   { color: var(--text3); }
+  .lia-prog-mini.new  { color: var(--text3); }
+  .lia-chevron { font-size: 9px; color: var(--text3); transition: transform 0.2s; flex-shrink: 0; }
+  .log-ia-exo-block.open .lia-chevron { transform: rotate(180deg); }
+  /* Accordion body — hidden by default, shown when open */
+  .lia-body { display: none; }
+  .log-ia-exo-block.open .lia-body { display: block; }
+  /* Superset */
+  .log-ia-ss-block { margin-bottom: 6px; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid rgba(232,255,71,0.2); transition: opacity 0.2s; }
+  .log-ia-ss-block.current { border-color: rgba(232,255,71,0.5); }
+  .log-ia-ss-block.done    { opacity: 0.35; }
+  .log-ia-ss-block.upcoming { opacity: 0.5; }
+  .log-ia-ss-block.done .lia-name::after { content: " ✓"; color: var(--accent); font-size: 11px; }
+  .log-ia-ss-block.open .lia-chevron { transform: rotate(180deg); }
+  .log-ia-ss-block.open .lia-body { display: block; }
 
   /* Log zone */
   .log-zone { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
@@ -134,11 +233,21 @@
   input.log-input-line:focus { border-color: var(--accent); }
 
   /* Exo cards */
-  .exo-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 8px; position: relative; }
-  .exo-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+  .exo-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 8px; }
+  .exo-card.editing { border-color: var(--accent); }
+  .exo-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
   .exo-card-num { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text3); }
-  .exo-card-delete { background: none; border: none; color: var(--text3); font-size: 18px; cursor: pointer; padding: 0; line-height: 1; }
+  .exo-card-actions { display: flex; gap: 6px; }
+  .exo-card-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 7px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg2); color: var(--text2); cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
+  .exo-card-btn:active { transform: scale(0.95); }
+  .exo-card-btn.edit  { color: var(--accent2); border-color: rgba(71,200,255,0.3); }
+  .exo-card-btn.del   { color: var(--accent3); border-color: rgba(255,107,71,0.3); }
+  .exo-card-btn.save  { color: var(--accent);  border-color: rgba(232,255,71,0.4); background: rgba(232,255,71,0.07); }
+  .exo-card-btn.cancel{ color: var(--text2);  }
   .exo-card-content { font-size: 14px; line-height: 1.6; color: var(--text); white-space: pre-wrap; }
+  .exo-card-edit-area { width: 100%; background: var(--bg); border: 1px solid var(--accent); border-radius: var(--radius-sm); padding: 10px 12px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 14px; outline: none; resize: none; line-height: 1.6; margin-bottom: 8px; display: none; }
+  .exo-card.editing .exo-card-edit-area { display: block; }
+  .exo-card.editing .exo-card-content   { display: none; }
   .exo-card-time { font-size: 11px; color: var(--text3); margin-top: 6px; }
 
   /* Type selector */
@@ -239,22 +348,6 @@
   .hist-section-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text3); margin-bottom: 8px; margin-top: 4px; }
 
   /* BODYFAT SCAN */
-  .bf-card { background: linear-gradient(135deg, rgba(232,255,71,0.05), rgba(71,200,255,0.04)); border: 1px solid rgba(232,255,71,0.2); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; }
-  .bf-result { display: flex; align-items: center; gap: 16px; padding: 14px 0 10px; }
-  .bf-percent { font-family: 'Barlow Condensed', sans-serif; font-size: 52px; font-weight: 900; line-height: 1; color: var(--accent); }
-  .bf-percent span { font-size: 22px; color: var(--text2); }
-  .bf-details { flex: 1; }
-  .bf-range { font-size: 13px; color: var(--text2); margin-bottom: 4px; }
-  .bf-note { font-size: 12px; color: var(--text3); line-height: 1.5; }
-  .bf-date { font-size: 11px; color: var(--text3); margin-top: 8px; }
-  .photo-preview { width: 100%; max-height: 220px; object-fit: cover; border-radius: var(--radius-sm); margin-bottom: 12px; display: none; }
-  .photo-preview.visible { display: block; }
-  .bf-history-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
-  .bf-history-item:last-child { border-bottom: none; }
-  .bf-history-val { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; color: var(--accent); font-size: 16px; }
-  .bf-trend-up { color: var(--accent3); }
-  .bf-trend-down { color: var(--accent2); }
-  input[type="file"] { display: none; }
 
   select { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 14px; outline: none; appearance: none; -webkit-appearance: none; }
   .profile-field { margin-bottom: 10px; }
@@ -363,42 +456,114 @@
 
   </div>
 
-  <!-- STEP 1 IA — vocal + génération -->
+  <!-- STEP 1 IA — formulaire structuré -->
   <div id="seance-step-ia" style="display:none">
     <div class="step-header">
       <button class="step-back" onclick="backToStep0()">←</button>
       <div class="step-title">SÉANCE IA</div>
       <span class="step-badge badge-ia">IA</span>
     </div>
-    <div class="card">
-      <div class="card-label">Décris ta demande</div>
-      <div class="voice-orb" id="ia-orb" onclick="toggleIAMic()">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-          <line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
-        </svg>
+
+    <!-- Formulaire collapsible -->
+    <div id="ia-form-wrapper">
+
+    <!-- Temps dispo -->
+    <div class="ia-form-card">
+      <div class="ia-form-label">Temps disponible</div>
+      <div class="ia-duration-row" id="ia-duration-btns">
+        <button class="ia-dur-btn" onclick="setDuration(30,this)">30 min</button>
+        <button class="ia-dur-btn" onclick="setDuration(45,this)">45 min</button>
+        <button class="ia-dur-btn active" onclick="setDuration(60,this)">1h</button>
+        <button class="ia-dur-btn" onclick="setDuration(75,this)">1h15</button>
+        <button class="ia-dur-btn" onclick="setDuration(90,this)">1h30</button>
       </div>
-      <div class="voice-status" id="ia-mic-status">Appuie pour parler</div>
-      <div class="input-mic-row" style="margin-top:8px">
-        <textarea class="log-input" id="ia-prompt" placeholder="Ex: séance dos/biceps, 1h, un peu fatigué..." rows="2" style="min-height:52px"></textarea>
-        <button class="btn-record" id="ia-mic-btn" onclick="toggleIAMic()" style="height:52px; width:48px; border-radius:var(--radius-sm)">
+    </div>
+
+    <!-- Niveau de forme -->
+    <div class="ia-form-card">
+      <div class="ia-form-label">Forme du jour</div>
+      <div class="ia-energy-row" id="ia-energy-btns">
+        <button class="ia-energy-btn" onclick="setEnergy(1,this)" title="Épuisé">💀</button>
+        <button class="ia-energy-btn" onclick="setEnergy(2,this)" title="Fatigué">😓</button>
+        <button class="ia-energy-btn active" onclick="setEnergy(3,this)" title="Normal">😐</button>
+        <button class="ia-energy-btn" onclick="setEnergy(4,this)" title="Bien">💪</button>
+        <button class="ia-energy-btn" onclick="setEnergy(5,this)" title="En feu">🔥</button>
+      </div>
+      <div class="ia-energy-label" id="ia-energy-label">Normal</div>
+    </div>
+
+    <!-- Focus séance -->
+    <div class="ia-form-card">
+      <div class="ia-form-label">Type de séance</div>
+      <div class="ia-focus-grid" id="ia-focus-btns">
+        <button class="ia-focus-btn" onclick="setFocus('push',this)">
+          <span class="ia-focus-icon">⬆️</span>
+          <span class="ia-focus-name">Push</span>
+          <span class="ia-focus-sub">Pecto · Épaules · Triceps</span>
+        </button>
+        <button class="ia-focus-btn" onclick="setFocus('pull',this)">
+          <span class="ia-focus-icon">⬇️</span>
+          <span class="ia-focus-name">Pull</span>
+          <span class="ia-focus-sub">Dos · Biceps · Deltoïdes</span>
+        </button>
+        <button class="ia-focus-btn" onclick="setFocus('legs',this)">
+          <span class="ia-focus-icon">🦵</span>
+          <span class="ia-focus-name">Legs</span>
+          <span class="ia-focus-sub">Quad · Ischios · Fessiers</span>
+        </button>
+        <button class="ia-focus-btn" onclick="setFocus('mix',this)">
+          <span class="ia-focus-icon">⚡</span>
+          <span class="ia-focus-name">Full body</span>
+          <span class="ia-focus-sub">Mix musculaire</span>
+        </button>
+        <button class="ia-focus-btn" onclick="setFocus('cardio',this)">
+          <span class="ia-focus-icon">🏃</span>
+          <span class="ia-focus-name">Cardio</span>
+          <span class="ia-focus-sub">Running · Vélo · HIIT</span>
+        </button>
+        <button class="ia-focus-btn ia-focus-btn--ai active" onclick="setFocus('ai_decide',this)">
+          <span class="ia-focus-icon">🤖</span>
+          <span class="ia-focus-name">IA decide</span>
+          <span class="ia-focus-sub">Selon ton historique</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Note optionnelle -->
+    <div class="ia-form-card">
+      <div class="ia-form-label">Contrainte du jour <span style="color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0">— optionnel</span></div>
+      <div class="input-mic-row">
+        <textarea class="log-input" id="ia-note" placeholder="Épaule gauche sensible, pas de squat, max 4 exercices..." rows="2" style="min-height:52px"></textarea>
+        <button class="btn-record" id="ia-mic-btn" onclick="toggleIAMic()" style="height:52px;width:48px;border-radius:var(--radius-sm)">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
         </button>
       </div>
-      <button class="btn btn-primary" onclick="generatePlanIA()" id="ia-gen-btn" style="margin-top:4px">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        Générer ma séance
+    </div>
+
+    </div><!-- /ia-form-wrapper -->
+
+    <!-- Résumé formulaire (visible quand plan affiché) -->
+    <div id="ia-form-summary" style="display:none;margin-bottom:10px">
+      <button class="ia-form-summary-btn" onclick="toggleIAForm()">
+        <span id="ia-form-summary-text">— min · 😐 Normal · 🤖 IA decide</span>
+        <span class="ia-form-summary-edit">Modifier ✎</span>
       </button>
     </div>
-    <div class="loading" id="ia-loading"><div class="spinner" style="border-top-color:var(--accent2)"></div>L'IA prépare ton planning...</div>
+
+    <button class="btn btn-primary" onclick="generatePlanIA()" id="ia-gen-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Générer ma séance
+    </button>
+
+    <div class="loading" id="ia-loading" style="margin-top:12px"><div class="spinner" style="border-top-color:var(--accent2)"></div>L'IA prépare ton planning...</div>
+
     <div class="ai-plan-card" id="ai-plan-card">
       <div class="ai-plan-title" id="ai-plan-title"></div>
       <div class="ai-plan-meta" id="ai-plan-meta"></div>
       <div class="ai-plan-note" id="ai-plan-note" style="display:none"></div>
       <div id="ai-plan-exercises"></div>
     </div>
-    <button class="btn btn-primary" id="ia-start-log-btn" style="display:none; margin-bottom:12px" onclick="startLogFromIA()">
+    <button class="btn btn-primary" id="ia-start-log-btn" style="display:none;margin-bottom:12px" onclick="startLogFromIA()">
       ✓ Commencer cette séance
     </button>
   </div>
@@ -420,42 +585,57 @@
       <button class="type-chip" onclick="setSessionType('autre',this)">🎾 Autre</button>
     </div>
 
-    <!-- Planning IA (si dispo) -->
-    <div id="log-ia-ref" style="display:none">
-      <div class="card-label" style="margin-bottom:6px">Planning IA — référence</div>
-      <div id="log-ia-ref-content" style="font-size:12px; color:var(--text2); background:var(--bg3); border-radius:8px; padding:10px; margin-bottom:12px; line-height:1.8;"></div>
+    <!-- MODE IA : plan intégré avec input par slot -->
+    <div id="log-ia-plan" style="display:none; margin-bottom:14px">
+      <div class="card-label" style="margin-bottom:8px">Programme IA</div>
+      <div id="log-ia-plan-content"></div>
     </div>
 
-    <!-- Zone saisie exo -->
-    <div class="log-zone">
+    <!-- MODE LIBRE : zone saisie classique -->
+    <div class="log-zone" id="log-libre-zone">
       <div class="log-zone-title">Ajouter un exercice / note</div>
       <div class="input-mic-row">
-        <textarea class="log-input" id="exo-input" placeholder="Ex: Rowing poulie 4x8 à 40kg, drop 2x12 à 25kg..." rows="3"></textarea>
-        <button class="btn-record" id="exo-mic-btn" onclick="toggleExoMic()" style="height:80px; width:48px; border-radius:var(--radius-sm)">
+        <textarea class="log-input" id="exo-input" placeholder="Ex: Rowing poulie 4x8 à 40kg..." rows="3"></textarea>
+        <button class="btn-record" id="exo-mic-btn" onclick="toggleExoMic()" style="height:80px;width:48px;border-radius:var(--radius-sm)">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
         </button>
       </div>
-      <button class="btn btn-secondary" onclick="saveExo()" style="font-size:14px; padding:12px">
+      <button class="btn btn-secondary" onclick="saveExo()" style="font-size:14px;padding:12px">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
         Enregistrer l'exo
       </button>
     </div>
 
-    <!-- Liste exos loggués -->
+    <!-- MODE IA bonus : zone saisie extra (après tous les exos IA) -->
+    <div class="log-zone" id="log-ia-bonus-zone" style="display:none">
+      <div class="log-zone-title">Exercice bonus / note</div>
+      <div class="input-mic-row">
+        <textarea class="log-input" id="exo-input-bonus" placeholder="Exercice supplémentaire ou note..." rows="2"></textarea>
+        <button class="btn-record" id="exo-mic-bonus-btn" onclick="toggleExoMicBonus()" style="height:60px;width:48px;border-radius:var(--radius-sm)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+        </button>
+      </div>
+      <button class="btn btn-secondary" onclick="saveExoBonus()" style="font-size:14px;padding:12px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Ajouter
+      </button>
+    </div>
+
+    <!-- Exos loggués -->
     <div id="exo-cards-container"></div>
     <div class="empty-state" id="exo-empty" style="display:none">
       <div class="empty-state-icon">🏋️</div>
-      Aucun exercice encore — commence à dicter !
+      Commence le premier exercice !
     </div>
 
-    <!-- Finir la séance -->
+    <!-- Clôturer -->
     <div class="log-zone" style="margin-top:4px">
       <div class="log-zone-title">Clôturer la séance</div>
       <div style="margin-bottom:10px">
         <label class="input-label">Notes finales (texte ou vocal)</label>
         <div class="input-mic-row">
           <textarea class="log-input" id="final-notes" placeholder="Ressenti global, douleurs, PR..." rows="2" style="min-height:60px"></textarea>
-          <button class="btn-record" id="notes-mic-btn" onclick="toggleNotesMic()" style="height:60px; width:48px; border-radius:var(--radius-sm)">
+          <button class="btn-record" id="notes-mic-btn" onclick="toggleNotesMic()" style="height:60px;width:48px;border-radius:var(--radius-sm)">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
           </button>
         </div>
@@ -475,7 +655,7 @@
         Envoyer à Make
       </button>
       <div class="loading" id="submit-loading" style="margin-top:10px"><div class="spinner"></div>Enregistrement...</div>
-      <button class="btn btn-danger" onclick="confirmAbandon()" style="margin-top:10px; font-size:13px; padding:10px">
+      <button class="btn btn-danger" onclick="confirmAbandon()" style="margin-top:10px;font-size:13px;padding:10px">
         Abandonner la séance
       </button>
     </div>
@@ -513,57 +693,6 @@
     <div class="profile-field"><label class="input-label">Contraintes / blessures</label><textarea id="p-constraints" placeholder="Épaule fragile..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;outline:none;resize:none;min-height:80px;line-height:1.6"></textarea></div>
     <div class="profile-field"><label class="input-label">Contexte pour l'IA</label><textarea id="p-context" placeholder="Programme actuel, équipements..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;outline:none;resize:none;min-height:80px;line-height:1.6"></textarea></div>
   </div>
-  <!-- BODYFAT SCAN -->
-  <div class="bf-card">
-    <div class="card-label">📸 Analyse Body Fat par IA</div>
-
-    <!-- Résultat actuel -->
-    <div id="bf-current" style="display:none">
-      <div class="bf-result">
-        <div class="bf-percent" id="bf-value">—<span>%</span></div>
-        <div class="bf-details">
-          <div class="bf-range" id="bf-range"></div>
-          <div class="bf-note" id="bf-note"></div>
-        </div>
-      </div>
-      <div class="bf-date" id="bf-date"></div>
-    </div>
-
-    <!-- Pas encore de scan -->
-    <div id="bf-empty" style="font-size:13px;color:var(--text2);margin-bottom:12px">
-      Prends une photo de face ou de profil — torse visible. L'IA estime ton % de masse grasse.
-    </div>
-
-    <!-- Preview photo -->
-    <img id="photo-preview" class="photo-preview" alt="Preview">
-
-    <!-- Bouton capture -->
-    <input type="file" id="photo-input" accept="image/*" capture="environment" onchange="handlePhotoSelected(this)">
-    <button class="btn btn-secondary" onclick="document.getElementById('photo-input').click()" id="bf-capture-btn" style="margin-bottom:8px">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
-      Prendre une photo
-    </button>
-    <button class="btn btn-primary" onclick="analyzeBF()" id="bf-analyze-btn" style="display:none">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-      Analyser avec l'IA
-    </button>
-    <div class="loading" id="bf-loading" style="margin-top:8px"><div class="spinner"></div>Analyse en cours...</div>
-
-    <!-- Historique -->
-    <div id="bf-history-section" style="display:none; margin-top:14px">
-      <div class="card-label" style="margin-bottom:8px">Historique</div>
-      <div id="bf-history-list"></div>
-    </div>
-  </div>
-
-  <!-- BF% dans le profil sportif — champ manuel -->
-  <div class="card" style="margin-bottom:12px">
-    <div class="card-label">⚖️ Composition corporelle</div>
-    <div class="input-row">
-      <div><label class="input-label">Body Fat % (dernière mesure)</label><input type="number" id="p-bodyfat" placeholder="—" step="0.1" min="3" max="50"></div>
-      <div><label class="input-label">Masse musculaire (kg)</label><input type="number" id="p-muscle-mass" placeholder="—" step="0.1"></div>
-    </div>
-  </div>
 
   <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:24px">
     <button class="btn btn-secondary" onclick="loadProfile()">Charger Make</button>
@@ -597,7 +726,7 @@ const PROFILE_KEY = 'forge_profile';
 const SESSION_KEY = 'forge_current_session';
 
 let config  = { webhook: 'https://hook.eu1.make.com/al8v39pzju7ngrcv59g3clfjq14c0u54' };
-let profile = { name:'', age:'', weight:'', height:'', level:'confirmé', goal:'prise de masse', sessions_week:4, constraints:'', context:'', bodyfat:'', muscle_mass:'' };
+let profile = { name:'', age:'', weight:'', height:'', level:'confirmé', goal:'prise de masse', sessions_week:4, constraints:'', context:'' };
 
 // Session courante
 let currentSession = {
@@ -606,12 +735,11 @@ let currentSession = {
   startedAt: null,
   exos: [],            // [{id, text, savedAt}]
   iaPlan: null,        // plan IA si mode ia
+  iaExoIdx: 0,         // index de l'exercice IA en cours
   feeling: null
 };
 
 let allSessions = [];   // 100 dernières séances — chargées avec le dashboard
-let bfHistory = [];         // historique des scans bodyfat
-let pendingPhotoB64 = null; // photo en attente d'analyse
 let mainChart = null;
 let currentChartType = 'volume';
 let chartDataFromAPI = null;
@@ -697,7 +825,7 @@ function loadSessionFromLS() {
 
 function clearSessionLS() {
   localStorage.removeItem(SESSION_KEY);
-  currentSession = { mode:null, type:'musculation', startedAt:null, exos:[], iaPlan:null, feeling:null };
+  currentSession = { mode:null, type:'musculation', startedAt:null, exos:[], iaPlan:null, iaExoIdx:0, feeling:null };
   updateSessionBadge();
 }
 
@@ -729,7 +857,19 @@ function showSeanceStep(step) {
 }
 
 function backToStep0() {
+  // Reset IA form state when going back
+  const formWrapper = document.getElementById('ia-form-wrapper');
+  const formSummary = document.getElementById('ia-form-summary');
+  if (formWrapper) formWrapper.classList.remove('collapsed');
+  if (formSummary) formSummary.style.display = 'none';
+  document.getElementById('ai-plan-card').classList.remove('visible');
+  document.getElementById('ia-start-log-btn').style.display = 'none';
   showSeanceStep(0);
+}
+
+function toggleIAForm() {
+  const formWrapper = document.getElementById('ia-form-wrapper');
+  if (formWrapper) formWrapper.classList.toggle('collapsed');
 }
 
 function startSeanceIA() {
@@ -737,12 +877,14 @@ function startSeanceIA() {
 }
 
 function startSeanceLibre() {
-  currentSession = { mode:'libre', type:'musculation', startedAt: new Date().toISOString(), exos:[], iaPlan:null, feeling:null };
+  currentSession = { mode:'libre', type:'musculation', startedAt: new Date().toISOString(), exos:[], iaPlan:null, iaExoIdx:0, feeling:null };
   saveSessionToLS();
   document.getElementById('log-step-title').textContent = 'SÉANCE LIBRE';
   document.getElementById('log-step-badge').textContent = 'LIBRE';
   document.getElementById('log-step-badge').className = 'step-badge badge-libre';
-  document.getElementById('log-ia-ref').style.display = 'none';
+  document.getElementById('log-ia-plan').style.display = 'none';
+  document.getElementById('log-libre-zone').style.display = 'block';
+  document.getElementById('log-ia-bonus-zone').style.display = 'none';
   setSessionType('musculation', document.querySelector('.type-chip'));
   renderExoCards();
   showSeanceStep('log');
@@ -751,22 +893,17 @@ function startSeanceLibre() {
 function startLogFromIA() {
   currentSession.mode = 'ia';
   currentSession.startedAt = new Date().toISOString();
+  currentSession.iaExoIdx = 0;
   saveSessionToLS();
   document.getElementById('log-step-title').textContent = 'SÉANCE IA';
   document.getElementById('log-step-badge').textContent = 'IA';
   document.getElementById('log-step-badge').className = 'step-badge badge-ia';
-  // Afficher ref planning IA
-  if (currentSession.iaPlan) {
-    document.getElementById('log-ia-ref').style.display = 'block';
-    const plan = currentSession.iaPlan;
-    document.getElementById('log-ia-ref-content').innerHTML =
-      (plan.exercises || []).map(ex => {
-        const setsStr = (ex.sets||[]).map(s => `${s.reps}×${s.load > 0 ? s.load+'kg' : 'PC'}${s.note ? ' ('+s.note+')' : ''}`).join(' · ');
-        return `<div style="margin-bottom:6px"><span style="color:var(--text);font-weight:500">${ex.name}</span><br><span style="color:var(--accent2);font-size:11px">${setsStr}</span></div>`;
-      }).join('');
-  }
+  document.getElementById('log-libre-zone').style.display = 'none';
+  document.getElementById('log-ia-bonus-zone').style.display = 'none';
+  document.getElementById('exo-cards-container').style.display = 'none';
+  document.getElementById('exo-empty').style.display = 'none';
   setSessionType('musculation', document.querySelector('.type-chip'));
-  renderExoCards();
+  renderIAPlanInLog();
   showSeanceStep('log');
 }
 
@@ -774,19 +911,21 @@ function goToLogStep() {
   document.getElementById('log-step-title').textContent = currentSession.mode === 'ia' ? 'SÉANCE IA' : 'SÉANCE LIBRE';
   document.getElementById('log-step-badge').textContent = currentSession.mode === 'ia' ? 'IA' : 'LIBRE';
   document.getElementById('log-step-badge').className = 'step-badge badge-' + (currentSession.mode || 'libre');
-  if (currentSession.iaPlan && currentSession.mode === 'ia') {
-    document.getElementById('log-ia-ref').style.display = 'block';
-    const plan = currentSession.iaPlan;
-    document.getElementById('log-ia-ref-content').innerHTML =
-      (plan.exercises || []).map(ex => {
-        const setsStr = (ex.sets||[]).map(s => `${s.reps}×${s.load > 0 ? s.load+'kg' : 'PC'}${s.note ? ' ('+s.note+')' : ''}`).join(' · ');
-        return `<div style="margin-bottom:6px"><span style="color:var(--text);font-weight:500">${ex.name}</span><br><span style="color:var(--accent2);font-size:11px">${setsStr}</span></div>`;
-      }).join('');
-  }
-  // Reselect type chip
   document.querySelectorAll('.type-chip').forEach(c => c.className = 'type-chip');
   const activeChip = document.querySelector(`.type-chip[onclick*="${currentSession.type}"]`);
   if (activeChip) activeChip.classList.add('active-' + currentSession.type);
+  if (currentSession.mode === 'ia' && currentSession.iaPlan) {
+    document.getElementById('log-libre-zone').style.display = 'none';
+    document.getElementById('exo-cards-container').style.display = 'none';
+    document.getElementById('exo-empty').style.display = 'none';
+    const slots = getIAExoSlots(currentSession.iaPlan);
+    const bonusZone = document.getElementById('log-ia-bonus-zone');
+    if (bonusZone) bonusZone.style.display = (currentSession.iaExoIdx || 0) >= slots.length ? 'block' : 'none';
+    renderIAPlanInLog();
+  } else {
+    document.getElementById('log-libre-zone').style.display = 'block';
+    document.getElementById('log-ia-bonus-zone').style.display = 'none';
+  }
   renderExoCards();
   showSeanceStep('log');
 }
@@ -807,6 +946,253 @@ function setFeeling(val, btn) {
 }
 
 // ── EXO MANAGEMENT ───────────────────────────────────────────────
+// ── IA PLAN IN LOG ────────────────────────────────────────────────
+// Builds a flat ordered list of "exercise slots" from the plan
+// (superset members are flattened in sequence, preserving order)
+function getIAExoSlots(plan) {
+  const slots = [];
+  const exercises = plan.exercises || [];
+  const ssProcessed = new Set();
+  exercises.forEach(ex => {
+    const sg = ex.superset_group;
+    if (sg !== null && sg !== undefined) {
+      if (!ssProcessed.has(sg)) {
+        ssProcessed.add(sg);
+        // All members of this superset as one slot
+        const members = exercises.filter(e => e.superset_group === sg);
+        slots.push({ type: 'superset', members, sg });
+      }
+    } else {
+      slots.push({ type: 'solo', ex });
+    }
+  });
+  return slots;
+}
+
+// Format a slot (solo or superset) as pre-fill text for the textarea
+function formatSlotAsText(slot) {
+  if (slot.type === 'solo') {
+    const ex = slot.ex;
+    const setsStr = (ex.sets || []).map(s =>
+      `${s.reps}×${s.load > 0 ? s.load + 'kg' : 'PC'}${s.note ? ' (' + s.note + ')' : ''}`
+    ).join(', ');
+    return `${ex.name} — ${setsStr}`;
+  } else {
+    // Superset: list each exercise
+    return slot.members.map(ex => {
+      const setsStr = (ex.sets || []).map(s =>
+        `${s.reps}×${s.load > 0 ? s.load + 'kg' : 'PC'}${s.note ? ' (' + s.note + ')' : ''}`
+      ).join(', ');
+      return `${ex.name} — ${setsStr}`;
+    }).join('\n');
+  }
+}
+
+function prefillNextExo() {
+  // Legacy — no longer used in IA mode (input is now embedded in each slot)
+}
+
+function progClass(prog) {
+  if (!prog) return 'new';
+  if (prog.startsWith('↑')) return 'up';
+  if (prog.startsWith('↓')) return 'down';
+  if (prog.startsWith('=')) return 'eq';
+  return 'new';
+}
+
+function buildLiaSlotHtml(slot, state, slotIdx, loggedExo) {
+  const isCurrent = state === 'current';
+  const isDone    = state === 'done';
+  const openClass = (isCurrent || isDone) ? ' open' : '';
+  const prefilled = isCurrent ? formatSlotAsText(slot) : '';
+
+  // Done zone — logged text + edit button (replaces input zone)
+  const doneZone = isDone && loggedExo ? `
+    <div class="lia-done-zone">
+      <div class="lia-done-text" id="lia-done-text-${slotIdx}">${loggedExo.text.replace(/\n/g, '<br>')}</div>
+      <textarea class="lia-textarea lia-done-edit" id="lia-done-edit-${slotIdx}" style="display:none" rows="3">${loggedExo.text}</textarea>
+      <div class="lia-done-actions" id="lia-done-actions-${slotIdx}">
+        <button class="exo-card-btn edit" onclick="editDoneSlot(${slotIdx})">Modifier</button>
+      </div>
+      <div class="lia-done-save-row" id="lia-done-save-${slotIdx}" style="display:none">
+        <button class="exo-card-btn save" onclick="saveDoneSlot(${slotIdx})" style="flex:1">✓ Enregistrer</button>
+        <button class="exo-card-btn cancel" onclick="cancelDoneSlot(${slotIdx})" style="flex:1">Annuler</button>
+      </div>
+    </div>` : '';
+
+  // Input zone — only for current slot
+  const inputZone = isCurrent ? `
+    <div class="lia-input-zone">
+      <div class="lia-input-row">
+        <textarea class="lia-textarea" id="lia-textarea-${slotIdx}" rows="3">${prefilled}</textarea>
+        <button class="btn-record" id="lia-mic-btn-${slotIdx}" onclick="toggleLiaMic(${slotIdx})" style="height:100%;width:44px;border-radius:var(--radius-sm)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+        </button>
+      </div>
+      <button class="lia-validate-btn" onclick="validateLiaSlot(${slotIdx})">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Valider cet exercice
+      </button>
+    </div>` : '';
+
+  function buildBody(inner, restHtml, extraZone) {
+    const extra = extraZone || inputZone;
+    return `<div class="lia-body">${inner}${restHtml}${extra}</div>`;
+  }
+
+  if (slot.type === 'solo') {
+    const ex = slot.ex;
+    const pc = progClass(ex.progression_note);
+    const progMini = ex.progression_note
+      ? `<div class="lia-prog-mini ${pc}">${ex.progression_note}</div>` : '';
+    const setsHtml = (ex.sets || []).map(s => {
+      const loadStr = s.load > 0 ? `${s.load} kg` : 'PC';
+      const noteHtml = s.note ? `<span class="ai-set-note">${s.note}</span>` : '';
+      return `<div class="ai-set-row"><span class="ai-set-reps">${s.reps} reps</span><span class="ai-set-load">${loadStr}${noteHtml}</span></div>`;
+    }).join('');
+    const progBodyHtml = ex.progression_note ? `<div class="ai-exo-prog ${pc}">${ex.progression_note}</div>` : '';
+    const tipHtml = ex.coaching_tip ? `<div class="ai-exo-tip">💡 ${ex.coaching_tip}</div>` : '';
+    const restHtml = ex.rest_seconds ? `<div class="ai-exo-rest" style="padding:0 14px 8px;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--text3)">⏱ repos ${ex.rest_seconds}s</div>` : '';
+    const body = buildBody(`${progBodyHtml}<div class="ai-exo-sets">${setsHtml}</div>${tipHtml}`, restHtml, doneZone);
+    return `<div class="log-ia-exo-block ${state}${openClass}" id="lia-slot-${slotIdx}">
+      <div class="lia-header" onclick="toggleLiaSlot(this.parentElement)">
+        <div class="lia-header-left">
+          <div class="lia-name">${ex.name}</div>
+          ${progMini}
+        </div>
+        <div class="lia-chevron">▼</div>
+      </div>
+      ${body}
+    </div>`;
+  } else {
+    // Superset
+    const firstProg = slot.members[0]?.progression_note;
+    const pc = progClass(firstProg);
+    const progMini = firstProg ? `<div class="lia-prog-mini ${pc}">${firstProg}</div>` : '';
+    const ssNames = slot.members.map(e => e.name).join(' + ');
+    const innerHtml = slot.members.map((ex, mi) => {
+      const isNotLast = mi < slot.members.length - 1;
+      const setsHtml = (ex.sets || []).map(s => {
+        const loadStr = s.load > 0 ? `${s.load} kg` : 'PC';
+        const noteHtml = s.note ? `<span class="ai-set-note">${s.note}</span>` : '';
+        return `<div class="ai-set-row"><span class="ai-set-reps">${s.reps} reps</span><span class="ai-set-load">${loadStr}${noteHtml}</span></div>`;
+      }).join('');
+      const exPc = progClass(ex.progression_note);
+      const progHtml = ex.progression_note ? `<div class="ai-exo-prog ${exPc}">${ex.progression_note}</div>` : '';
+      const tipHtml = ex.coaching_tip ? `<div class="ai-exo-tip">💡 ${ex.coaching_tip}</div>` : '';
+      const restDiv = isNotLast && ex.rest_seconds
+        ? `<div class="ai-superset-rest">⏱ ${ex.rest_seconds}s · enchaîner</div>` : '';
+      return `<div class="ai-exo-header" style="background:var(--bg3)"><div class="ai-exo-name">${ex.name}</div></div>${progHtml}<div class="ai-exo-sets">${setsHtml}</div>${tipHtml}${restDiv}`;
+    }).join('');
+    const lastMember = slot.members[slot.members.length - 1];
+    const restHtml = lastMember?.rest_seconds
+      ? `<div class="ai-exo-rest" style="padding:0 14px 8px;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--text3)">⏱ repos ${lastMember.rest_seconds}s</div>` : '';
+    const body = buildBody(`<div class="ai-superset-label" style="margin:0">⚡ Superset</div>${innerHtml}`, restHtml, doneZone);
+    return `<div class="log-ia-ss-block ${state}${openClass}" id="lia-slot-${slotIdx}">
+      <div class="lia-header" onclick="toggleLiaSlot(this.parentElement)">
+        <div class="lia-header-left">
+          <div class="lia-name">⚡ ${ssNames}</div>
+          ${progMini}
+        </div>
+        <div class="lia-chevron">▼</div>
+      </div>
+      ${body}
+    </div>`;
+  }
+}
+
+function toggleLiaSlot(el) {
+  el.classList.toggle('open');
+}
+
+function renderIAPlanInLog() {
+  const plan = currentSession.iaPlan;
+  const container = document.getElementById('log-ia-plan');
+  const content = document.getElementById('log-ia-plan-content');
+  if (!plan || !container || !content) return;
+
+  container.style.display = 'block';
+  const slots = getIAExoSlots(plan);
+  const idx = currentSession.iaExoIdx || 0;
+
+  content.innerHTML = slots.map((slot, i) => {
+    const state = i < idx ? 'done' : i === idx ? 'current' : 'upcoming';
+    // For done slots, pass the logged exo text
+    const loggedExo = state === 'done' ? currentSession.exos[i] : null;
+    return buildLiaSlotHtml(slot, state, i, loggedExo);
+  }).join('');
+
+  // Scroll current slot into view smoothly
+  setTimeout(() => {
+    const cur = content.querySelector('.current');
+    if (cur) cur.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 50);
+}
+
+// Edit / save / cancel a done slot
+function editDoneSlot(slotIdx) {
+  document.getElementById(`lia-done-text-${slotIdx}`).style.display = 'none';
+  document.getElementById(`lia-done-edit-${slotIdx}`).style.display = 'block';
+  document.getElementById(`lia-done-actions-${slotIdx}`).style.display = 'none';
+  document.getElementById(`lia-done-save-${slotIdx}`).style.display = 'flex';
+  document.getElementById(`lia-done-edit-${slotIdx}`).focus();
+}
+function cancelDoneSlot(slotIdx) {
+  const exo = currentSession.exos[slotIdx];
+  const edit = document.getElementById(`lia-done-edit-${slotIdx}`);
+  if (edit && exo) edit.value = exo.text;
+  document.getElementById(`lia-done-text-${slotIdx}`).style.display = 'block';
+  document.getElementById(`lia-done-edit-${slotIdx}`).style.display = 'none';
+  document.getElementById(`lia-done-actions-${slotIdx}`).style.display = 'flex';
+  document.getElementById(`lia-done-save-${slotIdx}`).style.display = 'none';
+}
+function saveDoneSlot(slotIdx) {
+  const edit = document.getElementById(`lia-done-edit-${slotIdx}`);
+  const newText = edit ? edit.value.trim() : '';
+  if (!newText) { showToast('Texte vide', true); return; }
+  if (currentSession.exos[slotIdx]) {
+    currentSession.exos[slotIdx].text = newText;
+    saveSessionToLS();
+  }
+  // Update display without full re-render
+  const textEl = document.getElementById(`lia-done-text-${slotIdx}`);
+  if (textEl) textEl.innerHTML = newText.replace(/\n/g, '<br>');
+  cancelDoneSlot(slotIdx);
+  showToast('Modifié ✓');
+}
+
+// Validate a slot from the integrated IA plan input
+function validateLiaSlot(slotIdx) {
+  const textarea = document.getElementById(`lia-textarea-${slotIdx}`);
+  const text = textarea ? textarea.value.trim() : '';
+  if (!text) { showToast('Saisis les charges réalisées', true); return; }
+  const exo = { id: Date.now(), text, savedAt: new Date().toISOString() };
+  currentSession.exos.push(exo);
+  currentSession.iaExoIdx = slotIdx + 1;
+  saveSessionToLS();
+  renderExoCards();
+  renderIAPlanInLog();
+  // Show bonus zone if all IA slots done
+  const slots = getIAExoSlots(currentSession.iaPlan);
+  const bonusZone = document.getElementById('log-ia-bonus-zone');
+  if (bonusZone) bonusZone.style.display = currentSession.iaExoIdx >= slots.length ? 'block' : 'none';
+  showToast('Exo enregistré ✓');
+}
+
+// Bonus exo (after all IA slots)
+function saveExoBonus() {
+  const input = document.getElementById('exo-input-bonus');
+  const text = input ? input.value.trim() : '';
+  if (!text) { showToast('Saisis un exercice', true); return; }
+  const exo = { id: Date.now(), text, savedAt: new Date().toISOString() };
+  currentSession.exos.push(exo);
+  saveSessionToLS();
+  if (input) input.value = '';
+  renderExoCards();
+  showToast('Exo ajouté ✓');
+}
+
+// Libre mode saveExo
 function saveExo() {
   const input = document.getElementById('exo-input');
   const text = input.value.trim();
@@ -825,6 +1211,39 @@ function deleteExo(id) {
   renderExoCards();
 }
 
+function editExo(id) {
+  // Toggle edit mode on the card
+  const card = document.querySelector(`.exo-card[data-id="${id}"]`);
+  if (!card) return;
+  card.classList.add('editing');
+  const textarea = card.querySelector('.exo-card-edit-area');
+  if (textarea) { textarea.focus(); textarea.setSelectionRange(textarea.value.length, textarea.value.length); }
+}
+
+function cancelEditExo(id) {
+  const card = document.querySelector(`.exo-card[data-id="${id}"]`);
+  if (card) card.classList.remove('editing');
+  // Restore original text from session
+  const exo = currentSession.exos.find(e => e.id === id);
+  const card2 = document.querySelector(`.exo-card[data-id="${id}"]`);
+  if (card2 && exo) {
+    const textarea = card2.querySelector('.exo-card-edit-area');
+    if (textarea) textarea.value = exo.text;
+  }
+}
+
+function saveEditExo(id) {
+  const card = document.querySelector(`.exo-card[data-id="${id}"]`);
+  if (!card) return;
+  const textarea = card.querySelector('.exo-card-edit-area');
+  const newText = textarea ? textarea.value.trim() : '';
+  if (!newText) { showToast('Le texte ne peut pas être vide', true); return; }
+  const exo = currentSession.exos.find(e => e.id === id);
+  if (exo) { exo.text = newText; saveSessionToLS(); }
+  renderExoCards();
+  showToast('Modifié ✓');
+}
+
 function renderExoCards() {
   const container = document.getElementById('exo-cards-container');
   const empty = document.getElementById('exo-empty');
@@ -835,13 +1254,20 @@ function renderExoCards() {
   }
   empty.style.display = 'none';
   container.innerHTML = currentSession.exos.map((exo, i) => `
-    <div class="exo-card">
+    <div class="exo-card" data-id="${exo.id}">
       <div class="exo-card-header">
-        <div class="exo-card-num">Exercice ${i + 1}</div>
-        <button class="exo-card-delete" onclick="deleteExo(${exo.id})">×</button>
+        <div class="exo-card-num">Exercice ${i + 1} · ${new Date(exo.savedAt).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div>
+        <div class="exo-card-actions">
+          <button class="exo-card-btn edit" onclick="editExo(${exo.id})">Modifier</button>
+          <button class="exo-card-btn del"  onclick="deleteExo(${exo.id})">Suppr.</button>
+        </div>
       </div>
       <div class="exo-card-content">${exo.text}</div>
-      <div class="exo-card-time">${new Date(exo.savedAt).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div>
+      <textarea class="exo-card-edit-area" rows="3">${exo.text}</textarea>
+      <div style="display:flex;gap:8px">
+        <button class="exo-card-btn save"   onclick="saveEditExo(${exo.id})" style="flex:1">✓ Enregistrer</button>
+        <button class="exo-card-btn cancel" onclick="cancelEditExo(${exo.id})" style="flex:1">Annuler</button>
+      </div>
     </div>`).join('');
 }
 
@@ -867,14 +1293,11 @@ function startIAMic() {
   iaRecog = new SR(); iaRecog.lang='fr-FR'; iaRecog.continuous=true; iaRecog.interimResults=true;
   iaRecog.onstart = () => {
     iaRecording = true;
-    document.getElementById('ia-orb').classList.add('listening');
-    document.getElementById('ia-mic-status').textContent='En écoute...';
-    document.getElementById('ia-mic-status').classList.add('active');
     document.getElementById('ia-mic-btn').classList.add('recording');
   };
   iaRecog.onresult = e => {
     let t=''; for(let i=0;i<e.results.length;i++) t+=e.results[i][0].transcript;
-    document.getElementById('ia-prompt').value = t;
+    document.getElementById('ia-note').value = t;
   };
   iaRecog.onend = () => stopIAMic();
   iaRecog.onerror = () => { stopIAMic(); showToast('Erreur micro', true); };
@@ -883,15 +1306,36 @@ function startIAMic() {
 function stopIAMic() {
   if (iaRecog) iaRecog.stop();
   iaRecording = false;
-  document.getElementById('ia-orb').classList.remove('listening');
-  document.getElementById('ia-mic-status').textContent='Appuie pour parler';
-  document.getElementById('ia-mic-status').classList.remove('active');
   document.getElementById('ia-mic-btn').classList.remove('recording');
 }
 
+// IA Form state
+let iaDuration = 60;
+let iaEnergy   = 3;
+let iaFocus    = 'ai_decide';
+
+const ENERGY_LABELS = { 1:'Épuisé', 2:'Fatigué', 3:'Normal', 4:'En forme', 5:'En feu 🔥' };
+
+function setDuration(val, btn) {
+  iaDuration = val;
+  document.querySelectorAll('.ia-dur-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function setEnergy(val, btn) {
+  iaEnergy = val;
+  document.querySelectorAll('.ia-energy-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('ia-energy-label').textContent = ENERGY_LABELS[val] || '';
+}
+
+function setFocus(val, btn) {
+  iaFocus = val;
+  document.querySelectorAll('.ia-focus-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
 async function generatePlanIA() {
-  const prompt = document.getElementById('ia-prompt').value.trim();
-  if (!prompt) { showToast('Décris ta demande d\'abord !', true); return; }
   document.getElementById('ai-plan-card').classList.remove('visible');
   document.getElementById('ia-start-log-btn').style.display = 'none';
   document.getElementById('ia-gen-btn').disabled = true;
@@ -900,8 +1344,17 @@ async function generatePlanIA() {
     setTimeout(() => { hideOverlay(); renderIAPlan(getDemoPlan()); }, 2000);
     return;
   }
+  const payload = {
+    event:            'generate_session',
+    duration_minutes: iaDuration,
+    energy_level:     iaEnergy,
+    requested_focus:  iaFocus,
+    extra_note:       document.getElementById('ia-note').value.trim(),
+    profile,
+    date:             new Date().toISOString()
+  };
   try {
-    const data = await callMake({ event:'generate_session', message:prompt, profile, date:new Date().toISOString() });
+    const data = await callMake(payload);
     hideOverlay();
     renderIAPlan(data);
   } catch(e) {
@@ -914,20 +1367,40 @@ async function generatePlanIA() {
 function getDemoPlan() {
   return {
     type: 'musculation', name: 'Pull — Dos / Biceps / Deltoïdes post.', duration: 75,
-    coach_note: 'On équilibre avec la séance push récente. Vise une progression sur le rowing poulie et les tractions.',
-    warmup: '5-10 min cardio léger + séries légères de rowing pour activer le dos.',
-    cooldown: 'Étirements dorsaux et biceps.',
+    coach_note: 'Séance pull retenue — dernier push il y a 48h, dos bien récupéré. Progression sur le Rowing poulie : étais à 50kg × 6 la dernière fois, on tente 52kg. Drop sets maintenus car déjà dans ton historique.',
+    warmup: '5 min vélo léger + 2×15 Scapular Pull-Ups pour activer les stabilisateurs du dos.',
+    cooldown: 'Étirements dorsaux au sol 2 min, stretch biceps contre mur, foam roller dorsaux.',
     exercises: [
-      { name: 'Rowing poulie neutre', coaching_tip: 'Concentre-toi sur la contraction des omoplates.',
-        sets: [{reps:12,load:32,note:'échauffement'},{reps:8,load:42,note:null},{reps:6,load:47,note:null},{reps:4,load:52,note:null},{reps:12,load:32,note:'DROP - sans pause'},{reps:8,load:27,note:'sans pause'},{reps:6,load:22,note:'sans pause'}] },
-      { name: 'Reverse fly machine', coaching_tip: 'Contrôle le mouvement, isole les deltoïdes post.',
-        sets: [{reps:15,load:32,note:null},{reps:12,load:37,note:null},{reps:12,load:37,note:null}] },
-      { name: 'Face pull', coaching_tip: null,
-        sets: [{reps:15,load:37,note:null},{reps:10,load:42,note:null},{reps:6,load:47,note:null},{reps:20,load:32,note:'Back-off'}] },
-      { name: 'Curl barre EZ', coaching_tip: 'Évite de balancer le corps.',
-        sets: [{reps:12,load:32,note:null},{reps:10,load:37,note:null},{reps:8,load:39,note:null},{reps:12,load:27,note:'DROP'}] },
-      { name: 'Traction pronation', coaching_tip: 'Tire avec le dos, pas les bras.',
-        sets: [{reps:8,load:0,note:'poids de corps'},{reps:7,load:0,note:'poids de corps'},{reps:6,load:5,note:'lesté'}] }
+      {
+        name: 'Tirage vertical prise neutre', superset_group: null, rest_seconds: 120,
+        progression_note: '↑ +5kg top set — étais à 60kg × 4 le 22 avr',
+        coaching_tip: "Tire les coudes vers les hanches, pas vers l'arrière. Contraction scapulaire en fin.",
+        sets: [{reps:12,load:40,note:'échauffement'},{reps:10,load:50,note:null},{reps:8,load:55,note:null},{reps:5,load:65,note:'top set'},{reps:12,load:42,note:'back-off'}]
+      },
+      {
+        name: 'Rowing poulie neutre', superset_group: null, rest_seconds: 90,
+        progression_note: '↑ +2kg — étais à 50kg × 6 le 22 avr',
+        coaching_tip: "Coudes proches du corps, contraction en fin de mouvement — 1 sec d'isométrique.",
+        sets: [{reps:12,load:32,note:'échauffement'},{reps:8,load:45,note:null},{reps:6,load:52,note:null},{reps:4,load:52,note:null},{reps:12,load:30,note:'DROP - sans pause'},{reps:8,load:25,note:'sans pause'},{reps:6,load:20,note:'sans pause'}]
+      },
+      {
+        name: 'Reverse Fly Machine', superset_group: 1, rest_seconds: 30,
+        progression_note: '= consolidation — 3×12 à 35kg maintenu',
+        coaching_tip: 'Contrôle la phase négative, coudes légèrement fléchis.',
+        sets: [{reps:15,load:30,note:null},{reps:12,load:35,note:null},{reps:12,load:35,note:null}]
+      },
+      {
+        name: 'Face Pull', superset_group: 1, rest_seconds: 90,
+        progression_note: '↑ +5kg — étais à 40kg × 10 le 22 avr',
+        coaching_tip: 'Coudes hauts, tire vers le front — contraction scapulaire.',
+        sets: [{reps:15,load:35,note:null},{reps:10,load:45,note:null},{reps:6,load:45,note:null},{reps:20,load:30,note:'back-off'}]
+      },
+      {
+        name: 'Curl EZ', superset_group: null, rest_seconds: 60,
+        progression_note: '↑ +2.5kg — étais à 15kg × 12 le 5 janv',
+        coaching_tip: 'Pas de balancement — isole le biceps, coudes fixes.',
+        sets: [{reps:12,load:17.5,note:null},{reps:10,load:17.5,note:null},{reps:8,load:17.5,note:null},{reps:12,load:12.5,note:'DROP'}]
+      }
     ]
   };
 }
@@ -948,45 +1421,176 @@ function renderIAPlan(data) {
 
   // Header
   document.getElementById('ai-plan-title').textContent = data.name || 'Séance du jour';
-  document.getElementById('ai-plan-meta').textContent  = `Durée estimée : ${data.duration || '60'} min`;
+  document.getElementById('ai-plan-meta').textContent  = `${data.duration || '60'} min estimées`;
 
-  // Coach note (remplace ancien "note")
+  // Coach note
   const noteEl = document.getElementById('ai-plan-note');
   const noteText = data.coach_note || data.note || null;
   if (noteText) { noteEl.innerHTML = `💬 ${noteText}`; noteEl.style.display = 'block'; }
   else noteEl.style.display = 'none';
 
-  // Exercices avec séries détaillées
-  const exosHtml = (data.exercises || []).map(ex => {
-    const setsHtml = (ex.sets || []).map(s => {
-      const loadStr = s.load > 0 ? `${s.load} kg` : 'Poids de corps';
-      const noteStr = s.note ? `<span style="font-size:10px;color:var(--accent3);margin-left:4px">${s.note}</span>` : '';
-      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
-        <span style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--accent2)">${s.reps} reps</span>
-        <span style="font-size:13px;color:var(--text2)">${loadStr}${noteStr}</span>
-      </div>`;
+  // Warmup / cooldown
+  const wcHtml = [
+    data.warmup   ? `<div class="ai-wc-block warmup">🔥 <strong>Échauffement</strong> — ${data.warmup}</div>` : '',
+    data.cooldown ? `<div class="ai-wc-block cooldown">🧘 <strong>Retour au calme</strong> — ${data.cooldown}</div>` : ''
+  ].filter(Boolean).join('');
+
+  // Group exercises by superset_group
+  const exercises = data.exercises || [];
+
+  // Build ordered list: solo exercises and superset groups in order
+  const rendered = [];
+  const ssProcessed = new Set();
+
+  exercises.forEach((ex, idx) => {
+    const sg = ex.superset_group;
+    if (sg !== null && sg !== undefined && !ssProcessed.has(sg)) {
+      // Superset group — collect all members in order
+      ssProcessed.add(sg);
+      const members = exercises.filter(e => e.superset_group === sg);
+      rendered.push({ type: 'superset', group: sg, members });
+    } else if (sg === null || sg === undefined) {
+      rendered.push({ type: 'solo', ex });
+    }
+  });
+
+  const exosHtml = rendered.map(item => {
+    if (item.type === 'solo') return buildExoBlock(item.ex, false);
+    // Superset
+    const innerHtml = item.members.map((ex, i) => {
+      const isLast = i === item.members.length - 1;
+      return buildExoBlock(ex, true, isLast ? null : ex.rest_seconds);
     }).join('');
-    const tipHtml = ex.coaching_tip
-      ? `<div style="font-size:11px;color:var(--text3);margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.04);line-height:1.5">💡 ${ex.coaching_tip}</div>`
-      : '';
-    return `<div style="margin-bottom:14px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px;color:var(--text)">${ex.name}</div>
-      ${setsHtml}${tipHtml}
+    return `<div class="ai-exo-block superset" style="margin-bottom:12px">
+      <div class="ai-superset-label">⚡ Superset</div>
+      ${innerHtml}
     </div>`;
   }).join('');
 
-  // Warmup / cooldown
-  const wcHtml = [
-    data.warmup   ? `<div style="padding:8px 10px;background:rgba(71,200,255,0.07);border-radius:8px;font-size:12px;color:var(--accent2);margin-bottom:6px">🔥 <strong>Échauffement</strong> — ${data.warmup}</div>` : '',
-    data.cooldown ? `<div style="padding:8px 10px;background:rgba(136,136,170,0.07);border-radius:8px;font-size:12px;color:var(--text2)">🧘 <strong>Retour au calme</strong> — ${data.cooldown}</div>` : ''
-  ].filter(Boolean).join('');
-
-  document.getElementById('ai-plan-exercises').innerHTML = (wcHtml ? wcHtml + '<div style="height:12px"></div>' : '') + exosHtml;
+  document.getElementById('ai-plan-exercises').innerHTML =
+    (wcHtml ? wcHtml + '<div style="height:10px"></div>' : '') + exosHtml;
   document.getElementById('ai-plan-card').classList.add('visible');
   document.getElementById('ia-start-log-btn').style.display = 'flex';
+
+  // Collapse form, show summary bar
+  const formWrapper = document.getElementById('ia-form-wrapper');
+  const formSummary = document.getElementById('ia-form-summary');
+  const summaryText = document.getElementById('ia-form-summary-text');
+  if (formWrapper) formWrapper.classList.add('collapsed');
+  if (formSummary) formSummary.style.display = 'block';
+  if (summaryText) {
+    const energyEmoji = {1:'💀',2:'😓',3:'😐',4:'💪',5:'🔥'}[iaEnergy] || '😐';
+    const focusLabel = {push:'Push',pull:'Pull',legs:'Legs',mix:'Full body',cardio:'Cardio',ai_decide:'IA decide'}[iaFocus] || iaFocus;
+    summaryText.textContent = `${iaDuration} min · ${energyEmoji} · ${focusLabel}`;
+  }
+
+  // Scroll plan into view
+  setTimeout(() => {
+    const card = document.getElementById('ai-plan-card');
+    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 80);
+}
+
+function buildExoBlock(ex, inSuperset, supersetRestSeconds) {
+  // Progression note color
+  const prog = ex.progression_note || null;
+  let progClass = 'new';
+  if (prog) {
+    if (prog.startsWith('↑')) progClass = 'up';
+    else if (prog.startsWith('↓')) progClass = 'down';
+    else if (prog.startsWith('=')) progClass = 'eq';
+  }
+
+  // Rest label — for superset inner, show superset rest; for last in superset or solo, show ex.rest_seconds
+  const restLabel = inSuperset && supersetRestSeconds !== null
+    ? `⏱ ${supersetRestSeconds}s → prochain`
+    : ex.rest_seconds ? `⏱ repos ${ex.rest_seconds}s` : '';
+
+  // Sets
+  const setsHtml = (ex.sets || []).map(s => {
+    const loadStr = s.load > 0 ? `${s.load} kg` : 'Poids de corps';
+    const noteHtml = s.note ? `<span class="ai-set-note">${s.note}</span>` : '';
+    return `<div class="ai-set-row">
+      <span class="ai-set-reps">${s.reps} reps</span>
+      <span class="ai-set-load">${loadStr}${noteHtml}</span>
+    </div>`;
+  }).join('');
+
+  const tipHtml = ex.coaching_tip
+    ? `<div class="ai-exo-tip">💡 ${ex.coaching_tip}</div>` : '';
+
+  const progHtml = prog
+    ? `<div class="ai-exo-prog ${progClass}">${prog}</div>` : '';
+
+  // Wrap — solo gets its own .ai-exo-block, superset members don't
+  const inner = `
+    <div class="ai-exo-header">
+      <div class="ai-exo-name">${ex.name}</div>
+      ${restLabel ? `<div class="ai-exo-rest">${restLabel}</div>` : ''}
+    </div>
+    ${progHtml}
+    <div class="ai-exo-sets">${setsHtml}</div>
+    ${tipHtml}`;
+
+  if (inSuperset) {
+    // Inside a superset wrapper — add a rest divider after if not last
+    const restDivider = supersetRestSeconds !== null
+      ? `<div class="ai-superset-rest">⏱ ${supersetRestSeconds}s · enchaîner</div>` : '';
+    return inner + restDivider;
+  }
+  return `<div class="ai-exo-block" style="margin-bottom:12px">${inner}</div>`;
 }
 
 // ── MICRO EXO ─────────────────────────────────────────────────────
+// ── MIC POUR SLOT IA ─────────────────────────────────────────────
+let liaMicRecog = null, liaMicRecording = false, liaMicSlotIdx = -1;
+
+function toggleLiaMic(slotIdx) {
+  if (liaMicRecording && liaMicSlotIdx === slotIdx) { stopLiaMic(); return; }
+  if (liaMicRecording) stopLiaMic();
+  startLiaMic(slotIdx);
+}
+function startLiaMic(slotIdx) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { showToast('Vocal non supporté', true); return; }
+  liaMicSlotIdx = slotIdx;
+  liaMicRecog = new SR(); liaMicRecog.lang='fr-FR'; liaMicRecog.continuous=true; liaMicRecog.interimResults=true;
+  liaMicRecog.onstart = () => {
+    liaMicRecording = true;
+    const btn = document.getElementById(`lia-mic-btn-${slotIdx}`);
+    if (btn) btn.classList.add('recording');
+  };
+  liaMicRecog.onresult = e => {
+    let t=''; for(let i=0;i<e.results.length;i++) t+=e.results[i][0].transcript;
+    const ta = document.getElementById(`lia-textarea-${slotIdx}`);
+    if (ta) ta.value = t;
+  };
+  liaMicRecog.onend = () => stopLiaMic();
+  liaMicRecog.onerror = () => { stopLiaMic(); showToast('Erreur micro', true); };
+  liaMicRecog.start();
+}
+function stopLiaMic() {
+  if (liaMicRecog) liaMicRecog.stop();
+  liaMicRecording = false;
+  const btn = document.getElementById(`lia-mic-btn-${liaMicSlotIdx}`);
+  if (btn) btn.classList.remove('recording');
+  liaMicSlotIdx = -1;
+}
+
+// Bonus mic (after all IA slots)
+let bonusMicRecog = null, bonusMicRecording = false;
+function toggleExoMicBonus() {
+  if (bonusMicRecording) { bonusMicRecog?.stop(); bonusMicRecording=false; document.getElementById('exo-mic-bonus-btn')?.classList.remove('recording'); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { showToast('Vocal non supporté', true); return; }
+  bonusMicRecog = new SR(); bonusMicRecog.lang='fr-FR'; bonusMicRecog.continuous=true; bonusMicRecog.interimResults=true;
+  bonusMicRecog.onstart = () => { bonusMicRecording=true; document.getElementById('exo-mic-bonus-btn')?.classList.add('recording'); };
+  bonusMicRecog.onresult = e => { let t=''; for(let i=0;i<e.results.length;i++) t+=e.results[i][0].transcript; const el=document.getElementById('exo-input-bonus'); if(el) el.value=t; };
+  bonusMicRecog.onend = () => { bonusMicRecording=false; document.getElementById('exo-mic-bonus-btn')?.classList.remove('recording'); };
+  bonusMicRecog.onerror = () => { bonusMicRecording=false; showToast('Erreur micro', true); };
+  bonusMicRecog.start();
+}
+
 function toggleExoMic() {
   if (exoRecording) stopExoMic(); else startExoMic();
 }
@@ -1357,14 +1961,7 @@ function loadProfileFields() {
   document.getElementById('p-sessions-week').value = profile.sessions_week;
   document.getElementById('p-constraints').value   = profile.constraints;
   document.getElementById('p-context').value       = profile.context;
-  document.getElementById('p-bodyfat').value       = profile.bodyfat || '';
-  document.getElementById('p-muscle-mass').value   = profile.muscle_mass || '';
-  // Restore BF history from profile
-  if (profile.bf_history && profile.bf_history.length) {
-    bfHistory = profile.bf_history;
-    renderBFHistory();
-    renderBFCurrent();
-  }
+
 }
 async function loadProfile() {
   if (!config.webhook) { showToast('Configure le webhook d\'abord', true); return; }
@@ -1382,9 +1979,6 @@ async function saveProfile() {
     sessions_week: document.getElementById('p-sessions-week').value,
     constraints: document.getElementById('p-constraints').value,
     context: document.getElementById('p-context').value,
-    bodyfat: document.getElementById('p-bodyfat').value,
-    muscle_mass: document.getElementById('p-muscle-mass').value,
-    bf_history: bfHistory
   };
   localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
   if (config.webhook) { try { await callMake({event:'save_profile', profile}); } catch(e){} }
@@ -1460,213 +2054,9 @@ function hideOverlay() {
 
 
 // ── BODY FAT ANALYSIS ─────────────────────────────────────────────
-// ── HEIC CONVERSION (libheif-js WASM) ────────────────────────────
-// Lit le fichier HEIC, extrait le premier frame via libheif,
-// le peint sur canvas et retourne un data URL JPEG.
-// Fonctionne sur Chrome/Mac/Safari indépendamment du décodeur système.
-async function heicToJpegDataUrl(file) {
-  const arrayBuffer = await file.arrayBuffer();
-  const uint8 = new Uint8Array(arrayBuffer);
 
-  const heif = new libheif.HeifDecoder();
-  const decoded = heif.decode(uint8);
 
-  if (!decoded || decoded.length === 0) throw new Error('No HEIF image decoded');
 
-  const img = decoded[0];
-  const w   = img.get_width();
-  const h   = img.get_height();
-
-  // Alloue un buffer RGBA et demande le rendu
-  const canvas = document.createElement('canvas');
-  const MAX = 1600;
-  let dw = w, dh = h;
-  if (dw > MAX || dh > MAX) {
-    if (dw >= dh) { dh = Math.round(dh * MAX / dw); dw = MAX; }
-    else          { dw = Math.round(dw * MAX / dh); dh = MAX; }
-  }
-
-  // Decode full resolution d'abord dans un ImageData
-  const imageData = new ImageData(w, h);
-  await new Promise((resolve, reject) => {
-    img.display(imageData, (result) => {
-      if (!result) reject(new Error('libheif display failed'));
-      else resolve();
-    });
-  });
-
-  // Resize si nécessaire via canvas intermédiaire
-  const srcCanvas = document.createElement('canvas');
-  srcCanvas.width = w; srcCanvas.height = h;
-  srcCanvas.getContext('2d').putImageData(imageData, 0, 0);
-
-  canvas.width = dw; canvas.height = dh;
-  canvas.getContext('2d').drawImage(srcCanvas, 0, 0, dw, dh);
-
-  return canvas.toDataURL('image/jpeg', 0.88);
-}
-
-// Resize JPEG/PNG/WebP via canvas (max 1600px)
-function resizeToJpegDataUrl(blob) {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(blob);
-    const img = new Image();
-    img.onload = () => {
-      const MAX = 1600;
-      let w = img.naturalWidth, h = img.naturalHeight;
-      if (w > MAX || h > MAX) {
-        if (w >= h) { h = Math.round(h * MAX / w); w = MAX; }
-        else        { w = Math.round(w * MAX / h); h = MAX; }
-      }
-      const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      URL.revokeObjectURL(url);
-      resolve(canvas.toDataURL('image/jpeg', 0.88));
-    };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('decode failed')); };
-    img.src = url;
-  });
-}
-
-async function handlePhotoSelected(input) {
-  const file = input.files?.[0];
-  if (!file) return;
-
-  const isHeic =
-    file.type === 'image/heic' ||
-    file.type === 'image/heif' ||
-    file.name.toLowerCase().endsWith('.heic') ||
-    file.name.toLowerCase().endsWith('.heif');
-
-  try {
-    let dataUrl;
-
-    if (isHeic) {
-      showToast('Conversion HEIC en cours...');
-      try {
-        dataUrl = await heicToJpegDataUrl(file);
-      } catch (e) {
-        console.error('libheif decode failed:', e);
-        showToast('Impossible de lire ce fichier HEIC. Essaie de partager la photo depuis Photos → Envoyer → choisir JPEG.', true);
-        return;
-      }
-    } else {
-      try { dataUrl = await resizeToJpegDataUrl(file); }
-      catch (e) {
-        // Fallback FileReader brut
-        dataUrl = await new Promise((res, rej) => {
-          const r = new FileReader();
-          r.onload  = e => res(e.target.result);
-          r.onerror = () => rej(new Error('read error'));
-          r.readAsDataURL(file);
-        });
-      }
-    }
-
-    pendingPhotoB64 = dataUrl;
-
-    const preview = document.getElementById('photo-preview');
-    if (preview) { preview.src = dataUrl; preview.classList.add('visible'); }
-    const analyzeBtn = document.getElementById('bf-analyze-btn');
-    if (analyzeBtn) analyzeBtn.style.display = 'flex';
-    const emptyState = document.getElementById('bf-empty');
-    if (emptyState) emptyState.style.display = 'none';
-
-    showToast('Photo prête ✓');
-
-  } catch (err) {
-    console.error('Photo handler error:', err);
-    showToast('Erreur chargement image', true);
-  }
-}
-
-async function analyzeBF() {
-  if (!pendingPhotoB64) return;
-  if (!config.webhook) { showToast('Configure le webhook Make', true); return; }
-  document.getElementById('bf-loading').classList.add('visible');
-  document.getElementById('bf-analyze-btn').disabled = true;
-  try {
-    const payload = {
-      event: 'analyze_body',
-      image: pendingPhotoB64.split(',')[1],
-      profile: {
-        age: profile.age,
-        weight: profile.weight,
-        height: profile.height,
-        gender: 'male',
-        level: profile.level,
-        goal: profile.goal
-      },
-      date: new Date().toISOString()
-    };
-    const data = await callMake(payload);
-    document.getElementById('bf-loading').classList.remove('visible');
-    document.getElementById('bf-analyze-btn').disabled = false;
-    if (data && data.bf_estimate) {
-      const entry = {
-        date: new Date().toISOString().split('T')[0],
-        bf_estimate: data.bf_estimate,
-        bf_range: data.bf_range || null,
-        muscle_def: data.muscle_definition || null,
-        coach_note: data.coach_note || null
-      };
-      bfHistory.unshift(entry);
-      if (bfHistory.length > 12) bfHistory = bfHistory.slice(0, 12);
-      // Update profile fields
-      if (data.bf_estimate) {
-        const num = parseFloat(data.bf_estimate);
-        if (!isNaN(num)) document.getElementById('p-bodyfat').value = num;
-      }
-      renderBFCurrent();
-      renderBFHistory();
-      // Auto-save
-      await saveProfile();
-      showToast('Analyse terminée ✓');
-    } else {
-      showToast('Réponse inattendue de Make', true);
-    }
-  } catch(e) {
-    document.getElementById('bf-loading').classList.remove('visible');
-    document.getElementById('bf-analyze-btn').disabled = false;
-    showToast('Erreur analyse', true);
-  }
-}
-
-function renderBFCurrent() {
-  if (!bfHistory.length) return;
-  const last = bfHistory[0];
-  document.getElementById('bf-current').style.display = 'block';
-  document.getElementById('bf-empty').style.display = 'none';
-  document.getElementById('bf-value').innerHTML = last.bf_estimate + '<span>%</span>';
-  document.getElementById('bf-range').textContent = last.bf_range ? 'Fourchette : ' + last.bf_range : '';
-  document.getElementById('bf-note').textContent = last.muscle_def || last.coach_note || '';
-  document.getElementById('bf-date').textContent = 'Dernière mesure : ' + last.date;
-}
-
-function renderBFHistory() {
-  if (bfHistory.length < 2) {
-    document.getElementById('bf-history-section').style.display = 'none';
-    return;
-  }
-  document.getElementById('bf-history-section').style.display = 'block';
-  document.getElementById('bf-history-list').innerHTML = bfHistory.map((entry, i) => {
-    let trend = '';
-    if (i < bfHistory.length - 1) {
-      const diff = parseFloat(entry.bf_estimate) - parseFloat(bfHistory[i+1].bf_estimate);
-      if (!isNaN(diff)) {
-        const cls = diff > 0 ? 'bf-trend-up' : 'bf-trend-down';
-        const arrow = diff > 0 ? '▲' : '▼';
-        trend = `<span class="${cls}">${arrow} ${Math.abs(diff).toFixed(1)}%</span>`;
-      }
-    }
-    return `<div class="bf-history-item">
-      <span style="color:var(--text2)">${entry.date}</span>
-      <span>${trend}</span>
-      <span class="bf-history-val">${entry.bf_estimate}%</span>
-    </div>`;
-  }).join('');
-}
 
 // ── TOAST ─────────────────────────────────────────────────────────
 function showToast(msg,isError=false) {
