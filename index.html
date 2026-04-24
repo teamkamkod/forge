@@ -397,6 +397,45 @@
   input[type="text"], input[type="number"] { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
   input:focus { border-color: var(--accent); }
   .divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+  /* ONBOARDING */
+  .onboarding-screen { position:fixed; inset:0; background:var(--bg); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:0; overflow:hidden; }
+  .ob-header { width:100%; max-width:480px; padding:24px 24px 0; }
+  .ob-logo { font-family:'Barlow Condensed',sans-serif; font-size:28px; font-weight:900; letter-spacing:2px; color:var(--text); margin-bottom:4px; }
+  .ob-logo span { color:var(--accent); }
+  .ob-progress { display:flex; gap:6px; margin-top:16px; margin-bottom:0; }
+  .ob-progress-dot { flex:1; height:3px; border-radius:2px; background:var(--border); transition:background 0.3s; }
+  .ob-progress-dot.active { background:var(--accent); }
+  .ob-body { width:100%; max-width:480px; padding:24px; flex:1; overflow-y:auto; }
+  .ob-step { display:none; }
+  .ob-step.visible { display:block; }
+  .ob-title { font-size:22px; font-weight:700; color:var(--text); margin-bottom:6px; }
+  .ob-subtitle { font-size:13px; color:var(--text2); margin-bottom:24px; line-height:1.5; }
+  .ob-field { margin-bottom:16px; }
+  .ob-field label { font-size:12px; color:var(--text2); margin-bottom:6px; display:block; text-transform:uppercase; letter-spacing:.5px; }
+  .ob-field input, .ob-field select, .ob-field textarea { width:100%; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; color:var(--text); font-family:'Barlow',sans-serif; font-size:14px; outline:none; transition:border-color .2s; box-sizing:border-box; }
+  .ob-field textarea { resize:none; height:80px; }
+  .ob-field input:focus, .ob-field select:focus, .ob-field textarea:focus { border-color:var(--accent); }
+  .ob-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .ob-chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .ob-chip { padding:8px 14px; border-radius:20px; border:1px solid var(--border); background:var(--bg3); color:var(--text2); font-size:13px; cursor:pointer; transition:all .2s; }
+  .ob-chip.active { border-color:var(--accent); background:rgba(var(--accent-rgb),.12); color:var(--accent); font-weight:600; }
+  .ob-footer { width:100%; max-width:480px; padding:16px 24px 32px; }
+  .ob-btn { width:100%; padding:16px; background:var(--accent); color:#000; border:none; border-radius:var(--radius); font-family:'Barlow Condensed',sans-serif; font-size:17px; font-weight:700; letter-spacing:1px; cursor:pointer; transition:opacity .2s; }
+  .ob-btn:disabled { opacity:.5; cursor:not-allowed; }
+  .ob-btn-ghost { background:transparent; color:var(--text2); border:1px solid var(--border); margin-top:10px; }
+
+  /* AI TOKEN BANNER */
+  .ai-quota-banner { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:16px; text-align:center; }
+  .ai-quota-count { font-size:32px; font-weight:900; color:var(--accent); font-family:'Barlow Condensed',sans-serif; }
+  .ai-quota-label { font-size:12px; color:var(--text2); margin-top:2px; }
+  .ai-token-form { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin-bottom:16px; }
+  .ai-token-form label { font-size:12px; color:var(--text2); text-transform:uppercase; letter-spacing:.5px; display:block; margin-bottom:8px; }
+  .ai-token-form input { width:100%; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px; color:var(--text); font-family:monospace; font-size:13px; outline:none; box-sizing:border-box; }
+  .ai-token-form input:focus { border-color:var(--accent); }
+  .ai-provider-tabs { display:flex; gap:8px; margin-bottom:14px; }
+  .ai-provider-tab { flex:1; padding:10px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--bg3); color:var(--text2); font-size:13px; font-weight:600; cursor:pointer; text-align:center; transition:all .2s; }
+  .ai-provider-tab.active { border-color:var(--accent); color:var(--accent); background:rgba(var(--accent-rgb),.1); }
 </style>
 
 </head>
@@ -425,6 +464,118 @@
 
     <div class="auth-error" id="auth-error"></div>
     <div class="auth-success" id="auth-success" style="font-size:13px;color:var(--accent);margin-top:12px;text-align:center;min-height:18px"></div>
+  </div>
+</div>
+
+<!-- ═══ ONBOARDING ═══ -->
+<div id="onboarding-screen" style="display:none">
+  <div class="onboarding-screen">
+    <div class="ob-header">
+      <div class="ob-logo">FOR<span>GE</span></div>
+      <div style="font-size:13px;color:var(--text2);margin-top:2px">Configurons ton profil</div>
+      <div class="ob-progress" id="ob-progress"></div>
+    </div>
+    <div class="ob-body">
+
+      <!-- Step 1 : Identité -->
+      <div class="ob-step visible" id="ob-step-0">
+        <div class="ob-title">Parle-moi de toi 👋</div>
+        <div class="ob-subtitle">Ces infos permettront à l'IA de personnaliser chaque séance.</div>
+        <div class="ob-row">
+          <div class="ob-field"><label>Prénom</label><input type="text" id="ob-name" placeholder="Alexandre"></div>
+          <div class="ob-field"><label>Âge</label><input type="number" id="ob-age" placeholder="28" min="14" max="90"></div>
+        </div>
+        <div class="ob-row">
+          <div class="ob-field"><label>Poids (kg)</label><input type="number" id="ob-weight" placeholder="75" step="0.5"></div>
+          <div class="ob-field"><label>Taille (cm)</label><input type="number" id="ob-height" placeholder="178"></div>
+        </div>
+        <div class="ob-field">
+          <label>Sexe</label>
+          <select id="ob-gender">
+            <option value="">-- Sélectionner --</option>
+            <option value="homme">Homme</option>
+            <option value="femme">Femme</option>
+            <option value="autre">Autre</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Step 2 : Objectif -->
+      <div class="ob-step" id="ob-step-1">
+        <div class="ob-title">Ton objectif principal 🎯</div>
+        <div class="ob-subtitle">L'IA adapte la programmation en fonction.</div>
+        <div class="ob-chips" id="ob-goals">
+          <div class="ob-chip" onclick="obChip(this,'goals')">Prise de masse</div>
+          <div class="ob-chip" onclick="obChip(this,'goals')">Perte de gras</div>
+          <div class="ob-chip" onclick="obChip(this,'goals')">Force / Performance</div>
+          <div class="ob-chip" onclick="obChip(this,'goals')">Remise en forme</div>
+          <div class="ob-chip" onclick="obChip(this,'goals')">Endurance</div>
+          <div class="ob-chip" onclick="obChip(this,'goals')">Mobilité / Santé</div>
+        </div>
+        <div class="ob-field" style="margin-top:20px"><label>Niveau</label>
+          <select id="ob-level">
+            <option value="">-- Sélectionner --</option>
+            <option value="débutant">Débutant (< 1 an)</option>
+            <option value="intermédiaire">Intermédiaire (1–3 ans)</option>
+            <option value="avancé">Avancé (3+ ans)</option>
+          </select>
+        </div>
+        <div class="ob-field"><label>Séances par semaine</label>
+          <select id="ob-freq">
+            <option value="">-- Sélectionner --</option>
+            <option value="2">2×</option>
+            <option value="3">3×</option>
+            <option value="4">4×</option>
+            <option value="5">5×</option>
+            <option value="6">6×</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Step 3 : Contexte & contraintes -->
+      <div class="ob-step" id="ob-step-2">
+        <div class="ob-title">Ton contexte 🏋️</div>
+        <div class="ob-subtitle">Équipement disponible et contraintes physiques.</div>
+        <div class="ob-field"><label>Équipement</label>
+          <div class="ob-chips" id="ob-equipment">
+            <div class="ob-chip" onclick="obChip(this,'equipment')">Salle complète</div>
+            <div class="ob-chip" onclick="obChip(this,'equipment')">Haltères</div>
+            <div class="ob-chip" onclick="obChip(this,'equipment')">Barres + disques</div>
+            <div class="ob-chip" onclick="obChip(this,'equipment')">Machines guidées</div>
+            <div class="ob-chip" onclick="obChip(this,'equipment')">Élastiques</div>
+            <div class="ob-chip" onclick="obChip(this,'equipment')">Poids du corps</div>
+          </div>
+        </div>
+        <div class="ob-field" style="margin-top:16px"><label>Contraintes / blessures (optionnel)</label>
+          <textarea id="ob-constraints" placeholder="Ex: épaule droite fragile, pas de squat lourd..."></textarea>
+        </div>
+      </div>
+
+      <!-- Step 4 : IA & token -->
+      <div class="ob-step" id="ob-step-3">
+        <div class="ob-title">Ton assistant IA ✨</div>
+        <div class="ob-subtitle">FORGE inclut <strong style="color:var(--accent)">3 séances IA offertes</strong>. Tu peux ensuite utiliser ton propre token pour continuer sans limite.</div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;text-align:center;">
+          <div style="font-size:48px;margin-bottom:8px">🎁</div>
+          <div style="font-size:15px;font-weight:700;color:var(--text)">3 séances offertes</div>
+          <div style="font-size:13px;color:var(--text2);margin-top:4px">Aucune carte requise. Génère tes premières séances gratuitement.</div>
+        </div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Tu as déjà un token ? Tu peux l'ajouter maintenant (optionnel).</div>
+        <div class="ai-provider-tabs">
+          <div class="ai-provider-tab active" id="ob-tab-openai" onclick="obSelectProvider('openai')">OpenAI</div>
+          <div class="ai-provider-tab" id="ob-tab-claude" onclick="obSelectProvider('claude')">Claude</div>
+        </div>
+        <div class="ob-field">
+          <label id="ob-token-label">Token OpenAI (optionnel)</label>
+          <input type="password" id="ob-ai-token" placeholder="sk-...">
+        </div>
+      </div>
+
+    </div>
+    <div class="ob-footer">
+      <button class="ob-btn" id="ob-next-btn" onclick="obNext()">Continuer →</button>
+      <button class="ob-btn ob-btn-ghost" id="ob-skip-btn" onclick="obSkip()" style="display:none;width:100%;padding:12px;border-radius:var(--radius);font-size:14px;cursor:pointer;margin-top:10px">Passer cette étape</button>
+    </div>
   </div>
 </div>
 
@@ -621,7 +772,29 @@
       </button>
     </div>
 
-    <button class="btn btn-primary" onclick="generatePlanIA()" id="ia-gen-btn">
+    <!-- AI Quota Banner -->
+    <div id="ai-quota-banner" class="ai-quota-banner" style="display:none">
+      <div class="ai-quota-count" id="ai-quota-count">3</div>
+      <div class="ai-quota-label">séances IA restantes</div>
+    </div>
+
+    <!-- AI Token Form (shown when quota = 0) -->
+    <div id="ai-token-section" class="ai-token-form" style="display:none">
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:24px;margin-bottom:6px">⚡</div>
+        <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">Séances gratuites épuisées</div>
+        <div style="font-size:13px;color:var(--text2)">Ajoute ton token pour continuer sans limite.</div>
+      </div>
+      <div class="ai-provider-tabs">
+        <div class="ai-provider-tab active" id="main-tab-openai" onclick="mainSelectProvider('openai')">OpenAI</div>
+        <div class="ai-provider-tab" id="main-tab-claude" onclick="mainSelectProvider('claude')">Claude</div>
+      </div>
+      <label id="main-token-label">Token OpenAI</label>
+      <input type="password" id="main-ai-token" placeholder="sk-..." style="margin-top:8px;margin-bottom:12px">
+      <button class="btn btn-primary" onclick="saveAiToken()" style="width:100%">Sauvegarder mon token</button>
+    </div>
+
+        <button class="btn btn-primary" onclick="generatePlanIA()" id="ia-gen-btn">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
       Générer ma séance
     </button>
@@ -865,6 +1038,12 @@ let CONFIG_KEY  = 'forge_config';
 let PROFILE_KEY = 'forge_profile';
 let SESSION_KEY = 'forge_current_session';
 let CURRENT_USER = null;
+let FREE_SESSIONS_REMAINING = null; // null = not loaded yet
+let OB_STEP = 0;
+const OB_STEPS = 4;
+let obGoals = [];
+let obEquipment = [];
+let obProvider = 'openai';
 
 const WEBHOOK_URL = 'https://hook.eu1.make.com/al8v39pzju7ngrcv59g3clfjq14c0u54';
 let config  = { webhook: WEBHOOK_URL };
@@ -966,7 +1145,7 @@ async function doSignup() {
     if (data.access_token) {
       localStorage.setItem(TOKEN_KEY, JSON.stringify({ token: data.access_token, email: data.email }));
       const user = await fetchUser(data.access_token);
-      onAuthSuccess(user, data.access_token);
+      onAuthSuccess(user, data.access_token, true); // true = new user → onboarding
       return;
     }
     // (no-op fallback)
@@ -996,21 +1175,196 @@ async function authSignOut() {
   document.getElementById('auth-password').value = '';
 }
 
-function onAuthSuccess(user, token) {
+// ── ONBOARDING ───────────────────────────────────────────────────
+function showOnboarding() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('onboarding-screen').style.display = 'flex';
+  obRenderProgress();
+  obUpdateStep();
+}
+
+function obRenderProgress() {
+  const el = document.getElementById('ob-progress');
+  el.innerHTML = Array.from({length: OB_STEPS}, (_,i) =>
+    `<div class="ob-progress-dot ${i <= OB_STEP ? 'active' : ''}"></div>`
+  ).join('');
+}
+
+function obUpdateStep() {
+  document.querySelectorAll('.ob-step').forEach((s,i) => {
+    s.classList.toggle('visible', i === OB_STEP);
+  });
+  const isLast = OB_STEP === OB_STEPS - 1;
+  document.getElementById('ob-next-btn').textContent = isLast ? 'Commencer ✓' : 'Continuer →';
+  document.getElementById('ob-skip-btn').style.display = OB_STEP >= 2 ? 'block' : 'none';
+  obRenderProgress();
+}
+
+function obChip(el, group) {
+  if (group === 'goals') {
+    document.querySelectorAll('#ob-goals .ob-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    obGoals = [el.textContent];
+  } else {
+    el.classList.toggle('active');
+    obEquipment = [...document.querySelectorAll('#ob-equipment .ob-chip.active')].map(c => c.textContent);
+  }
+}
+
+function obSelectProvider(p) {
+  obProvider = p;
+  document.getElementById('ob-tab-openai').classList.toggle('active', p === 'openai');
+  document.getElementById('ob-tab-claude').classList.toggle('active', p === 'claude');
+  document.getElementById('ob-token-label').textContent = p === 'openai' ? 'Token OpenAI (optionnel)' : 'Token Claude (optionnel)';
+  document.getElementById('ob-ai-token').placeholder = p === 'openai' ? 'sk-...' : 'sk-ant-...';
+}
+
+function obNext() {
+  if (OB_STEP < OB_STEPS - 1) {
+    OB_STEP++;
+    obUpdateStep();
+  } else {
+    obFinish();
+  }
+}
+
+function obSkip() {
+  if (OB_STEP < OB_STEPS - 1) {
+    OB_STEP++;
+    obUpdateStep();
+  } else {
+    obFinish();
+  }
+}
+
+async function obFinish() {
+  const btn = document.getElementById('ob-next-btn');
+  btn.disabled = true; btn.textContent = 'Sauvegarde...';
+
+  // Build profile from onboarding
+  const obProfile = {
+    name:        document.getElementById('ob-name').value.trim(),
+    age:         document.getElementById('ob-age').value,
+    weight:      document.getElementById('ob-weight').value,
+    height:      document.getElementById('ob-height').value,
+    gender:      document.getElementById('ob-gender').value,
+    goal:        obGoals[0] || '',
+    level:       document.getElementById('ob-level').value,
+    frequency:   document.getElementById('ob-freq').value,
+    equipment:   obEquipment.join(', '),
+    constraints: document.getElementById('ob-constraints').value.trim(),
+  };
+  const aiToken    = document.getElementById('ob-ai-token').value.trim();
+
+  try {
+    // 1. init_user: creates free_sessions=3 entry in Make datastore
+    await callMake({ event: 'init_user', profile: obProfile });
+    // 2. Save AI token if provided
+    if (aiToken) {
+      await callMake({ event: 'save_ai_token', ai_token: aiToken, ai_provider: obProvider });
+    }
+  } catch(e) {
+    console.warn('Onboarding Make call failed', e);
+  }
+
+  // Merge into local profile
+  profile = { ...profile, ...obProfile };
+  localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+
+  // Hide onboarding, show app
+  document.getElementById('onboarding-screen').style.display = 'none';
+  document.getElementById('app-wrapper').style.display = 'block';
+  loadProfileFields();
+  loadDashboard();
+  checkSessionInProgress();
+  FREE_SESSIONS_REMAINING = 3;
+  updateQuotaUI();
+}
+
+// ── AI QUOTA & TOKEN ──────────────────────────────────────────────
+function updateQuotaUI() {
+  const banner = document.getElementById('ai-quota-banner');
+  const tokenSection = document.getElementById('ai-token-section');
+  const genBtn = document.getElementById('ia-gen-btn');
+  if (FREE_SESSIONS_REMAINING === null) return;
+
+  if (FREE_SESSIONS_REMAINING > 0) {
+    banner.style.display = 'block';
+    document.getElementById('ai-quota-count').textContent = FREE_SESSIONS_REMAINING;
+    tokenSection.style.display = 'none';
+    if (genBtn) genBtn.disabled = false;
+  } else {
+    // Check if user has their own token saved
+    if (window._userHasToken) {
+      banner.style.display = 'none';
+      tokenSection.style.display = 'none';
+      if (genBtn) genBtn.disabled = false;
+    } else {
+      banner.style.display = 'none';
+      tokenSection.style.display = 'block';
+      if (genBtn) genBtn.disabled = true;
+    }
+  }
+}
+
+function mainSelectProvider(p) {
+  document.getElementById('main-tab-openai').classList.toggle('active', p === 'openai');
+  document.getElementById('main-tab-claude').classList.toggle('active', p === 'claude');
+  document.getElementById('main-token-label').textContent = p === 'openai' ? 'Token OpenAI' : 'Token Claude';
+  document.getElementById('main-ai-token').placeholder = p === 'openai' ? 'sk-...' : 'sk-ant-...';
+  window._mainProvider = p;
+}
+window._mainProvider = 'openai';
+
+async function saveAiToken() {
+  const token = document.getElementById('main-ai-token').value.trim();
+  if (!token) { showToast('Saisis un token valide', true); return; }
+  try {
+    await callMake({ event: 'save_ai_token', ai_token: token, ai_provider: window._mainProvider });
+    window._userHasToken = true;
+    document.getElementById('ai-token-section').style.display = 'none';
+    document.getElementById('ia-gen-btn').disabled = false;
+    showToast('Token sauvegardé ✓');
+  } catch(e) {
+    showToast('Erreur sauvegarde', true);
+  }
+}
+
+async function loadUserQuota() {
+  try {
+    const data = await callMake({ event: 'get_user_meta' });
+    FREE_SESSIONS_REMAINING = data.free_sessions_remaining ?? 0;
+    window._userHasToken = !!(data.ai_token);
+    updateQuotaUI();
+  } catch(e) {
+    FREE_SESSIONS_REMAINING = 0;
+    updateQuotaUI();
+  }
+}
+
+function onAuthSuccess(user, token, isNewUser = false) {
   CURRENT_USER = user;
   const uid = user.id || user.sub || btoa(user.email);
   CONFIG_KEY  = 'forge_config_'  + uid;
   PROFILE_KEY = 'forge_profile_' + uid;
   SESSION_KEY = 'forge_current_session_' + uid;
-  document.getElementById('auth-screen').style.display = 'none';
-  document.getElementById('app-wrapper').style.display = 'block';
   const badge = document.getElementById('user-badge-email');
   if (badge) badge.textContent = user.email;
   loadConfig();
   loadLocalProfile();
-  loadProfileFields();
-  loadDashboard();
-  checkSessionInProgress();
+
+  if (isNewUser) {
+    // New user: show onboarding
+    showOnboarding();
+  } else {
+    // Existing user: go straight to app
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('app-wrapper').style.display = 'block';
+    loadProfileFields();
+    loadDashboard();
+    checkSessionInProgress();
+    loadUserQuota();
+  }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -1644,6 +1998,11 @@ async function generatePlanIA() {
     const data = await callMake(payload);
     hideOverlay();
     renderIAPlan(data);
+    // Update quota from server response
+    if (data.free_sessions_remaining !== undefined) {
+      FREE_SESSIONS_REMAINING = data.free_sessions_remaining;
+      updateQuotaUI();
+    }
   } catch(e) {
     hideOverlay();
     document.getElementById('ia-gen-btn').disabled = false;
