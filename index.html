@@ -940,18 +940,16 @@ async function doAcceptInvite() {
   btn.disabled = true; btn.textContent = 'Activation...'; errEl.textContent = '';
   try {
     const cleanToken = decodeURIComponent(token);
-    console.log('[invite] token:', cleanToken.slice(0,20)+'...');
     const res = await fetch(
-      NETLIFY_ID_URL + '/verify?token=' + encodeURIComponent(cleanToken) + '&type=invite',
+      NETLIFY_ID_URL + '/verify?token=' + encodeURIComponent(cleanToken) + '&type=signup',
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })
       }
     );
-    console.log('[invite] response status:', res.status);
     const data = await res.json();
-    if (!res.ok) throw new Error(data.msg || 'Erreur activation');
+    if (!res.ok) throw new Error(data.error_description || data.msg || 'Erreur activation (' + res.status + ')');
     // Store token and boot app
     localStorage.setItem(TOKEN_KEY, JSON.stringify({ token: data.access_token, email: data.email }));
     // Clean URL
