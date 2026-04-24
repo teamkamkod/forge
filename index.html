@@ -14,30 +14,6 @@
     --text: #f0f0f8; --text2: #8888aa; --text3: #4a4a66;
     --card: #13131a; --radius: 16px; --radius-sm: 10px;
   }
-  /* AUTH SCREEN */
-  .auth-screen { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; z-index: 1000; }
-  .auth-screen.hidden { display: none; }
-  .auth-logo { font-family: 'Barlow Condensed', sans-serif; font-size: 52px; font-weight: 900; letter-spacing: -0.03em; color: var(--text); margin-bottom: 4px; }
-  .auth-logo span { color: var(--accent); }
-  .auth-tagline { font-size: 13px; color: var(--text3); margin-bottom: 48px; letter-spacing: 0.08em; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif; }
-  .auth-card { width: 100%; max-width: 360px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
-  .auth-tabs { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
-  .auth-tab { flex: 1; padding: 10px; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.2s; background: none; border-left: none; border-right: none; border-top: none; }
-  .auth-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-  .auth-field { margin-bottom: 14px; }
-  .auth-field label { font-size: 11px; color: var(--text3); font-family: 'Barlow Condensed', sans-serif; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; display: block; margin-bottom: 6px; }
-  .auth-field input { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 13px 14px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 15px; outline: none; transition: border-color 0.2s; }
-  .auth-field input:focus { border-color: var(--accent2); }
-  .auth-submit { width: 100%; padding: 15px; border-radius: var(--radius-sm); border: none; background: var(--accent); color: var(--bg); font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; margin-top: 6px; transition: all 0.2s; }
-  .auth-submit:active { transform: scale(0.98); }
-  .auth-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-  .auth-error { font-size: 13px; color: var(--accent3); margin-top: 12px; text-align: center; min-height: 18px; }
-  .auth-success { font-size: 13px; color: var(--accent); margin-top: 12px; text-align: center; min-height: 18px; }
-  /* User badge in header */
-  .user-badge { display: flex; align-items: center; gap: 8px; }
-  .user-badge-name { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; color: var(--text3); }
-  .user-signout-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); background: none; color: var(--text3); cursor: pointer; }
-  .user-signout-btn:active { background: var(--bg3); }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body { font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; max-width: 430px; margin: 0 auto; overflow-x: hidden; padding-bottom: 90px; }
 
@@ -399,37 +375,10 @@
   input:focus { border-color: var(--accent); }
   .divider { height: 1px; background: var(--border); margin: 16px 0; }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
 </head>
 <body>
 
-<!-- ═══ AUTH SCREEN ═══ -->
-<div class="auth-screen" id="auth-screen">
-  <div class="auth-logo">FOR<span>GE</span></div>
-  <div class="auth-tagline">Training OS</div>
-  <div class="auth-card">
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')" type="button">Connexion</button>
-      <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')" type="button">Créer un compte</button>
-    </div>
-    <div id="auth-login-form">
-      <div class="auth-field"><label>Email</label><input type="email" id="auth-email" placeholder="ton@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')authLogin()"></div>
-      <div class="auth-field"><label>Mot de passe</label><input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')authLogin()"></div>
-      <button type="button" class="auth-submit" id="auth-submit-btn" onclick="authLogin()">Se connecter</button>
-    </div>
-    <div id="auth-signup-form" style="display:none">
-      <div class="auth-field"><label>Email</label><input type="email" id="auth-email-signup" placeholder="ton@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')authSignUp()"></div>
-      <div class="auth-field"><label>Mot de passe</label><input type="password" id="auth-password-signup" placeholder="Min. 6 caractères" autocomplete="new-password" onkeydown="if(event.key==='Enter')authSignUp()"></div>
-      <button type="button" class="auth-submit" id="auth-submit-signup-btn" onclick="authSignUp()">Créer mon compte</button>
-    </div>
-    <div class="auth-error" id="auth-error"></div>
-    <div class="auth-success" id="auth-success"></div>
-  </div>
-</div>
-
-<!-- ═══ APP (hidden until authenticated) ═══ -->
-<div id="app-wrapper" style="display:none">
 
 <div class="toast" id="toast"></div>
 
@@ -738,10 +687,6 @@
 <div class="view" id="view-profile">
   <div class="header">
     <div><div class="header-title">PROFIL</div><div class="header-sub">Identité & objectifs</div></div>
-    <div class="user-badge">
-      <span class="user-badge-name" id="user-badge-email"></span>
-      <button class="user-signout-btn" onclick="authSignOut()">Déconnexion</button>
-    </div>
   </div>
 
   <!-- VIEW MODE -->
@@ -860,86 +805,15 @@
 
 <script>
 // ══════════════════════════════════════════════════════════════════
-// SUPABASE — init & auth (must be at top of script for onclick refs)
-// ══════════════════════════════════════════════════════════════════
-const SUPABASE_URL  = 'https://rfrajisqwhfojemswph.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmcmFqaXNxd2hmb2plbXNzd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5Mzg2MDMsImV4cCI6MjA5MjUxNDYwM30.MOUmhKWbeIY_NRh-5NBOkGTpghGnESsAVfurodnVkpk';
-// Use window.sb to avoid conflict with supabase SDK global
-let sb;
-try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON); }
-catch(e) { console.error('Supabase init failed:', e); }
-
-// ══════════════════════════════════════════════════════════════════
 // STATE & CONSTANTS
 // ══════════════════════════════════════════════════════════════════
-let CURRENT_USER_ID = null;
-let CONFIG_KEY  = 'forge_config';
-let PROFILE_KEY = 'forge_profile';
-let SESSION_KEY = 'forge_current_session';
+const CONFIG_KEY  = 'forge_config';
+const PROFILE_KEY = 'forge_profile';
+const SESSION_KEY = 'forge_current_session';
 
 const WEBHOOK_URL = 'https://hook.eu1.make.com/al8v39pzju7ngrcv59g3clfjq14c0u54';
 let config  = { webhook: WEBHOOK_URL };
 let profile = { name:'', age:'', weight:'', height:'', level:'confirmé', goal:'prise de masse', sessions_week:4, constraints:'', context:'', weight_target:'', equipment:'salle complète' };
-
-// ── AUTH FUNCTIONS ────────────────────────────────────────────────
-// Exposed on window so inline onclick handlers work before full parse
-window.switchAuthTab = function(tab) {
-  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
-  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
-  document.getElementById('auth-login-form').style.display  = tab === 'login'  ? 'block' : 'none';
-  document.getElementById('auth-signup-form').style.display = tab === 'signup' ? 'block' : 'none';
-  document.getElementById('auth-error').textContent = '';
-  document.getElementById('auth-success').textContent = '';
-};
-
-window.authLogin = async function() {
-  if (!sb) { document.getElementById('auth-error').textContent = 'Service indisponible'; return; }
-  const email = document.getElementById('auth-email').value.trim();
-  const password = document.getElementById('auth-password').value;
-  const btn = document.getElementById('auth-submit-btn');
-  const errEl = document.getElementById('auth-error');
-  if (!email || !password) { errEl.textContent = 'Remplis tous les champs'; return; }
-  btn.disabled = true; btn.textContent = 'Connexion...'; errEl.textContent = '';
-  const { error } = await sb.auth.signInWithPassword({ email, password });
-  btn.disabled = false; btn.textContent = 'Se connecter';
-  if (error) errEl.textContent = error.message === 'Invalid login credentials'
-    ? 'Email ou mot de passe incorrect' : error.message;
-};
-
-window.authSignUp = async function() {
-  if (!sb) { document.getElementById('auth-error').textContent = 'Service indisponible'; return; }
-  const email = document.getElementById('auth-email-signup').value.trim();
-  const password = document.getElementById('auth-password-signup').value;
-  const btn = document.getElementById('auth-submit-signup-btn');
-  const errEl = document.getElementById('auth-error');
-  const okEl  = document.getElementById('auth-success');
-  if (!email || !password) { errEl.textContent = 'Remplis tous les champs'; return; }
-  if (password.length < 6) { errEl.textContent = 'Mot de passe trop court (6 min)'; return; }
-  btn.disabled = true; btn.textContent = 'Création...';
-  errEl.textContent = ''; okEl.textContent = '';
-  const { error } = await sb.auth.signUp({ email, password });
-  btn.disabled = false; btn.textContent = 'Créer mon compte';
-  if (error) errEl.textContent = error.message;
-  else okEl.textContent = 'Compte créé ✓ — connecte-toi maintenant';
-};
-
-window.authSignOut = async function() {
-  if (supabase) await sb.auth.signOut();
-};
-
-
-
-// ── AUTH FUNCTIONS ───────────────────────────────────────────────
-
-
-
-
-
-// ══════════════════════════════════════════════════════════════════
-// SUPABASE CONFIG — replace with your project values
-// ══════════════════════════════════════════════════════════════════
-
-// STATE & CONSTANTS defined above
 
 // Session courante
 let currentSession = {
@@ -963,79 +837,36 @@ let exoRecog = null, exoRecording = false;
 let notesRecog = null, notesRecording = false;
 
 // ── INIT ──────────────────────────────────────────────────────────
-async function onAuthSuccess(user) {
-  CURRENT_USER_ID = user.id;
-  CONFIG_KEY  = 'forge_config_'  + user.id;
-  PROFILE_KEY = 'forge_profile_' + user.id;
-  SESSION_KEY = 'forge_current_session_' + user.id;
-  document.getElementById('auth-screen').style.display = 'none';
-  document.getElementById('app-wrapper').style.display = 'block';
-  const badge = document.getElementById('user-badge-email');
-  if (badge) badge.textContent = user.email;
+
+
+document.addEventListener('DOMContentLoaded', () => {
   loadConfig();
   loadLocalProfile();
-  loadProfileFields();
-  loadDashboard();
-  checkSessionInProgress();
-}
-
-function onAuthSignOut() {
-  CURRENT_USER_ID = null;
-  CONFIG_KEY  = 'forge_config';
-  PROFILE_KEY = 'forge_profile';
-  SESSION_KEY = 'forge_current_session';
-  profile = { name:'', age:'', weight:'', height:'', level:'confirmé', goal:'prise de masse', sessions_week:4, constraints:'', context:'', weight_target:'', equipment:'salle complète' };
-  allSessions = [];
-  document.getElementById('app-wrapper').style.display = 'none';
-  document.getElementById('auth-screen').style.display = 'flex';
-  document.getElementById('auth-error').textContent = '';
-  document.getElementById('auth-success').textContent = '';
-}
-
-document.addEventListener('DOMContentLoaded', async () => {
-  initChart();
   setHeaderDate();
   buildStreakBar([0,0,0,0,0,0,0],[]);
-
-  // Check existing Supabase session
-  if (!sb) {
-    // Supabase failed to load — show auth screen anyway (will show error on submit)
-    return;
-  }
-  try {
-    const { data: { session } } = await sb.auth.getSession();
-    if (session) {
-      await onAuthSuccess(session.user);
-    }
-    // If no session, auth-screen is already visible
-    sb.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        await onAuthSuccess(session.user);
-      } else if (event === 'SIGNED_OUT') {
-        onAuthSignOut();
-      }
-    });
-  } catch(e) {
-    console.error('Supabase session check failed:', e);
-    // Auth screen stays visible, user can try to log in
-  }
+  initChart();
+  loadDashboard();
+  loadProfileFields();
+  checkSessionInProgress();
 });
 
-// Called when user is authenticated
 
 
 // ── CONFIG ────────────────────────────────────────────────────────
 function loadConfig() {
   const s = localStorage.getItem(CONFIG_KEY);
-  if (s) config = { ...config, ...JSON.parse(s) };
+  if (s) {
+    const saved = JSON.parse(s);
+    // Never overwrite webhook with empty value — WEBHOOK_URL is always the fallback
+    config = { ...config, ...saved };
+    if (!config.webhook) config.webhook = WEBHOOK_URL;
+  }
   document.getElementById('config-warning').style.display = config.webhook ? 'none' : 'flex';
 }
 function saveWebhooks() { /* webhook form removed */ }
 async function callMake(payload) {
-  // Always include user_id for Make-side data isolation
-  const enriched = { ...payload, user_id: CURRENT_USER_ID };
   const res = await fetch(config.webhook, {
-    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(enriched)
+    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
   });
   const text = await res.text();
   try {
@@ -2393,7 +2224,6 @@ function showToast(msg,isError=false) {
   setTimeout(()=>t.classList.remove('show'),2800);
 }
 </script>
-</div><!-- /app-wrapper -->
 
 </body>
 </html>
