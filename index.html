@@ -939,11 +939,15 @@ async function doAcceptInvite() {
   if (!token) { errEl.textContent = "Token d'invitation manquant"; return; }
   btn.disabled = true; btn.textContent = 'Activation...'; errEl.textContent = '';
   try {
+    const payload = { type: 'invite', token: decodeURIComponent(token), password };
+    console.log('[invite] token:', token.slice(0,20)+'...');
+    console.log('[invite] payload keys:', Object.keys(payload));
     const res  = await fetch(NETLIFY_ID_URL + '/verify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token, password, token_type: 'invite' })
+      body: JSON.stringify(payload)
     });
+    console.log('[invite] response status:', res.status);
     const data = await res.json();
     if (!res.ok) throw new Error(data.msg || 'Erreur activation');
     // Store token and boot app
