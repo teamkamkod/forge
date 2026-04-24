@@ -461,12 +461,31 @@
     </div>
     <div id="form-login">
       <div class="auth-field"><label>Email</label><input type="email" id="auth-email" placeholder="ton@email.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
-      <div class="auth-field"><label>Mot de passe</label><input type="password" id="auth-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="auth-field">
+        <label>Mot de passe</label>
+        <div style="position:relative">
+          <input type="password" id="auth-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" style="width:100%;box-sizing:border-box;padding-right:44px">
+          <button onclick="togglePwd('auth-password',this)" type="button" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text2);font-size:16px;padding:0">👁</button>
+        </div>
+      </div>
       <button class="auth-btn" onclick="doLogin()" id="btn-login">Se connecter</button>
     </div>
     <div id="form-signup" style="display:none">
       <div class="auth-field"><label>Email</label><input type="email" id="signup-email" placeholder="ton@email.com" onkeydown="if(event.key==='Enter')doSignup()"></div>
-      <div class="auth-field"><label>Mot de passe</label><input type="password" id="signup-password" placeholder="Min. 8 caractères" onkeydown="if(event.key==='Enter')doSignup()"></div>
+      <div class="auth-field">
+        <label>Mot de passe</label>
+        <div style="position:relative">
+          <input type="password" id="signup-password" placeholder="Min. 8 caractères" onkeydown="if(event.key==='Enter')doSignup()" style="width:100%;box-sizing:border-box;padding-right:44px">
+          <button onclick="togglePwd('signup-password',this)" type="button" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text2);font-size:16px;padding:0">👁</button>
+        </div>
+      </div>
+      <div class="auth-field">
+        <label>Confirmer le mot de passe</label>
+        <div style="position:relative">
+          <input type="password" id="signup-password2" placeholder="••••••••" onkeydown="if(event.key==='Enter')doSignup()" style="width:100%;box-sizing:border-box;padding-right:44px">
+          <button onclick="togglePwd('signup-password2',this)" type="button" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text2);font-size:16px;padding:0">👁</button>
+        </div>
+      </div>
       <button class="auth-btn" onclick="doSignup()" id="btn-signup">Créer mon compte</button>
     </div>
 
@@ -1167,13 +1186,22 @@ async function doLogin() {
   btn.disabled = false; btn.textContent = 'Se connecter';
 }
 
+function togglePwd(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+}
+
 async function doSignup() {
   const email    = document.getElementById('signup-email').value.trim();
   const password = document.getElementById('signup-password').value;
   const btn      = document.getElementById('btn-signup');
   const errEl    = document.getElementById('auth-error');
+  const password2 = document.getElementById('signup-password2')?.value || '';
   if (!email || !password) { errEl.textContent = 'Remplis tous les champs'; return; }
   if (password.length < 8) { errEl.textContent = 'Mot de passe trop court (8 min)'; return; }
+  if (password !== password2) { errEl.textContent = 'Les mots de passe ne correspondent pas'; return; }
 
   // Dev bypass
   const isLocal = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
@@ -1192,14 +1220,24 @@ async function doSignup() {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.msg || data.error_description || 'Erreur inscription');
-    // No email confirmation — data contains access_token directly
+    // Account created — data contains access_token directly
     if (data.access_token) {
       localStorage.setItem(TOKEN_KEY, JSON.stringify({ token: data.access_token, email: data.email }));
-      const user = await fetchUser(data.access_token);
+      // Use signup response directly — avoid extra /user fetch that can fail
+      const user = {
+        id:    data.id    || data.user?.id    || btoa(data.email),
+        email: data.email || data.user?.email || '',
+        sub:   data.id    || data.user?.id    || btoa(data.email),
+      };
       onAuthSuccess(user, data.access_token, true); // true = new user → onboarding
       return;
     }
-    // (no-op fallback)
+    // Email confirmation required — show message and switch to login tab
+    const okEl = document.getElementById('auth-success');
+    if (okEl) okEl.textContent = 'Compte créé ✓ — connecte-toi maintenant';
+    switchTab('login');
+    document.getElementById('auth-email').value = email;
+    btn.disabled = false; btn.textContent = 'Créer mon compte';
   } catch(e) {
     errEl.textContent = e.message;
     btn.disabled = false; btn.textContent = 'Créer mon compte';
