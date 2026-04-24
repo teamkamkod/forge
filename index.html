@@ -436,6 +436,14 @@
   .ai-provider-tabs { display:flex; gap:8px; margin-bottom:14px; }
   .ai-provider-tab { flex:1; padding:10px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--bg3); color:var(--text2); font-size:13px; font-weight:600; cursor:pointer; text-align:center; transition:all .2s; }
   .ai-provider-tab.active { border-color:var(--accent); color:var(--accent); background:rgba(var(--accent-rgb),.1); }
+
+  /* EMPTY STATE BANNER */
+  .first-session-banner { background:linear-gradient(135deg,rgba(var(--accent-rgb),.08),rgba(var(--accent-rgb),.03)); border:1px solid rgba(var(--accent-rgb),.25); border-radius:var(--radius); padding:16px 18px; margin-bottom:16px; display:flex; align-items:center; gap:14px; }
+  .first-session-banner .fsb-icon { font-size:28px; flex-shrink:0; }
+  .first-session-banner .fsb-text { flex:1; }
+  .first-session-banner .fsb-title { font-size:14px; font-weight:700; color:var(--text); margin-bottom:3px; }
+  .first-session-banner .fsb-sub { font-size:12px; color:var(--text2); line-height:1.4; }
+  .first-session-banner .fsb-cta { background:var(--accent); color:#000; border:none; border-radius:var(--radius-sm); padding:9px 16px; font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; letter-spacing:.5px; cursor:pointer; white-space:nowrap; }
 </style>
 
 </head>
@@ -602,6 +610,14 @@
   </div>
   <div id="config-warning" class="config-banner" style="display:none">
     ⚙️ Webhook non configuré — <a onclick="showView('profile')">configure dans Profil</a>
+  </div>
+  <div id="first-session-banner" class="first-session-banner" style="display:none">
+    <div class="fsb-icon">🏋️</div>
+    <div class="fsb-text">
+      <div class="fsb-title">Tes stats t'attendent !</div>
+      <div class="fsb-sub">Log ta première séance pour voir ta progression, ton streak et tes insights IA.</div>
+    </div>
+    <button class="fsb-cta" onclick="showView('seance')">Commencer</button>
   </div>
   <div class="card">
     <div class="card-label">Streak — 7 derniers jours</div>
@@ -1010,6 +1026,23 @@
       <button class="btn btn-secondary" onclick="cancelProfileEdit()">Annuler</button>
       <button class="btn btn-primary" onclick="saveProfile()">Sauvegarder</button>
     </div>
+
+    <!-- ── TOKEN IA ── -->
+    <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">🤖 Token IA personnel</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.5">Utilise ton propre token OpenAI ou Claude pour des séances IA illimitées.</div>
+      <div class="ai-provider-tabs">
+        <div class="ai-provider-tab active" id="profile-tab-openai" onclick="profileSelectProvider('openai')">OpenAI</div>
+        <div class="ai-provider-tab" id="profile-tab-claude" onclick="profileSelectProvider('claude')">Claude</div>
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px" id="profile-token-label">Token OpenAI</label>
+        <input type="password" id="profile-ai-token" placeholder="sk-..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;color:var(--text);font-family:monospace;font-size:13px;outline:none;box-sizing:border-box">
+      </div>
+      <div id="profile-token-status" style="font-size:12px;color:var(--text2);margin-bottom:12px;min-height:16px"></div>
+      <button class="btn btn-primary" onclick="saveProfileAiToken()" style="width:100%">Sauvegarder le token</button>
+    </div>
+
   </div>
 </div>
 
@@ -1101,6 +1134,15 @@ async function doLogin() {
   const btn      = document.getElementById('btn-login');
   const errEl    = document.getElementById('auth-error');
   if (!email || !password) { errEl.textContent = 'Remplis tous les champs'; return; }
+
+  // Dev bypass
+  const isLocal = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (isLocal) {
+    const devUser = { id: 'dev-user-001', email: email || 'dev@forge.local', sub: 'dev-user-001' };
+    onAuthSuccess(devUser, 'dev-token', false);
+    return;
+  }
+
   btn.disabled = true; btn.textContent = 'Connexion...'; errEl.textContent = '';
   try {
     const res  = await fetch(NETLIFY_ID_URL + '/token', {
@@ -1132,6 +1174,15 @@ async function doSignup() {
   const errEl    = document.getElementById('auth-error');
   if (!email || !password) { errEl.textContent = 'Remplis tous les champs'; return; }
   if (password.length < 8) { errEl.textContent = 'Mot de passe trop court (8 min)'; return; }
+
+  // Dev bypass
+  const isLocal = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (isLocal) {
+    const devUser = { id: 'dev-user-001', email: email || 'dev@forge.local', sub: 'dev-user-001' };
+    onAuthSuccess(devUser, 'dev-token', true);
+    return;
+  }
+
   btn.disabled = true; btn.textContent = 'Création...'; errEl.textContent = '';
   try {
     const res  = await fetch(NETLIFY_ID_URL + '/signup', {
@@ -1156,6 +1207,7 @@ async function doSignup() {
 }
 
 async function fetchUser(token) {
+  if (token === 'dev-token') return { id: 'dev-user-001', email: 'dev@forge.local', sub: 'dev-user-001' };
   const res  = await fetch(NETLIFY_ID_URL + '/user', {
     headers: { 'Authorization': 'Bearer ' + token }
   });
@@ -1241,7 +1293,6 @@ async function obFinish() {
   const btn = document.getElementById('ob-next-btn');
   btn.disabled = true; btn.textContent = 'Sauvegarde...';
 
-  // Build profile from onboarding
   const obProfile = {
     name:        document.getElementById('ob-name').value.trim(),
     age:         document.getElementById('ob-age').value,
@@ -1254,24 +1305,23 @@ async function obFinish() {
     equipment:   obEquipment.join(', '),
     constraints: document.getElementById('ob-constraints').value.trim(),
   };
-  const aiToken    = document.getElementById('ob-ai-token').value.trim();
+  const aiToken = document.getElementById('ob-ai-token').value.trim();
 
-  try {
-    // 1. init_user: creates free_sessions=3 entry in Make datastore
-    await callMake({ event: 'init_user', profile: obProfile });
-    // 2. Save AI token if provided
-    if (aiToken) {
-      await callMake({ event: 'save_ai_token', ai_token: aiToken, ai_provider: obProvider });
-    }
-  } catch(e) {
-    console.warn('Onboarding Make call failed', e);
-  }
-
-  // Merge into local profile
+  // Save profile locally immediately — Make calls are best-effort
   profile = { ...profile, ...obProfile };
   localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
 
-  // Hide onboarding, show app
+  // Fire Make calls without blocking the UI
+  (async () => {
+    try {
+      await callMake({ event: 'init_user', profile: obProfile });
+    } catch(e) { console.warn('[ob] init_user failed:', e.message); }
+    try {
+      if (aiToken) await callMake({ event: 'save_ai_token', ai_token: aiToken, ai_provider: obProvider });
+    } catch(e) { console.warn('[ob] save_ai_token failed:', e.message); }
+  })();
+
+  // Transition immediately — don't wait for Make
   document.getElementById('onboarding-screen').style.display = 'none';
   document.getElementById('app-wrapper').style.display = 'block';
   loadProfileFields();
@@ -1330,15 +1380,51 @@ async function saveAiToken() {
   }
 }
 
-async function loadUserQuota() {
+function profileSelectProvider(p) {
+  document.getElementById('profile-tab-openai').classList.toggle('active', p === 'openai');
+  document.getElementById('profile-tab-claude').classList.toggle('active', p === 'claude');
+  document.getElementById('profile-token-label').textContent = p === 'openai' ? 'Token OpenAI' : 'Token Claude';
+  document.getElementById('profile-ai-token').placeholder = p === 'openai' ? 'sk-...' : 'sk-ant-...';
+  window._profileProvider = p;
+}
+window._profileProvider = 'openai';
+
+async function saveProfileAiToken() {
+  const token = document.getElementById('profile-ai-token').value.trim();
+  const statusEl = document.getElementById('profile-token-status');
+  if (!token) { statusEl.textContent = '⚠️ Saisis un token valide'; statusEl.style.color = 'var(--danger, #ef4444)'; return; }
+  statusEl.textContent = 'Sauvegarde...'; statusEl.style.color = 'var(--text2)';
   try {
-    const data = await callMake({ event: 'get_user_meta' });
-    FREE_SESSIONS_REMAINING = data.free_sessions_remaining ?? 0;
-    window._userHasToken = !!(data.ai_token);
+    await callMake({ event: 'save_ai_token', ai_token: token, ai_provider: window._profileProvider });
+    window._userHasToken = true;
+    statusEl.textContent = '✓ Token sauvegardé';
+    statusEl.style.color = 'var(--accent)';
+    document.getElementById('profile-ai-token').value = '';
+    document.getElementById('profile-ai-token').placeholder = '••••••••••••••••';
     updateQuotaUI();
+    setTimeout(() => { statusEl.textContent = ''; }, 3000);
   } catch(e) {
-    FREE_SESSIONS_REMAINING = 0;
-    updateQuotaUI();
+    statusEl.textContent = '✗ Erreur — réessaie';
+    statusEl.style.color = 'var(--danger, #ef4444)';
+  }
+}
+
+async function loadUserQuota() {
+  // Legacy alias → now handled by initApp/absorbServerState
+  await initApp();
+}
+
+async function initApp() {
+  if (!config.webhook) { renderDemoData(); return; }
+  showOverlay('dashboard');
+  try {
+    await callMake({ event: 'init_app' });
+    // all_data absorbed automatically by callMake → absorbServerState
+  } catch(e) {
+    renderDemoData();
+    showToast('Chargement impossible — démo', true);
+  } finally {
+    hideOverlay();
   }
 }
 
@@ -1361,9 +1447,8 @@ function onAuthSuccess(user, token, isNewUser = false) {
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('app-wrapper').style.display = 'block';
     loadProfileFields();
-    loadDashboard();
     checkSessionInProgress();
-    loadUserQuota();
+    initApp();
   }
 }
 
@@ -1371,6 +1456,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   initChart();
   setHeaderDate();
   buildStreakBar([0,0,0,0,0,0,0],[]);
+
+  // ── DEV MODE (local file / localhost) ─────────────────────────
+  const isLocal = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (isLocal) {
+    const devUser = { id: 'dev-user-001', email: 'dev@forge.local', sub: 'dev-user-001' };
+    const devBadge = document.getElementById('dev-badge');
+    if (!devBadge) {
+      const badge = document.createElement('div');
+      badge.id = 'dev-badge';
+      badge.style.cssText = 'position:fixed;top:8px;right:8px;background:#f59e0b;color:#000;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;z-index:99999;letter-spacing:.5px';
+      badge.textContent = '⚡ DEV';
+      document.body.appendChild(badge);
+    }
+    // Check if dev wants onboarding or direct app
+    const devMode = localStorage.getItem('forge_dev_mode') || 'app';
+    if (devMode === 'onboarding') {
+      onAuthSuccess(devUser, 'dev-token', true);
+    } else {
+      onAuthSuccess(devUser, 'dev-token', false);
+    }
+    return;
+  }
+  // ─────────────────────────────────────────────────────────────
 
   // Check existing session
   const stored = localStorage.getItem(TOKEN_KEY);
@@ -1402,7 +1510,6 @@ function loadConfig() {
 }
 function saveWebhooks() { /* webhook form removed */ }
 async function callMake(payload) {
-  // Inject user context into every Make call
   const uid = CURRENT_USER ? (CURRENT_USER.id || CURRENT_USER.sub || btoa(CURRENT_USER.email)) : null;
   const enriched = {
     ...payload,
@@ -1413,17 +1520,102 @@ async function callMake(payload) {
     method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(enriched)
   });
   const text = await res.text();
+  let data;
   try {
-    return JSON.parse(text);
+    data = JSON.parse(text);
   } catch(e) {
     try {
       const nl = String.fromCharCode(10);
-      const t2 = text.split('}' + nl + '"').join('},' + nl + '"');
-      return JSON.parse(t2);
+      data = JSON.parse(text.split('}' + nl + '"').join('},' + nl + '"'));
     } catch(e2) {
       console.warn('Make JSON parse failed');
       throw e2;
     }
+  }
+
+  // ── Unwrap Make array wrapper if needed ──────────────────────
+  let envelope = data;
+  if (Array.isArray(data) && data[0]?.body) {
+    try { envelope = JSON.parse(data[0].body); } catch(e) { envelope = data; }
+  } else if (Array.isArray(data) && data[0]?.result) {
+    // Make native OpenAI module returns [{result: {...}, ...}]
+    envelope = data[0];
+  }
+
+  console.log('[callMake] envelope keys:', Object.keys(envelope));
+  console.log('[callMake] success:', envelope.success);
+
+  // ── Universal response envelope ───────────────────────────────
+  if (typeof envelope.success !== 'undefined') {
+    if (envelope.success === false) {
+      const reason = envelope.reason || 'Erreur serveur';
+      showToast(reason, true);
+      throw new Error(reason);
+    }
+    if (envelope.all_data) {
+      try { absorbServerState(envelope.all_data); }
+      catch(e) { console.error('[callMake] absorbServerState error:', e); }
+    }
+    console.log('[callMake] response:', JSON.stringify(envelope.response)?.slice(0,80));
+    return envelope.response ?? envelope;
+  }
+
+  // Legacy: raw data, no envelope
+  return envelope;
+}
+
+// ── Absorb server state (all_data) ───────────────────────────────
+function absorbServerState(allData) {
+  if (!allData) return;
+
+  // Profile — only merge non-null/non-empty values
+  if (allData.profile) {
+    const p = allData.profile;
+    const filtered = Object.fromEntries(
+      Object.entries(p).filter(([k, v]) => v !== null && v !== '' && v !== undefined)
+    );
+    profile = { ...profile, ...filtered };
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+    try { loadProfileFields(); } catch(e) {}
+  }
+
+  // Dashboard
+  if (allData.dashboard) {
+    window._lastAbsorbedDashboard = true;
+    renderDashboardData(allData.dashboard);
+    const banner = document.getElementById('first-session-banner');
+    if (banner) banner.style.display = 'none';
+  } else if (allData.hasOwnProperty('dashboard') && allData.dashboard === null) {
+    window._lastAbsorbedDashboard = false;
+    if (!allData.sessions || allData.sessions.length === 0) {
+      const banner = document.getElementById('first-session-banner');
+      if (banner) banner.style.display = 'flex';
+    }
+  }
+
+  // Sessions history
+  if (allData.sessions !== undefined && allData.sessions !== null) {
+    try { renderHistory(allData.sessions); } catch(e) {}
+  }
+
+  // User meta (quota, token)
+  if (allData.user_meta) {
+    const meta = allData.user_meta;
+    if (meta.free_sessions_remaining !== undefined) {
+      FREE_SESSIONS_REMAINING = meta.free_sessions_remaining;
+    }
+    if (meta.ai_token !== undefined) {
+      window._userHasToken = !!(meta.ai_token);
+      if (meta.ai_token && meta.ai_provider) {
+        profileSelectProvider(meta.ai_provider);
+        mainSelectProvider(meta.ai_provider);
+      }
+      const inp = document.getElementById('profile-ai-token');
+      if (inp) inp.placeholder = meta.ai_token
+        ? '••••••••••••••••  (token existant)'
+        : 'sk-...';
+    }
+    updateQuotaUI();
   }
 }
 
@@ -1992,21 +2184,21 @@ async function generatePlanIA() {
     requested_focus:  iaFocus,
     extra_note:       document.getElementById('ia-note').value.trim(),
     profile,
-    date:             new Date().toISOString()
+    date:             (() => {
+      const now = new Date();
+      const pad = n => String(n).padStart(2,'0');
+      return `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    })()
   };
   try {
-    const data = await callMake(payload);
+    const plan = await callMake(payload);
+    // callMake absorbs all_data automatically via absorbServerState
     hideOverlay();
-    renderIAPlan(data);
-    // Update quota from server response
-    if (data.free_sessions_remaining !== undefined) {
-      FREE_SESSIONS_REMAINING = data.free_sessions_remaining;
-      updateQuotaUI();
-    }
+    renderIAPlan(plan);
   } catch(e) {
     hideOverlay();
     document.getElementById('ia-gen-btn').disabled = false;
-    showToast('Erreur IA', true);
+    // Toast already shown by callMake for success:false
   }
 }
 
@@ -2316,17 +2508,21 @@ async function submitSession() {
     document.getElementById('final-notes').value = '';
     document.querySelectorAll('.feeling-btn').forEach(b => b.classList.remove('selected'));
     showSeanceStep(0);
+    // Always refresh dashboard after logging a session
+    // Clear the IA plan so it doesn't reappear on next session
+    currentSession.iaPlan = null;
+    document.getElementById('ai-plan-card').classList.remove('visible');
+    document.getElementById('ia-start-log-btn').style.display = 'none';
+    const formWrapper = document.getElementById('ia-form-wrapper');
+    const formSummary = document.getElementById('ia-form-summary');
+    if (formWrapper) formWrapper.classList.remove('collapsed');
+    if (formSummary) formSummary.style.display = 'none';
+
+    showToast('Calcul du dashboard IA… ⚡');
+    showOverlay('dashboard');
+    await initApp();
+    hideOverlay();
     showView('dashboard');
-    // Refresh dashboard after Make has processed the session
-    // force_refresh: true bypasses the Make cache (node 34 filter)
-    // 8s delay to ensure Make has finished writing the session to datastore
-    setTimeout(async () => {
-      try {
-        const dashData = await callMake({ event: 'get_dashboard', force_refresh: true });
-        renderDashboardData(dashData);
-        showToast('Dashboard mis à jour ✓');
-      } catch(e) { /* silent fail */ }
-    }, 8000);
   } catch(e) {
     hideOverlay();
     document.getElementById('submit-session-btn').disabled = false;
@@ -2336,24 +2532,18 @@ async function submitSession() {
 
 // ── DASHBOARD ─────────────────────────────────────────────────────
 async function loadDashboard() {
-  if (!config.webhook) { renderDemoData(); return; }
-  showOverlay('dashboard');
-  try {
-    const data = await callMake({ event:'get_dashboard' });
-    hideOverlay();
-    renderDashboardData(data);
-  } catch(e) {
-    hideOverlay();
-    renderDemoData();
-    showToast('Erreur chargement — démo', true);
-  }
+  await initApp();
 }
 
 function renderDashboardData(data) {
   // Nouvelle structure Make : { ai_data: {...}, sessions_database: {...} }
-  // On normalise pour accepter les deux formats
-  const ai   = data.ai_data   || data;           // nouveau format ou ancien
-  const dbRaw = data.sessions_database || null;   // sessions brutes Make
+  const ai    = data.ai_data   || data;
+  const dbRaw = data.sessions_database || null;
+
+  // Empty state banner
+  const isFirstTime = !dbRaw && !ai.stats;
+  const banner = document.getElementById('first-session-banner');
+  if (banner) banner.style.display = isFirstTime ? 'flex' : 'none';
 
   // ── Stats ──
   if (ai.stats) {
