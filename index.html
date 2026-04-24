@@ -410,20 +410,29 @@
   <div class="auth-card" id="auth-card">
     <div class="auth-tabs" id="auth-tabs">
       <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Connexion</button>
+      <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Inscription</button>
     </div>
     <div id="form-login">
       <div class="auth-field"><label>Email</label><input type="email" id="auth-email" placeholder="ton@email.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <div class="auth-field"><label>Mot de passe</label><input type="password" id="auth-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <button class="auth-btn" onclick="doLogin()" id="btn-login">Se connecter</button>
     </div>
-    <!-- Formulaire invitation (visible si #invite_token dans l'URL) -->
-    <div id="form-invite" style="display:none">
-      <div style="font-size:13px;color:var(--text2);margin-bottom:16px;text-align:center">Choisis ton mot de passe pour activer ton compte</div>
-      <div class="auth-field"><label>Mot de passe</label><input type="password" id="invite-password" placeholder="Min. 8 caractères" onkeydown="if(event.key==='Enter')doAcceptInvite()"></div>
-      <div class="auth-field"><label>Confirmer</label><input type="password" id="invite-password2" placeholder="Confirme ton mot de passe" onkeydown="if(event.key==='Enter')doAcceptInvite()"></div>
-      <button class="auth-btn" onclick="doAcceptInvite()" id="btn-invite">Activer mon compte</button>
+    <div id="form-signup" style="display:none">
+      <div class="auth-field"><label>Email</label><input type="email" id="signup-email" placeholder="ton@email.com" onkeydown="if(event.key==='Enter')doSignup()"></div>
+      <div class="auth-field"><label>Mot de passe</label><input type="password" id="signup-password" placeholder="Min. 8 caractères" onkeydown="if(event.key==='Enter')doSignup()"></div>
+      <button class="auth-btn" onclick="doSignup()" id="btn-signup">Créer mon compte</button>
+    </div>
+    <!-- Confirmation email envoyé -->
+    <div id="form-confirm" style="display:none">
+      <div style="text-align:center;padding:16px 0">
+        <div style="font-size:32px;margin-bottom:12px">📧</div>
+        <div style="font-size:15px;color:var(--text);font-weight:500;margin-bottom:8px">Vérifie tes emails</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.6">Un lien de confirmation t'a été envoyé.<br>Clique dessus pour activer ton compte.</div>
+      </div>
+      <button class="auth-btn" onclick="switchTab('login')" style="background:var(--bg3);color:var(--text2);border:1px solid var(--border)">Retour à la connexion</button>
     </div>
     <div class="auth-error" id="auth-error"></div>
+    <div class="auth-success" id="auth-success" style="font-size:13px;color:var(--accent);margin-top:12px;text-align:center;min-height:18px"></div>
   </div>
 </div>
 
@@ -898,9 +907,21 @@ const NETLIFY_ID_URL = 'https://pi-fitness-app.netlify.app/.netlify/identity';
 const TOKEN_KEY = 'forge_auth_token';
 
 function switchTab(tab) {
-  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
-  document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
+  ['tab-login','tab-signup'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  const tabEl = document.getElementById('tab-' + tab);
+  if (tabEl) tabEl.classList.add('active');
+  ['form-login','form-signup','form-confirm'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  const formEl = document.getElementById('form-' + tab);
+  if (formEl) formEl.style.display = 'block';
   document.getElementById('auth-error').textContent = '';
+  const ok = document.getElementById('auth-success');
+  if (ok) ok.textContent = '';
 }
 
 async function doLogin() {
@@ -927,45 +948,28 @@ async function doLogin() {
   btn.disabled = false; btn.textContent = 'Se connecter';
 }
 
-async function doAcceptInvite() {
-  const password  = document.getElementById('invite-password').value;
-  const password2 = document.getElementById('invite-password2').value;
-  const btn       = document.getElementById('btn-invite');
-  const errEl     = document.getElementById('auth-error');
-  if (!password) { errEl.textContent = 'Saisis un mot de passe'; return; }
+async function doSignup() {
+  const email    = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+  const btn      = document.getElementById('btn-signup');
+  const errEl    = document.getElementById('auth-error');
+  if (!email || !password) { errEl.textContent = 'Remplis tous les champs'; return; }
   if (password.length < 8) { errEl.textContent = 'Mot de passe trop court (8 min)'; return; }
-  if (password !== password2) { errEl.textContent = 'Les mots de passe ne correspondent pas'; return; }
-  const token = getInviteToken();
-  if (!token) { errEl.textContent = "Token d'invitation manquant"; return; }
-  btn.disabled = true; btn.textContent = 'Activation...'; errEl.textContent = '';
+  btn.disabled = true; btn.textContent = 'Création...'; errEl.textContent = '';
   try {
-    const cleanToken = decodeURIComponent(token);
-    const res = await fetch(
-      NETLIFY_ID_URL + '/verify?token=' + encodeURIComponent(cleanToken) + '&type=signup',
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
-      }
-    );
+    const res  = await fetch(NETLIFY_ID_URL + '/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error_description || data.msg || 'Erreur activation (' + res.status + ')');
-    // Store token and boot app
-    localStorage.setItem(TOKEN_KEY, JSON.stringify({ token: data.access_token, email: data.email }));
-    // Clean URL
-    history.replaceState(null, '', window.location.pathname);
-    const user = await fetchUser(data.access_token);
-    onAuthSuccess(user, data.access_token);
+    if (!res.ok) throw new Error(data.msg || data.error_description || 'Erreur inscription');
+    // Email confirmation required — show confirmation screen
+    switchTab('confirm');
   } catch(e) {
     errEl.textContent = e.message;
-    btn.disabled = false; btn.textContent = 'Activer mon compte';
+    btn.disabled = false; btn.textContent = 'Créer mon compte';
   }
-}
-
-function getInviteToken() {
-  const hash = window.location.hash;
-  const match = hash.match(/invite_token=([^&]+)/);
-  return match ? match[1] : null;
 }
 
 async function fetchUser(token) {
@@ -1010,13 +1014,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   setHeaderDate();
   buildStreakBar([0,0,0,0,0,0,0],[]);
 
-  // Check for invite token in URL hash
-  const inviteToken = getInviteToken();
-  if (inviteToken) {
-    document.getElementById('auth-tabs').style.display = 'none';
-    document.getElementById('form-login').style.display = 'none';
-    document.getElementById('form-invite').style.display = 'block';
-    return;
+  // Check for email confirmation token in URL hash (after clicking confirm email link)
+  const hash = window.location.hash;
+  const confirmToken = hash.match(/confirmation_token=([^&]+)/);
+  if (confirmToken) {
+    // Auto-confirm then show login
+    try {
+      await fetch(NETLIFY_ID_URL + '/verify?token=' + encodeURIComponent(confirmToken[1]) + '&type=signup', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({})
+      });
+    } catch(e) {}
+    history.replaceState(null, '', window.location.pathname);
+    const okEl = document.getElementById('auth-success');
+    if (okEl) okEl.textContent = 'Compte confirmé ✓ — connecte-toi maintenant';
   }
 
   // Check existing session
