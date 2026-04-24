@@ -14,6 +14,20 @@
     --text: #f0f0f8; --text2: #8888aa; --text3: #4a4a66;
     --card: #13131a; --radius: 16px; --radius-sm: 10px;
   }
+  /* AUTH SCREEN */
+  .auth-screen { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; z-index: 1000; }
+  .auth-logo { font-family: 'Barlow Condensed', sans-serif; font-size: 56px; font-weight: 900; letter-spacing: -0.03em; color: var(--text); margin-bottom: 4px; }
+  .auth-logo span { color: var(--accent); }
+  .auth-tagline { font-size: 13px; color: var(--text3); margin-bottom: 48px; letter-spacing: 0.08em; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif; }
+  .auth-btn { width: 100%; max-width: 320px; padding: 16px; border-radius: var(--radius-sm); border: none; background: var(--accent); color: var(--bg); font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; margin-bottom: 12px; }
+  .auth-btn:active { transform: scale(0.98); background: #d4eb30; }
+  .auth-status { font-size: 13px; color: var(--text3); text-align: center; }
+  /* User badge */
+  .user-badge { display: flex; align-items: center; gap: 8px; }
+  .user-badge-name { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; color: var(--text3); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .user-signout-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); background: none; color: var(--text3); cursor: pointer; }
+  .user-signout-btn:active { background: var(--bg3); }
+
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body { font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; max-width: 430px; margin: 0 auto; overflow-x: hidden; padding-bottom: 90px; }
 
@@ -376,10 +390,23 @@
   .divider { height: 1px; background: var(--border); margin: 16px 0; }
 </style>
 
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
 
 
+<!-- ═══ AUTH SCREEN ═══ -->
+<div class="auth-screen" id="auth-screen">
+  <div class="auth-logo">FOR<span>GE</span></div>
+  <div class="auth-tagline">Training OS</div>
+  <button class="auth-btn" id="auth-open-btn" onclick="netlifyIdentity.open()">
+    Se connecter
+  </button>
+  <div class="auth-status" id="auth-status">Chargement...</div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="app-wrapper" style="display:none">
 <div class="toast" id="toast"></div>
 
 <!-- FORGE LOADING OVERLAY -->
@@ -687,6 +714,10 @@
 <div class="view" id="view-profile">
   <div class="header">
     <div><div class="header-title">PROFIL</div><div class="header-sub">Identité & objectifs</div></div>
+    <div class="user-badge">
+      <span class="user-badge-name" id="user-badge-email"></span>
+      <button class="user-signout-btn" onclick="authSignOut()">Déconnexion</button>
+    </div>
   </div>
 
   <!-- VIEW MODE -->
@@ -807,9 +838,10 @@
 // ══════════════════════════════════════════════════════════════════
 // STATE & CONSTANTS
 // ══════════════════════════════════════════════════════════════════
-const CONFIG_KEY  = 'forge_config';
-const PROFILE_KEY = 'forge_profile';
-const SESSION_KEY = 'forge_current_session';
+let CONFIG_KEY  = 'forge_config';
+let PROFILE_KEY = 'forge_profile';
+let SESSION_KEY = 'forge_current_session';
+let CURRENT_USER = null;
 
 const WEBHOOK_URL = 'https://hook.eu1.make.com/al8v39pzju7ngrcv59g3clfjq14c0u54';
 let config  = { webhook: WEBHOOK_URL };
@@ -839,7 +871,24 @@ let notesRecog = null, notesRecording = false;
 // ── INIT ──────────────────────────────────────────────────────────
 
 
-document.addEventListener('DOMContentLoaded', () => {
+// ── NETLIFY IDENTITY AUTH ─────────────────────────────────────────
+function authSignOut() {
+  netlifyIdentity.logout();
+}
+
+function onAuthSuccess(user) {
+  CURRENT_USER = user;
+  const uid = user.id;
+  CONFIG_KEY  = 'forge_config_'  + uid;
+  PROFILE_KEY = 'forge_profile_' + uid;
+  SESSION_KEY = 'forge_current_session_' + uid;
+
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-wrapper').style.display = 'block';
+
+  const badge = document.getElementById('user-badge-email');
+  if (badge) badge.textContent = user.email;
+
   loadConfig();
   loadLocalProfile();
   setHeaderDate();
@@ -848,6 +897,46 @@ document.addEventListener('DOMContentLoaded', () => {
   loadDashboard();
   loadProfileFields();
   checkSessionInProgress();
+}
+
+function onAuthSignOut() {
+  CURRENT_USER = null;
+  CONFIG_KEY  = 'forge_config';
+  PROFILE_KEY = 'forge_profile';
+  SESSION_KEY = 'forge_current_session';
+  document.getElementById('app-wrapper').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('auth-status').textContent = '';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Init chart early (before auth)
+  initChart();
+  setHeaderDate();
+  buildStreakBar([0,0,0,0,0,0,0],[]);
+
+  // Netlify Identity
+  netlifyIdentity.on('init', user => {
+    document.getElementById('auth-status').textContent = '';
+    if (user) {
+      onAuthSuccess(user);
+    }
+  });
+
+  netlifyIdentity.on('login', user => {
+    netlifyIdentity.close();
+    onAuthSuccess(user);
+  });
+
+  netlifyIdentity.on('logout', () => {
+    onAuthSignOut();
+  });
+
+  netlifyIdentity.on('error', err => {
+    document.getElementById('auth-status').textContent = 'Erreur : ' + err.message;
+  });
+
+  netlifyIdentity.init({ APIUrl: 'https://pi-fitness-app.netlify.app/.netlify/identity' });
 });
 
 
@@ -2225,5 +2314,6 @@ function showToast(msg,isError=false) {
 }
 </script>
 
+</div><!-- /app-wrapper -->
 </body>
 </html>
