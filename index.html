@@ -938,7 +938,13 @@ async function doLogin() {
       body: `grant_type=password&username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error_description || data.msg || 'Erreur connexion');
+    if (!res.ok) {
+      const msg = data.error_description || data.msg || data.error || '';
+      if (msg.toLowerCase().includes('confirm') || msg.toLowerCase().includes('email')) {
+        throw new Error('Confirme ton email avant de te connecter — vérifie ta boite mail');
+      }
+      throw new Error(msg || 'Email ou mot de passe incorrect');
+    }
     localStorage.setItem(TOKEN_KEY, JSON.stringify({ token: data.access_token, email }));
     const user = await fetchUser(data.access_token);
     onAuthSuccess(user, data.access_token);
@@ -1014,17 +1020,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   setHeaderDate();
   buildStreakBar([0,0,0,0,0,0,0],[]);
 
-  // Check for email confirmation token in URL hash (after clicking confirm email link)
+  // Check for email confirmation token in URL hash
   const hash = window.location.hash;
-  const confirmToken = hash.match(/confirmation_token=([^&]+)/);
-  if (confirmToken) {
-    // Auto-confirm then show login
-    try {
-      await fetch(NETLIFY_ID_URL + '/verify?token=' + encodeURIComponent(confirmToken[1]) + '&type=signup', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({})
-      });
-    } catch(e) {}
+  const confirmMatch = hash.match(/confirmation_token=([^&]+)/);
+  if (confirmMatch) {
     history.replaceState(null, '', window.location.pathname);
+    try {
+      const res = await fetch(
+        NETLIFY_ID_URL + '/verify?token=' + encodeURIComponent(confirmMatch[1]) + '&type=signup',
+        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }
+      );
+      const data = await res.json();
+      if (res.ok && data.access_token) {
+        // Confirmed and logged in directly
+        localStorage.setItem(TOKEN_KEY, JSON.stringify({ token: data.access_token, email: data.email }));
+        const user = await fetchUser(data.access_token);
+        onAuthSuccess(user, data.access_token);
+        return;
+      }
+    } catch(e) {}
+    // Fallback: show success and prompt login
     const okEl = document.getElementById('auth-success');
     if (okEl) okEl.textContent = 'Compte confirmé ✓ — connecte-toi maintenant';
   }
