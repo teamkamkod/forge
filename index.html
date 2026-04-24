@@ -600,8 +600,12 @@
 
     </div>
     <div class="ob-footer">
+      <div id="ob-step-error" style="display:none;font-size:13px;color:#ef4444;margin-bottom:10px;text-align:center"></div>
       <button class="ob-btn" id="ob-next-btn" onclick="obNext()">Continuer →</button>
-      <button class="ob-btn ob-btn-ghost" id="ob-skip-btn" onclick="obSkip()" style="display:none;width:100%;padding:12px;border-radius:var(--radius);font-size:14px;cursor:pointer;margin-top:10px">Passer cette étape</button>
+      <div style="display:flex;gap:10px;margin-top:10px">
+        <button class="ob-btn ob-btn-ghost" id="ob-prev-btn" onclick="obPrev()" style="display:none;flex:1;padding:12px;border-radius:var(--radius);font-size:14px;cursor:pointer">← Retour</button>
+        <button class="ob-btn ob-btn-ghost" id="ob-skip-btn" onclick="obSkip()" style="display:none;flex:1;padding:12px;border-radius:var(--radius);font-size:14px;cursor:pointer">Passer</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1222,19 +1226,28 @@ async function doSignup() {
     if (!res.ok) throw new Error(data.msg || data.error_description || 'Erreur inscription');
     // Account created successfully
     if (data.access_token) {
-      // Store token
       localStorage.setItem(TOKEN_KEY, JSON.stringify({ token: data.access_token, email: data.email }));
-      // Build user from signup response (no extra fetch needed)
       const user = {
         id:    data.id    || btoa(data.email),
         email: data.email || email,
         sub:   data.id    || btoa(data.email),
       };
+      // Set CURRENT_USER + keys so callMake can inject user_id
+      CURRENT_USER = user;
+      const uid = user.id;
+      CONFIG_KEY  = 'forge_config_'  + uid;
+      PROFILE_KEY = 'forge_profile_' + uid;
+      SESSION_KEY = 'forge_current_session_' + uid;
+      loadConfig();
+      // Register user in Make backend
+      try { await callMake({ event: 'init_user' }); } catch(e) { console.warn('init_user failed', e); }
       btn.disabled = false; btn.textContent = 'Créer mon compte';
-      onAuthSuccess(user, data.access_token, true); // → onboarding
+      // Show onboarding
+      document.getElementById('auth-screen').style.display = 'none';
+      showOnboarding();
       return;
     }
-    // Fallback: no token (shouldn't happen without email confirmation)
+    // Fallback: no token
     const okEl = document.getElementById('auth-success');
     if (okEl) okEl.textContent = 'Compte créé ✓ — connecte-toi maintenant';
     switchTab('login');
@@ -1288,7 +1301,11 @@ function obUpdateStep() {
   });
   const isLast = OB_STEP === OB_STEPS - 1;
   document.getElementById('ob-next-btn').textContent = isLast ? 'Commencer ✓' : 'Continuer →';
-  document.getElementById('ob-skip-btn').style.display = OB_STEP >= 2 ? 'block' : 'none';
+  document.getElementById('ob-prev-btn').style.display = OB_STEP > 0 ? 'flex' : 'none';
+  document.getElementById('ob-skip-btn').style.display = OB_STEP >= 2 ? 'flex' : 'none';
+  // Clear error on step change
+  const errEl = document.getElementById('ob-step-error');
+  if (errEl) errEl.style.display = 'none';
   obRenderProgress();
 }
 
@@ -1311,7 +1328,44 @@ function obSelectProvider(p) {
   document.getElementById('ob-ai-token').placeholder = p === 'openai' ? 'sk-...' : 'sk-ant-...';
 }
 
+function obValidateStep() {
+  // Required fields per step
+  const required = {
+    0: [
+      { id: 'ob-name',   label: 'Prénom' },
+      { id: 'ob-age',    label: 'Âge' },
+      { id: 'ob-gender', label: 'Sexe' },
+    ],
+    1: [
+      { id: 'ob-level', label: 'Niveau' },
+      { id: 'ob-freq',  label: 'Séances / semaine' },
+    ],
+    2: [], // equipment optional
+    3: [], // token optional
+  };
+  const fields = required[OB_STEP] || [];
+  for (const f of fields) {
+    const el = document.getElementById(f.id);
+    if (!el || !el.value.trim()) {
+      const errEl = document.getElementById('ob-step-error');
+      if (errEl) { errEl.textContent = `⚠️ "${f.label}" est requis`; errEl.style.display = 'block'; }
+      el?.focus();
+      return false;
+    }
+  }
+  // Step 1: check at least one goal selected
+  if (OB_STEP === 1 && obGoals.length === 0) {
+    const errEl = document.getElementById('ob-step-error');
+    if (errEl) { errEl.textContent = '⚠️ Choisis un objectif'; errEl.style.display = 'block'; }
+    return false;
+  }
+  const errEl = document.getElementById('ob-step-error');
+  if (errEl) errEl.style.display = 'none';
+  return true;
+}
+
 function obNext() {
+  if (!obValidateStep()) return;
   if (OB_STEP < OB_STEPS - 1) {
     OB_STEP++;
     obUpdateStep();
@@ -1320,12 +1374,18 @@ function obNext() {
   }
 }
 
-function obSkip() {
-  if (OB_STEP < OB_STEPS - 1) {
-    OB_STEP++;
+function obPrev() {
+  if (OB_STEP > 0) {
+    OB_STEP--;
     obUpdateStep();
-  } else {
-    obFinish();
+  }
+}
+
+function obSkip() {
+  // Only allowed on optional steps (2+)
+  if (OB_STEP >= 2) {
+    if (OB_STEP < OB_STEPS - 1) { OB_STEP++; obUpdateStep(); }
+    else obFinish();
   }
 }
 
@@ -1479,17 +1539,12 @@ function onAuthSuccess(user, token, isNewUser = false) {
   loadConfig();
   loadLocalProfile();
 
-  if (isNewUser) {
-    // New user: show onboarding
-    showOnboarding();
-  } else {
-    // Existing user: go straight to app
-    document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('app-wrapper').style.display = 'block';
-    loadProfileFields();
-    checkSessionInProgress();
-    initApp();
-  }
+  // Always go to app — initApp redirects to onboarding if profile empty
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-wrapper').style.display = 'block';
+  loadProfileFields();
+  checkSessionInProgress();
+  initApp();
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
