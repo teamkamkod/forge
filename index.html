@@ -1220,19 +1220,21 @@ async function doSignup() {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.msg || data.error_description || 'Erreur inscription');
-    // Account created — data contains access_token directly
+    // Account created successfully
     if (data.access_token) {
+      // Store token
       localStorage.setItem(TOKEN_KEY, JSON.stringify({ token: data.access_token, email: data.email }));
-      // Use signup response directly — avoid extra /user fetch that can fail
+      // Build user from signup response (no extra fetch needed)
       const user = {
-        id:    data.id    || data.user?.id    || btoa(data.email),
-        email: data.email || data.user?.email || '',
-        sub:   data.id    || data.user?.id    || btoa(data.email),
+        id:    data.id    || btoa(data.email),
+        email: data.email || email,
+        sub:   data.id    || btoa(data.email),
       };
-      onAuthSuccess(user, data.access_token, true); // true = new user → onboarding
+      btn.disabled = false; btn.textContent = 'Créer mon compte';
+      onAuthSuccess(user, data.access_token, true); // → onboarding
       return;
     }
-    // Email confirmation required — show message and switch to login tab
+    // Fallback: no token (shouldn't happen without email confirmation)
     const okEl = document.getElementById('auth-success');
     if (okEl) okEl.textContent = 'Compte créé ✓ — connecte-toi maintenant';
     switchTab('login');
@@ -1456,7 +1458,7 @@ async function initApp() {
   if (!config.webhook) { renderDemoData(); return; }
   showOverlay('dashboard');
   try {
-    await callMake({ event: 'init_app' });
+    await callMake({ event: 'init_app', _source: 'init_app' });
     // all_data absorbed automatically by callMake → absorbServerState
   } catch(e) {
     renderDemoData();
@@ -1591,6 +1593,8 @@ async function callMake(payload) {
       throw new Error(reason);
     }
     if (envelope.all_data) {
+      // Tag source event so absorbServerState can act conditionally
+      envelope.all_data._source = enriched.event || '';
       try { absorbServerState(envelope.all_data); }
       catch(e) { console.error('[callMake] absorbServerState error:', e); }
     }
@@ -1615,6 +1619,14 @@ function absorbServerState(allData) {
     profile = { ...profile, ...filtered };
     localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
     try { loadProfileFields(); } catch(e) {}
+
+    // If profile has no name after merge → user never filled onboarding
+    // Show onboarding instead of empty dashboard (only on init_app, not generate_session etc.)
+    if (!profile.name && allData._source === 'init_app') {
+      document.getElementById('app-wrapper').style.display = 'none';
+      showOnboarding();
+      return;
+    }
   }
 
   // Dashboard
