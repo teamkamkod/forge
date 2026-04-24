@@ -936,7 +936,7 @@ async function doAcceptInvite() {
   if (password.length < 8) { errEl.textContent = 'Mot de passe trop court (8 min)'; return; }
   if (password !== password2) { errEl.textContent = 'Les mots de passe ne correspondent pas'; return; }
   const token = getInviteToken();
-  if (!token) { errEl.textContent = 'Token d'invitation manquant'; return; }
+  if (!token) { errEl.textContent = "Token d'invitation manquant"; return; }
   btn.disabled = true; btn.textContent = 'Activation...'; errEl.textContent = '';
   try {
     const res  = await fetch(NETLIFY_ID_URL + '/verify', {
