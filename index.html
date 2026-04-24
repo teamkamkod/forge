@@ -408,19 +408,20 @@
   <div class="auth-logo">FOR<span>GE</span></div>
   <div class="auth-tagline">Training OS</div>
   <div class="auth-card" id="auth-card">
-    <div class="auth-tabs">
+    <div class="auth-tabs" id="auth-tabs">
       <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Connexion</button>
-      <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Inscription</button>
     </div>
     <div id="form-login">
       <div class="auth-field"><label>Email</label><input type="email" id="auth-email" placeholder="ton@email.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <div class="auth-field"><label>Mot de passe</label><input type="password" id="auth-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <button class="auth-btn" onclick="doLogin()" id="btn-login">Se connecter</button>
     </div>
-    <div id="form-signup" style="display:none">
-      <div class="auth-field"><label>Email</label><input type="email" id="signup-email" placeholder="ton@email.com" onkeydown="if(event.key==='Enter')doSignup()"></div>
-      <div class="auth-field"><label>Mot de passe</label><input type="password" id="signup-password" placeholder="Min. 8 caractères" onkeydown="if(event.key==='Enter')doSignup()"></div>
-      <button class="auth-btn" onclick="doSignup()" id="btn-signup">Créer mon compte</button>
+    <!-- Formulaire invitation (visible si #invite_token dans l'URL) -->
+    <div id="form-invite" style="display:none">
+      <div style="font-size:13px;color:var(--text2);margin-bottom:16px;text-align:center">Choisis ton mot de passe pour activer ton compte</div>
+      <div class="auth-field"><label>Mot de passe</label><input type="password" id="invite-password" placeholder="Min. 8 caractères" onkeydown="if(event.key==='Enter')doAcceptInvite()"></div>
+      <div class="auth-field"><label>Confirmer</label><input type="password" id="invite-password2" placeholder="Confirme ton mot de passe" onkeydown="if(event.key==='Enter')doAcceptInvite()"></div>
+      <button class="auth-btn" onclick="doAcceptInvite()" id="btn-invite">Activer mon compte</button>
     </div>
     <div class="auth-error" id="auth-error"></div>
   </div>
@@ -898,9 +899,7 @@ const TOKEN_KEY = 'forge_auth_token';
 
 function switchTab(tab) {
   document.getElementById('tab-login').classList.toggle('active', tab === 'login');
-  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
-  document.getElementById('form-login').style.display  = tab === 'login'  ? 'block' : 'none';
-  document.getElementById('form-signup').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
   document.getElementById('auth-error').textContent = '';
 }
 
@@ -928,29 +927,41 @@ async function doLogin() {
   btn.disabled = false; btn.textContent = 'Se connecter';
 }
 
-async function doSignup() {
-  const email    = document.getElementById('signup-email').value.trim();
-  const password = document.getElementById('signup-password').value;
-  const btn      = document.getElementById('btn-signup');
-  const errEl    = document.getElementById('auth-error');
-  if (!email || !password) { errEl.textContent = 'Remplis tous les champs'; return; }
+async function doAcceptInvite() {
+  const password  = document.getElementById('invite-password').value;
+  const password2 = document.getElementById('invite-password2').value;
+  const btn       = document.getElementById('btn-invite');
+  const errEl     = document.getElementById('auth-error');
+  if (!password) { errEl.textContent = 'Saisis un mot de passe'; return; }
   if (password.length < 8) { errEl.textContent = 'Mot de passe trop court (8 min)'; return; }
-  btn.disabled = true; btn.textContent = 'Création...'; errEl.textContent = '';
+  if (password !== password2) { errEl.textContent = 'Les mots de passe ne correspondent pas'; return; }
+  const token = getInviteToken();
+  if (!token) { errEl.textContent = 'Token d'invitation manquant'; return; }
+  btn.disabled = true; btn.textContent = 'Activation...'; errEl.textContent = '';
   try {
-    const res  = await fetch(NETLIFY_ID_URL + '/signup', {
+    const res  = await fetch(NETLIFY_ID_URL + '/verify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ token, password, type: 'invite' })
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.msg || 'Erreur inscription');
-    // Auto-login after signup
-    await doLogin();
-    return;
+    if (!res.ok) throw new Error(data.msg || 'Erreur activation');
+    // Store token and boot app
+    localStorage.setItem(TOKEN_KEY, JSON.stringify({ token: data.access_token, email: data.email }));
+    // Clean URL
+    history.replaceState(null, '', window.location.pathname);
+    const user = await fetchUser(data.access_token);
+    onAuthSuccess(user, data.access_token);
   } catch(e) {
     errEl.textContent = e.message;
+    btn.disabled = false; btn.textContent = 'Activer mon compte';
   }
-  btn.disabled = false; btn.textContent = 'Créer mon compte';
+}
+
+function getInviteToken() {
+  const hash = window.location.hash;
+  const match = hash.match(/invite_token=([^&]+)/);
+  return match ? match[1] : null;
 }
 
 async function fetchUser(token) {
@@ -995,11 +1006,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   setHeaderDate();
   buildStreakBar([0,0,0,0,0,0,0],[]);
 
+  // Check for invite token in URL hash
+  const inviteToken = getInviteToken();
+  if (inviteToken) {
+    document.getElementById('auth-tabs').style.display = 'none';
+    document.getElementById('form-login').style.display = 'none';
+    document.getElementById('form-invite').style.display = 'block';
+    return;
+  }
+
   // Check existing session
   const stored = localStorage.getItem(TOKEN_KEY);
   if (stored) {
     try {
-      const { token, email } = JSON.parse(stored);
+      const { token } = JSON.parse(stored);
       const user = await fetchUser(token);
       if (user && user.email) {
         onAuthSuccess(user, token);
