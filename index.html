@@ -1048,8 +1048,15 @@ function loadConfig() {
 }
 function saveWebhooks() { /* webhook form removed */ }
 async function callMake(payload) {
+  // Inject user context into every Make call
+  const uid = CURRENT_USER ? (CURRENT_USER.id || CURRENT_USER.sub || btoa(CURRENT_USER.email)) : null;
+  const enriched = {
+    ...payload,
+    user_id:    uid,
+    user_email: CURRENT_USER ? CURRENT_USER.email : null,
+  };
   const res = await fetch(config.webhook, {
-    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
+    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(enriched)
   });
   const text = await res.text();
   try {
