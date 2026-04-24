@@ -970,7 +970,14 @@ async function doSignup() {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.msg || data.error_description || 'Erreur inscription');
-    // Email confirmation required — show confirmation screen
+    // No email confirmation — data contains access_token directly
+    if (data.access_token) {
+      localStorage.setItem(TOKEN_KEY, JSON.stringify({ token: data.access_token, email: data.email }));
+      const user = await fetchUser(data.access_token);
+      onAuthSuccess(user, data.access_token);
+      return;
+    }
+    // Fallback if confirmation still required
     switchTab('confirm');
   } catch(e) {
     errEl.textContent = e.message;
@@ -1019,30 +1026,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   initChart();
   setHeaderDate();
   buildStreakBar([0,0,0,0,0,0,0],[]);
-
-  // Check for email confirmation token in URL hash
-  const hash = window.location.hash;
-  const confirmMatch = hash.match(/confirmation_token=([^&]+)/);
-  if (confirmMatch) {
-    history.replaceState(null, '', window.location.pathname);
-    try {
-      const res = await fetch(
-        NETLIFY_ID_URL + '/verify?token=' + encodeURIComponent(confirmMatch[1]) + '&type=signup',
-        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }
-      );
-      const data = await res.json();
-      if (res.ok && data.access_token) {
-        // Confirmed and logged in directly
-        localStorage.setItem(TOKEN_KEY, JSON.stringify({ token: data.access_token, email: data.email }));
-        const user = await fetchUser(data.access_token);
-        onAuthSuccess(user, data.access_token);
-        return;
-      }
-    } catch(e) {}
-    // Fallback: show success and prompt login
-    const okEl = document.getElementById('auth-success');
-    if (okEl) okEl.textContent = 'Compte confirmé ✓ — connecte-toi maintenant';
-  }
 
   // Check existing session
   const stored = localStorage.getItem(TOKEN_KEY);
