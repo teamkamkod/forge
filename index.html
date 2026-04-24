@@ -942,7 +942,7 @@ async function doAcceptInvite() {
     const res  = await fetch(NETLIFY_ID_URL + '/verify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token, password, type: 'invite' })
+      body: JSON.stringify({ token, password, token_type: 'invite' })
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.msg || 'Erreur activation');
