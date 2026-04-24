@@ -399,7 +399,7 @@
 <div class="auth-screen" id="auth-screen">
   <div class="auth-logo">FOR<span>GE</span></div>
   <div class="auth-tagline">Training OS</div>
-  <button class="auth-btn" id="auth-open-btn" onclick="netlifyIdentity.open()">
+  <button class="auth-btn" id="auth-open-btn">
     Se connecter
   </button>
   <div class="auth-status" id="auth-status">Chargement...</div>
@@ -918,6 +918,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Netlify Identity
   netlifyIdentity.on('init', user => {
     document.getElementById('auth-status').textContent = '';
+    // Attach button click now that widget is ready
+    document.getElementById('auth-open-btn').onclick = () => netlifyIdentity.open();
     if (user) {
       onAuthSuccess(user);
     }
