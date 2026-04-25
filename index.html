@@ -50,8 +50,16 @@
   .nav-badge.visible { display: block; }
 
   /* VIEWS */
-  .view { display: none; padding: 0 16px; animation: fadeIn 0.25s ease; }
+  .view { display: none; padding: 0 16px; }
   .view.active { display: block; }
+  .view.slide-in-right  { animation: slideInRight  0.28s cubic-bezier(0.25,0.8,0.25,1) both; }
+  .view.slide-in-left   { animation: slideInLeft   0.28s cubic-bezier(0.25,0.8,0.25,1) both; }
+  .view.slide-out-right { animation: slideOutRight 0.28s cubic-bezier(0.25,0.8,0.25,1) both; }
+  .view.slide-out-left  { animation: slideOutLeft  0.28s cubic-bezier(0.25,0.8,0.25,1) both; }
+  @keyframes slideInRight  { from { transform:translateX(40px);  opacity:0 } to { transform:translateX(0); opacity:1 } }
+  @keyframes slideInLeft   { from { transform:translateX(-40px); opacity:0 } to { transform:translateX(0); opacity:1 } }
+  @keyframes slideOutRight { from { opacity:1 } to { opacity:0 } }
+  @keyframes slideOutLeft  { from { opacity:1 } to { opacity:0 } }
   @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
 
   /* HEADER UNIFIÉ */
@@ -59,15 +67,18 @@
   .app-header-left { display: flex; flex-direction: column; gap: 1px; }
   .app-header-title { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 900; letter-spacing: -0.02em; line-height: 1; }
   .app-header-sub { font-size: 12px; color: var(--text2); font-weight: 300; }
-  /* Badge quota */
-  .quota-badge { display: flex; align-items: center; gap: 6px; background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; padding: 6px 12px; cursor: default; transition: all 0.2s; text-decoration: none; }
-  .quota-badge.cta { background: var(--accent); border-color: var(--accent); cursor: pointer; }
-  .quota-badge.cta:active { background: #d4eb30; transform: scale(0.97); }
-  .quota-badge-count { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); line-height: 1; }
-  .quota-badge.cta .quota-badge-count { color: var(--bg); }
-  .quota-badge-icon { font-size: 14px; line-height: 1; }
-  .quota-badge.pro .quota-badge-count { color: var(--accent2); }
-  .quota-badge.pro { border-color: rgba(71,200,255,0.3); }
+  /* QUOTA BADGE HEADER */
+  .quota-badge-wrap { display: flex; align-items: center; gap: 6px; }
+  .quota-badge { display: flex; align-items: center; gap: 5px; border-radius: 20px; padding: 5px 11px; cursor: default; transition: all 0.2s; }
+  .quota-badge-count { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; color: #000; line-height: 1; }
+  .quota-badge-icon  { font-size: 13px; line-height: 1; }
+  /* Couleurs selon niveau */
+  .quota-badge.green  { background: #b8f5b0; border: 1px solid #8ee888; }
+  .quota-badge.yellow { background: #fff176; border: 1px solid #f0d800; }
+  .quota-badge.red    { background: #ffb3b3; border: 1px solid #f07070; }
+  /* Bouton "+ crédits" séparé */
+  .quota-add-btn { display: flex; align-items: center; background: var(--accent); border: none; border-radius: 20px; padding: 5px 11px; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; color: #000; cursor: pointer; letter-spacing: .04em; transition: all .2s; white-space: nowrap; }
+  .quota-add-btn:active { background: #d4eb30; transform: scale(0.97); }
 
   /* CARDS */
   .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; }
@@ -355,22 +366,31 @@
   @keyframes spin { to { transform: rotate(360deg); } }
 
   /* LOADING OVERLAY plein écran */
-  .forge-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(10,10,12,0.93); backdrop-filter: blur(14px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 40px; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+  .forge-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(10,10,12,0.95); backdrop-filter: blur(20px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; padding: 40px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
   .forge-overlay.visible { opacity: 1; pointer-events: all; }
-  .overlay-ring { position: relative; width: 80px; height: 80px; }
-  .overlay-ring svg { width: 80px; height: 80px; transform: rotate(-90deg); }
-  .ring-track { fill: none; stroke: var(--bg3); stroke-width: 3; }
-  .ring-progress { fill: none; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 220; stroke-dashoffset: 220; animation: ring-spin 1.8s ease-in-out infinite; }
-  @keyframes ring-spin { 0%{stroke-dashoffset:220;opacity:1} 65%{stroke-dashoffset:28;opacity:1} 100%{stroke-dashoffset:28;opacity:0.15} }
-  .overlay-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 30px; }
-  .overlay-message { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 0.03em; text-align: center; color: var(--text); line-height: 1.3; min-height: 60px; transition: all 0.35s ease; }
-  .overlay-message.changing { opacity: 0; transform: translateY(8px); }
-  .overlay-sub { font-size: 12px; color: var(--text3); text-align: center; font-weight: 300; letter-spacing: 0.04em; text-transform: uppercase; }
-  .overlay-dots { display: flex; gap: 6px; }
-  .overlay-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text3); animation: dot-pulse 1.4s ease-in-out infinite; }
-  .overlay-dot:nth-child(2) { animation-delay: 0.2s; }
-  .overlay-dot:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes dot-pulse { 0%,80%,100%{opacity:0.3;transform:scale(1)} 40%{opacity:1;transform:scale(1.5)} }
+  .overlay-ring { position: relative; width: 96px; height: 96px; }
+  .overlay-ring svg { width: 96px; height: 96px; transform: rotate(-90deg); }
+  .ring-track { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 2; }
+  .ring-glow { fill: none; stroke-width: 2; stroke-linecap: round; stroke-dasharray: 301; stroke-dashoffset: 301; animation: ring-fill 2.4s cubic-bezier(0.4,0,0.2,1) infinite; filter: blur(0px); }
+  .ring-progress { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 301; stroke-dashoffset: 301; animation: ring-fill 2.4s cubic-bezier(0.4,0,0.2,1) infinite; }
+  @keyframes ring-fill {
+    0%   { stroke-dashoffset: 301; opacity: 0.2; }
+    15%  { opacity: 1; }
+    70%  { stroke-dashoffset: 30; opacity: 1; }
+    85%  { stroke-dashoffset: 30; opacity: 0.4; }
+    100% { stroke-dashoffset: 301; opacity: 0.2; }
+  }
+  .ring-glow { animation-delay: 0.05s; filter: blur(4px); opacity: 0.5; }
+  .overlay-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 32px; animation: icon-pulse 2.4s ease-in-out infinite; }
+  @keyframes icon-pulse { 0%,100%{transform:scale(1);opacity:0.7} 50%{transform:scale(1.12);opacity:1} }
+  .overlay-message { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 0.03em; text-align: center; color: var(--text); line-height: 1.3; min-height: 60px; transition: all 0.4s ease; }
+  .overlay-message.changing { opacity: 0; transform: translateY(10px); }
+  .overlay-sub { font-size: 11px; color: var(--text3); text-align: center; font-weight: 300; letter-spacing: 0.1em; text-transform: uppercase; }
+  .overlay-dots { display: flex; gap: 8px; }
+  .overlay-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--text3); animation: dot-pulse 1.6s ease-in-out infinite; }
+  .overlay-dot:nth-child(2) { animation-delay: 0.25s; }
+  .overlay-dot:nth-child(3) { animation-delay: 0.5s; }
+  @keyframes dot-pulse { 0%,80%,100%{opacity:0.2;transform:scale(1)} 40%{opacity:1;transform:scale(1.8)} }
 
   /* HISTORY CARDS */
   .hist-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 8px; overflow: hidden; transition: border-color 0.2s; }
@@ -440,6 +460,11 @@
   .ai-quota-label { font-size:12px; color:var(--text2); margin-top:2px; }
   /* PRO UPGRADE BANNER */
   .pro-upgrade-banner { background:linear-gradient(135deg,rgba(232,255,71,0.08),rgba(71,200,255,0.06)); border:1px solid rgba(232,255,71,0.25); border-radius:var(--radius); padding:20px; margin-bottom:16px; text-align:center; }
+  /* CREDITS PRESET BUTTONS */
+  .credits-preset { flex:1; padding:10px 6px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--bg3); color:var(--text2); font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; letter-spacing:.04em; cursor:pointer; text-align:center; transition:all .15s; line-height:1.2; }
+  .credits-preset.active { border-color:var(--accent); color:var(--accent); background:rgba(232,255,71,0.08); }
+  .credits-preset-sub { font-size:10px; font-weight:400; color:var(--text3); margin-top:2px; }
+  .credits-preset.active .credits-preset-sub { color:var(--accent); opacity:.7; }
   /* ACCORDION MON COMPTE */
   .account-accordion { border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:16px; }
   .account-accordion-header { display:flex; justify-content:space-between; align-items:center; padding:14px 16px; cursor:pointer; background:var(--card); user-select:none; -webkit-user-select:none; }
@@ -643,7 +668,7 @@
 <!-- FORGE LOADING OVERLAY -->
 <div class="forge-overlay" id="forge-overlay">
   <div class="overlay-ring">
-    <svg viewBox="0 0 80 80"><circle class="ring-track" cx="40" cy="40" r="35"/><circle class="ring-progress" id="overlay-ring-color" cx="40" cy="40" r="35"/></svg>
+    <svg viewBox="0 0 96 96"><circle class="ring-track" cx="48" cy="48" r="44"/><circle class="ring-glow" id="overlay-ring-glow" cx="48" cy="48" r="44"/><circle class="ring-progress" id="overlay-ring-color" cx="48" cy="48" r="44"/></svg>
     <div class="overlay-icon" id="overlay-icon">⚡</div>
   </div>
   <div class="overlay-message" id="overlay-message">Chargement...</div>
@@ -658,7 +683,10 @@
       <div class="app-header-title">FORGE</div>
       <div class="app-header-sub">Training Dashboard</div>
     </div>
-    <div id="quota-badge-dashboard" class="quota-badge" onclick="handleQuotaBadgeClick()"></div>
+    <div class="quota-badge-wrap" id="quota-wrap-dashboard">
+      <div id="quota-badge-dashboard" class="quota-badge green"></div>
+      <button class="quota-add-btn" id="quota-add-btn-dashboard">+ crédits</button>
+    </div>
   </div>
   <div id="config-warning" class="config-banner" style="display:none">
     ⚙️ Webhook non configuré — <a onclick="showView('profile')">configure dans Profil</a>
@@ -670,6 +698,12 @@
       <div class="fsb-sub">Log ta première séance pour voir ta progression, ton streak et tes insights IA.</div>
     </div>
     <button class="fsb-cta" onclick="showView('seance')">Commencer</button>
+  </div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+    <button class="btn btn-secondary" onclick="loadDashboard()" style="padding:8px 14px;font-size:12px;display:flex;align-items:center;gap:6px">
+      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      Actualiser
+    </button>
   </div>
   <div class="card">
     <div class="card-label">Streak — 7 derniers jours</div>
@@ -693,14 +727,15 @@
     <div class="card-label">Insights IA</div>
     <div id="insights-list"><div class="loading visible" id="insights-loading"><div class="spinner"></div>Analyse en cours...</div></div>
   </div>
-  <div class="card">
-    <div class="card-label">Sessions récentes</div>
-    <div id="session-history"><div class="loading visible"><div class="spinner"></div>Chargement...</div></div>
+  <div class="account-accordion" id="recent-sessions-accordion">
+    <div class="account-accordion-header" onclick="toggleRecentSessions()">
+      <span class="account-accordion-title">📋 Sessions récentes</span>
+      <span class="account-accordion-chevron">▼</span>
+    </div>
+    <div class="account-accordion-body">
+      <div id="session-history"><div class="loading visible"><div class="spinner"></div>Chargement...</div></div>
+    </div>
   </div>
-  <button class="btn btn-secondary" onclick="loadDashboard()" style="margin-bottom:16px">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-    Actualiser
-  </button>
   <!-- PRO CTA BAR — bas de page -->
   <div class="pro-cta-bar hidden" id="pro-cta-dashboard">
     <div class="pro-cta-bar-text"><strong>FORGE Pro</strong> — séances IA illimitées</div>
@@ -718,7 +753,10 @@
         <div class="app-header-title">SÉANCE</div>
         <div class="app-header-sub">Génère ou logge</div>
       </div>
-      <div id="quota-badge-seance" class="quota-badge" onclick="handleQuotaBadgeClick()"></div>
+      <div class="quota-badge-wrap" id="quota-wrap-seance">
+        <div id="quota-badge-seance" class="quota-badge green"></div>
+        <button class="quota-add-btn" id="quota-add-btn-seance">+ crédits</button>
+      </div>
     </div>
 
     <!-- Banner session en cours -->
@@ -778,6 +816,13 @@
         <button class="ia-dur-btn active" onclick="setDuration(60,this)">1h</button>
         <button class="ia-dur-btn" onclick="setDuration(75,this)">1h15</button>
         <button class="ia-dur-btn" onclick="setDuration(90,this)">1h30</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+        <div style="font-size:12px;color:var(--text2);white-space:nowrap">Autre :</div>
+        <input type="number" id="ia-duration-custom" min="10" max="240" placeholder="ex: 50"
+          style="width:72px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;outline:none;text-align:center"
+          oninput="setDurationCustom(this.value)">
+        <div style="font-size:12px;color:var(--text2)">min</div>
       </div>
     </div>
 
@@ -862,19 +907,19 @@
     <div id="ai-token-section" class="pro-upgrade-banner" style="display:none">
       <div style="font-size:28px;margin-bottom:8px">🔒</div>
       <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.04em">SÉANCES GRATUITES ÉPUISÉES</div>
-      <div style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.5">Passe à FORGE Pro pour continuer à générer des séances IA illimitées.</div>
-      <button class="btn btn-primary" style="max-width:240px;margin:0 auto" onclick="goToPro()">
-        Passer à Pro — 15€/mois
+      <div style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.5">Choisis l'offre qui te convient pour continuer à générer des séances IA.</div>
+      <button class="btn btn-primary" style="max-width:240px;margin:0 auto" onclick="showModal('modal-convert')">
+        Voir les offres
       </button>
     </div>
 
     <!-- Bouton génération / achat crédits -->
     <div id="ia-gen-zone">
-      <button class="btn btn-primary" onclick="generatePlanIA()" id="ia-gen-btn">
+      <button class="btn btn-primary" onclick="generatePlanIA()" id="ia-gen-btn" style="transition:opacity .2s,filter .2s">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         Générer ma séance
       </button>
-      <button class="btn btn-secondary" onclick="showModal('modal-buy-credits')" id="ia-buy-credits-btn" style="display:none">
+      <button class="btn btn-secondary" onclick="openBuyCreditsModal()" id="ia-buy-credits-btn" style="display:none">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         Acheter des crédits — 5€ / 10 séances
       </button>
@@ -977,7 +1022,7 @@
       </div>
       <button class="btn btn-primary" onclick="submitSession()" id="submit-session-btn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        Envoyer à Make
+        Enregistrer la séance
       </button>
       <div class="loading" id="submit-loading" style="margin-top:10px"><div class="spinner"></div>Enregistrement...</div>
       <button class="btn btn-danger" onclick="confirmAbandon()" style="margin-top:10px;font-size:13px;padding:10px">
@@ -995,10 +1040,9 @@
       <div class="app-header-sub">Identité & objectifs</div>
     </div>
     <div style="display:flex;align-items:center;gap:8px">
-      <div id="quota-badge-profile" class="quota-badge" onclick="handleQuotaBadgeClick()"></div>
-      <div class="user-badge">
-        <span class="user-badge-name" id="user-badge-email"></span>
-        <button class="user-signout-btn" onclick="authSignOut()">Déconnexion</button>
+      <div class="quota-badge-wrap" id="quota-wrap-profile">
+        <div id="quota-badge-profile" class="quota-badge green"></div>
+        <button class="quota-add-btn" id="quota-add-btn-profile">+ crédits</button>
       </div>
     </div>
   </div>
@@ -1009,6 +1053,7 @@
     <div class="card pcard" onclick="openProfileEdit()">
       <div class="pcard-edit-hint">Modifier ✎</div>
       <div class="pcard-hero" id="pv-hero">—</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:-6px;margin-bottom:10px;text-align:center" id="pv-email">—</div>
       <div class="pcard-row">
         <div class="pcard-stat"><div class="pcard-val" id="pv-age">—</div><div class="pcard-lbl">ans</div></div>
         <div class="pcard-stat"><div class="pcard-val" id="pv-weight">—</div><div class="pcard-lbl">kg</div></div>
@@ -1054,6 +1099,10 @@
       <div class="pro-cta-bar-text"><strong>FORGE Pro</strong> — séances IA illimitées</div>
       <button class="pro-cta-bar-btn" onclick="goToPro()">15€/mois →</button>
     </div>
+    <!-- Déconnexion -->
+    <button onclick="authSignOut()" style="width:100%;margin-top:8px;margin-bottom:24px;padding:12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:none;color:var(--text3);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--accent3)';this.style.color='var(--accent3)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text3)'">
+      Déconnexion
+    </button>
   </div>
 
   <!-- EDIT MODE (hidden by default) -->
@@ -1117,27 +1166,62 @@
   </div>
 </div>
 
-<!-- ═══ MODAL — NO CREDITS ═══ -->
-<div class="modal-backdrop" id="modal-no-credits" onclick="closeNoCreditsModal(event)">
+<!-- ═══ MODAL — CONVERT (choix offre) ═══ -->
+<div class="modal-backdrop" id="modal-convert" onclick="closeModal('modal-convert',event)">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
-    <div class="modal-title">Crédits épuisés 🔒</div>
-    <div class="modal-body">
-      Tes <strong style="color:var(--text)">3 séances IA offertes</strong> ont été utilisées.<br><br>
-      Passe à <strong style="color:var(--accent)">FORGE Pro</strong> pour continuer à générer des séances personnalisées, sans limite.
+    <div class="modal-title">Continuer avec FORGE ⚡</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.5">
+      Tes séances gratuites sont épuisées. Choisis l'offre qui te convient.
     </div>
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--text)">FORGE Pro</div>
-        <div style="font-size:12px;color:var(--text2);margin-top:2px">30 séances IA / mois · Insights avancés</div>
+
+    <!-- Option 1 — Abonnement (mise en avant) -->
+    <div style="position:relative;background:linear-gradient(135deg,rgba(232,255,71,0.08),rgba(71,200,255,0.05));border:1.5px solid var(--accent);border-radius:var(--radius);padding:16px;margin-bottom:10px">
+      <div style="position:absolute;top:-10px;left:16px;background:var(--accent);color:#000;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;padding:2px 10px;border-radius:10px">RECOMMANDÉ</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--text);letter-spacing:-.01em">FORGE Pro</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px">Abonnement mensuel</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:var(--accent);line-height:1">15€</div>
+          <div style="font-size:11px;color:var(--text2)">/mois</div>
+        </div>
       </div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--accent)">15€<span style="font-size:13px;font-weight:400;color:var(--text2)">/mois</span></div>
+      <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)">
+          <span style="color:var(--accent);font-weight:700">✓</span> 30 séances IA incluses / mois
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)">
+          <span style="color:var(--accent);font-weight:700">✓</span> Crédits ponctuels à <strong style="color:var(--text)">5€/10 séances</strong> (vs 15€)
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)">
+          <span style="color:var(--accent);font-weight:700">✓</span> Dashboard & insights mis à jour après chaque séance
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="closeModal('modal-convert');goToPro()">
+        S'abonner — 15€/mois
+      </button>
     </div>
-    <button class="btn btn-primary" onclick="goToPro()" style="margin-bottom:10px">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-      Passer à Pro — 15€/mois
-    </button>
-    <button class="btn btn-secondary" onclick="closeNoCreditsModal()" style="font-size:13px;padding:12px">Fermer</button>
+
+    <!-- Option 2 — Crédits ponctuels -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--text);letter-spacing:-.01em">Crédits ponctuels</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px">Sans abonnement · Sans expiration</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:var(--text2);line-height:1">15€</div>
+          <div style="font-size:11px;color:var(--text2)">/10 séances</div>
+        </div>
+      </div>
+      <button class="btn btn-secondary" style="font-size:13px" onclick="closeModal('modal-convert');openBuyCreditsModal()">
+        Acheter des crédits
+      </button>
+    </div>
+
+    <button class="btn btn-secondary" onclick="closeModal('modal-convert')" style="font-size:12px;padding:10px;color:var(--text3)">Fermer</button>
   </div>
 </div>
 
@@ -1161,22 +1245,73 @@
 <div class="modal-backdrop" id="modal-buy-credits" onclick="closeModal('modal-buy-credits',event)">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
-    <div class="modal-title">Recharger des crédits ⚡</div>
-    <div class="modal-body">
-      Tu as utilisé tous tes crédits ce mois-ci. Recharge pour continuer à générer des séances IA.
-    </div>
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center">
+    <div class="modal-title">Acheter des crédits ⚡</div>
+
+    <!-- Pricing selon plan -->
+    <div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px">
       <div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--text)">Pack crédits</div>
-        <div style="font-size:12px;color:var(--text2);margin-top:2px">10 séances IA · Valables sans limite de durée</div>
+        <div style="font-size:12px;color:var(--text2)">Prix par pack de 10 séances</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px" id="credits-pricing-note"></div>
       </div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--accent)">5€<span style="font-size:13px;font-weight:400;color:var(--text2)">/10 séances</span></div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:var(--accent)" id="credits-unit-price"></div>
     </div>
-    <button class="btn btn-primary" onclick="buyCredits()" style="margin-bottom:10px">
+
+    <!-- Presets -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px" id="credits-presets">
+      <button class="credits-preset active" data-qty="1" onclick="selectCreditPreset(1)">1 pack<div class="credits-preset-sub">10 séances</div></button>
+      <button class="credits-preset" data-qty="2" onclick="selectCreditPreset(2)">2 packs<div class="credits-preset-sub">20 séances</div></button>
+      <button class="credits-preset" data-qty="5" onclick="selectCreditPreset(5)">5 packs<div class="credits-preset-sub">50 séances</div></button>
+      <button class="credits-preset" data-qty="10" onclick="selectCreditPreset(10)">10 packs<div class="credits-preset-sub">100 séances</div></button>
+    </div>
+
+    <!-- Saisie manuelle -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      <div style="font-size:12px;color:var(--text2);white-space:nowrap">Autre quantité :</div>
+      <div style="display:flex;align-items:center;gap:6px;flex:1">
+        <button onclick="adjustCreditQty(-1)" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">−</button>
+        <input type="number" id="credits-qty-input" min="1" max="100" value="1"
+          style="width:56px;text-align:center;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;outline:none"
+          oninput="onCreditQtyInput(this.value)">
+        <button onclick="adjustCreditQty(1)" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">+</button>
+        <div style="font-size:12px;color:var(--text2)" id="credits-sessions-label">= 10 séances</div>
+      </div>
+    </div>
+
+    <!-- Total + CTA -->
+    <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:16px;margin-bottom:16px">
+      <div>
+        <div style="font-size:12px;color:var(--text2)">Total</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:var(--text)" id="credits-total-price">5€</div>
+      </div>
+      <div style="text-align:right;font-size:12px;color:var(--text2)">
+        <div id="credits-total-sessions">10 séances</div>
+        <div style="color:var(--text3);margin-top:2px">Sans limite de durée</div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="credits-buy-btn" onclick="confirmBuyCredits()" style="margin-bottom:10px">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-      Acheter des crédits
+      <span id="credits-buy-label">Acheter — 5€</span>
     </button>
     <button class="btn btn-secondary" onclick="closeModal('modal-buy-credits')" style="font-size:13px;padding:12px">Annuler</button>
+  </div>
+</div>
+
+<!-- ═══ MODAL — COACH COMMENT ═══ -->
+<div class="modal-backdrop" id="modal-coach" onclick="if(event.target===this)onCloseCoachModal()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,rgba(71,200,255,0.2),rgba(232,255,71,0.1));border:1px solid rgba(71,200,255,0.3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🧠</div>
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:.04em;color:var(--text)">Analyse du coach</div>
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Feedback IA · Post-séance</div>
+      </div>
+    </div>
+    <div id="coach-comment-text" style="font-size:14px;color:var(--text2);line-height:1.7;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:20px;min-height:60px"></div>
+    <button class="btn btn-primary" onclick="onCloseCoachModal()">
+      Merci coach 💪
+    </button>
   </div>
 </div>
 
@@ -1206,13 +1341,21 @@ let PROFILE_KEY = 'forge_profile';
 let SESSION_KEY = 'forge_current_session';
 let CURRENT_USER = null;
 let FREE_SESSIONS_REMAINING = null; // null = not loaded yet
-let IS_PRO = false;
-let PAID_SESSIONS_COUNT = null;
-let PAID_PLAN_START_DATE = null;  // UNIX timestamp
-let NEXT_BILLING_DATE = null;     // UNIX timestamp
+let PAID_SUBSCRIPTION = false;      // abonnement mensuel actif
+let PAID_SESSIONS_COUNT = null;     // crédits mensuels restants (30/mois)
+let EXTRA_CREDITS_COUNT = null;     // crédits ponctuels non-expirables
+let PAID_PLAN_START_DATE = null;    // UNIX timestamp
+let NEXT_BILLING_DATE = null;       // UNIX timestamp
 
-const STRIPE_PAYMENT_LINK        = 'https://buy.stripe.com/test_28E5kEb9m3jO4uUef9ew802';
-const STRIPE_CREDITS_PAYMENT_LINK = 'https://buy.stripe.com/test_cNifZi7XacUoe5ugnhew803';
+// Helpers dérivés — à utiliser partout
+function totalCredits() { return (PAID_SESSIONS_COUNT ?? 0) + (EXTRA_CREDITS_COUNT ?? 0); }
+function hasAnyCredits() {
+  if (PAID_SUBSCRIPTION) return totalCredits() > 0;
+  return (FREE_SESSIONS_REMAINING ?? 0) > 0 || (EXTRA_CREDITS_COUNT ?? 0) > 0;
+}
+
+const STRIPE_SUBSCRIPTION_LINK    = 'https://buy.stripe.com/test_28E5kEb9m3jO4uUef9ew802';
+// Credits links définis dynamiquement selon paid_subscription (voir buyCredits())
 let OB_STEP = 0;
 const OB_STEPS = 4;
 let obGoals = [];
@@ -1538,60 +1681,50 @@ async function obFinish() {
 
 // ── AI QUOTA ──────────────────────────────────────────────────────
 function updateQuotaUI() {
-  const banner    = document.getElementById('ai-quota-banner');
-  const countEl   = document.getElementById('ai-quota-count');
-  const labelEl   = document.getElementById('ai-quota-label');
+  const banner     = document.getElementById('ai-quota-banner');
+  const countEl    = document.getElementById('ai-quota-count');
+  const labelEl    = document.getElementById('ai-quota-label');
   const proSection = document.getElementById('ai-token-section');
-  const genBtn    = document.getElementById('ia-gen-btn');
+  const genBtn     = document.getElementById('ia-gen-btn');
 
-  // Toujours mettre à jour les badges header
   updateQuotaBadge();
 
-  if (IS_PRO) {
-    // Pro user — affiche paid_sessions_count
-    const remaining = PAID_SESSIONS_COUNT !== null ? PAID_SESSIONS_COUNT : '∞';
+  if (PAID_SUBSCRIPTION) {
+    const total = totalCredits();
     banner.style.display = 'block';
-    countEl.textContent = remaining;
-    countEl.style.color = 'var(--accent2)';
-    labelEl.innerHTML = 'séances Pro restantes &nbsp;<span style="font-size:10px;background:rgba(71,200,255,0.15);color:var(--accent2);padding:2px 7px;border-radius:10px;font-family:\'Barlow Condensed\',sans-serif;font-weight:700;letter-spacing:.06em">PRO ⚡</span>';
-    if (proSection) proSection.style.display = 'none';
-    if (genBtn) genBtn.disabled = (PAID_SESSIONS_COUNT !== null && PAID_SESSIONS_COUNT <= 0);
-    return;
-  }
-
-  // Free user
-  if (FREE_SESSIONS_REMAINING === null) return;
-  countEl.style.color = 'var(--accent)';
-  labelEl.textContent = 'séances IA restantes';
-
-  if (FREE_SESSIONS_REMAINING > 0) {
-    banner.style.display = 'block';
-    countEl.textContent = FREE_SESSIONS_REMAINING;
+    countEl.textContent  = total;
+    countEl.style.color  = total > 0 ? 'var(--accent2)' : 'var(--accent3)';
+    labelEl.innerHTML    = 'crédits restants &nbsp;<span style="font-size:10px;background:rgba(71,200,255,0.15);color:var(--accent2);padding:2px 7px;border-radius:10px;font-family:\'Barlow Condensed\',sans-serif;font-weight:700;letter-spacing:.06em">PRO ⚡</span>';
     if (proSection) proSection.style.display = 'none';
     if (genBtn) genBtn.disabled = false;
   } else {
-    banner.style.display = 'none';
-    if (proSection) proSection.style.display = 'block';
-    if (genBtn) genBtn.disabled = true;
+    const total = (FREE_SESSIONS_REMAINING ?? 0) + (EXTRA_CREDITS_COUNT ?? 0);
+    if (FREE_SESSIONS_REMAINING === null) { updateQuotaBadge(); return; }
+    countEl.style.color = 'var(--accent)';
+    if (total > 0) {
+      banner.style.display = 'block';
+      countEl.textContent  = total;
+      labelEl.textContent  = (FREE_SESSIONS_REMAINING ?? 0) > 0 ? 'séances IA restantes' : 'crédits restants';
+      if (proSection) proSection.style.display = 'none';
+      if (genBtn) genBtn.disabled = false;
+    } else {
+      banner.style.display = 'none';
+      if (proSection) proSection.style.display = 'block';
+      if (genBtn) genBtn.disabled = true;
+    }
   }
 }
 
-async function loadUserQuota() {
-  // Legacy alias → now handled by initApp/absorbServerState
-  await initApp();
-}
+async function loadUserQuota() { await initApp(); }
 
 // ── HELPERS ───────────────────────────────────────────────────────
 function formatUnixDate(ts) {
   if (!ts) return '—';
-  const d = new Date(Number(ts) * 1000);
-  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  return new Date(Number(ts) * 1000).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 // ── MODAUX GÉNÉRIQUES ─────────────────────────────────────────────
-function showModal(id) {
-  document.getElementById(id).classList.add('visible');
-}
+function showModal(id) { document.getElementById(id).classList.add('visible'); }
 function closeModal(id, e) {
   if (e && e.target !== document.getElementById(id)) return;
   document.getElementById(id).classList.remove('visible');
@@ -1601,125 +1734,159 @@ function closeModal(id, e) {
 const PRO_CTA_IDS = ['pro-cta-dashboard','pro-cta-seance0','pro-cta-profile'];
 
 function updateQuotaBadge() {
-  const BADGE_IDS = ['quota-badge-dashboard','quota-badge-seance','quota-badge-profile'];
-  BADGE_IDS.forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
+  const WRAP_IDS = [
+    { wrap: 'quota-wrap-dashboard', badge: 'quota-badge-dashboard', btn: 'quota-add-btn-dashboard' },
+    { wrap: 'quota-wrap-seance',    badge: 'quota-badge-seance',    btn: 'quota-add-btn-seance'    },
+    { wrap: 'quota-wrap-profile',   badge: 'quota-badge-profile',   btn: 'quota-add-btn-profile'   },
+  ];
 
-    if (IS_PRO && PAID_SESSIONS_COUNT > 0) {
-      el.className = 'quota-badge pro';
-      el.onclick = null;
-      el.innerHTML = `<span class="quota-badge-count">${PAID_SESSIONS_COUNT}</span><span class="quota-badge-icon">⚡</span>`;
-    } else if (IS_PRO && PAID_SESSIONS_COUNT <= 0) {
-      // Pro mais plus de crédits → badge "Recharger"
-      el.className = 'quota-badge cta';
-      el.onclick = () => showModal('modal-buy-credits');
-      el.innerHTML = `<span class="quota-badge-count">Recharger ⚡</span>`;
-    } else if (!IS_PRO && FREE_SESSIONS_REMAINING !== null && FREE_SESSIONS_REMAINING > 0) {
-      el.className = 'quota-badge';
-      el.onclick = null;
-      el.innerHTML = `<span class="quota-badge-count">${FREE_SESSIONS_REMAINING}</span><span class="quota-badge-icon">🎁</span>`;
-    } else {
-      // Free + quota épuisé → CTA Pro
-      el.className = 'quota-badge cta';
-      el.onclick = () => goToPro();
-      el.innerHTML = `<span class="quota-badge-count">Passer Pro →</span>`;
+  const free  = FREE_SESSIONS_REMAINING ?? 0;
+  const paid  = PAID_SUBSCRIPTION ? (PAID_SESSIONS_COUNT ?? 0) : 0;
+  const extra = EXTRA_CREDITS_COUNT ?? 0;
+  const total = free + paid + extra;
+
+  // Couleur selon niveau
+  const color = total > 10 ? 'green' : total >= 4 ? 'yellow' : 'red';
+  const modal = PAID_SUBSCRIPTION ? 'modal-buy-credits' : 'modal-convert';
+
+  WRAP_IDS.forEach(({ wrap, badge, btn }) => {
+    const wrapEl  = document.getElementById(wrap);
+    const badgeEl = document.getElementById(badge);
+    const btnEl   = document.getElementById(btn);
+    if (!badgeEl) return;
+
+    // Badge compteur
+    badgeEl.className = `quota-badge ${color}`;
+    badgeEl.onclick   = null;
+    badgeEl.innerHTML = `<span class="quota-badge-count">${total} ⚡</span>`;
+
+    // Bouton + crédits — toujours visible
+    if (btnEl) {
+      btnEl.onclick = () => PAID_SUBSCRIPTION ? openBuyCreditsModal() : showModal('modal-convert');
     }
   });
 }
 
 function handleQuotaBadgeClick() {
-  if (IS_PRO && PAID_SESSIONS_COUNT <= 0) showModal('modal-buy-credits');
-  else if (!IS_PRO && (FREE_SESSIONS_REMAINING === null || FREE_SESSIONS_REMAINING <= 0)) goToPro();
+  if (PAID_SUBSCRIPTION && totalCredits() <= 0) openBuyCreditsModal();
+  else if (!PAID_SUBSCRIPTION && !hasAnyCredits()) showModal('modal-convert');
 }
 
 function updateSeanceIAButtons() {
-  // Pro sans crédits → masquer "Générer", afficher "Acheter crédits"
   const genBtn        = document.getElementById('ia-gen-btn');
   const buyCreditsBtn = document.getElementById('ia-buy-credits-btn');
   if (!genBtn || !buyCreditsBtn) return;
-  const proNoCredits = IS_PRO && PAID_SESSIONS_COUNT !== null && PAID_SESSIONS_COUNT <= 0;
-  genBtn.style.display        = proNoCredits ? 'none' : 'flex';
-  buyCreditsBtn.style.display = proNoCredits ? 'flex' : 'none';
+
+  const subNoCredits = PAID_SUBSCRIPTION && totalCredits() <= 0;
+  const noCredits    = !hasAnyCredits();
+
+  genBtn.style.display        = subNoCredits ? 'none' : 'flex';
+  buyCreditsBtn.style.display = subNoCredits ? 'flex' : 'none';
+
+  // Griser si plus aucun crédit (free user épuisé)
+  if (noCredits && !subNoCredits) {
+    genBtn.disabled      = true;
+    genBtn.style.opacity = '0.35';
+    genBtn.style.filter  = 'grayscale(0.6)';
+    genBtn.style.cursor  = 'not-allowed';
+  } else {
+    genBtn.disabled      = false;
+    genBtn.style.opacity = '';
+    genBtn.style.filter  = '';
+    genBtn.style.cursor  = '';
+  }
 }
 
 function updateProUI() {
   updateQuotaBadge();
   updateSeanceIAButtons();
-
-  // Barres CTA bas de page : visibles si pas Pro
   PRO_CTA_IDS.forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.classList.toggle('hidden', IS_PRO);
+    if (el) el.classList.toggle('hidden', PAID_SUBSCRIPTION);
   });
-
-  // Section abonnement dans le profil edit
   const proBlock = document.getElementById('profile-pro-block');
   if (!proBlock) return;
 
-  if (IS_PRO) {
+  if (PAID_SUBSCRIPTION) {
+    const paidLeft  = PAID_SESSIONS_COUNT ?? 0;
+    const extraLeft = EXTRA_CREDITS_COUNT ?? 0;
+    const totalLeft = paidLeft + extraLeft;
     proBlock.innerHTML = `
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
         <div style="font-size:13px;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.5px">⚡ FORGE PRO</div>
         <span style="font-size:10px;background:rgba(71,200,255,0.15);color:var(--accent2);padding:2px 8px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.06em">ACTIF</span>
       </div>
       <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <span style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px">Crédits restants</span>
-          <span style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:${PAID_SESSIONS_COUNT > 0 ? 'var(--accent2)' : 'var(--accent3)'}">${PAID_SESSIONS_COUNT ?? '—'} <span style="font-size:12px;font-weight:400;color:var(--text2)">séances</span></span>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--border)">
+          <span style="font-size:12px;color:var(--text2)">Total crédits restants</span>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:${totalLeft > 0 ? 'var(--accent2)' : 'var(--accent3)'}">${totalLeft}</span>
         </div>
-        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);padding-top:10px;border-top:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:4px">
+          <span>Crédits mensuels (abo)</span><span style="color:var(--text)">${paidLeft} séances</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--border)">
+          <span>Crédits ponctuels</span><span style="color:var(--text)">${extraLeft} séances</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:4px">
           <span>Souscription</span><span style="color:var(--text)">${formatUnixDate(PAID_PLAN_START_DATE)}</span>
         </div>
-        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-top:6px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2)">
           <span>Prochain renouvellement</span><span style="color:var(--text)">${formatUnixDate(NEXT_BILLING_DATE)}</span>
         </div>
       </div>
-      <button class="btn btn-primary" onclick="showModal('modal-buy-credits')" style="margin-bottom:8px">
+      <button class="btn btn-primary" onclick="openBuyCreditsModal()" style="margin-bottom:8px">
         ⚡ Acheter des crédits — 5€ / 10 séances
       </button>
       <button class="btn btn-secondary" onclick="showModal('modal-stripe-portal')" style="font-size:13px;padding:12px">
         💳 Gérer mon abonnement
       </button>`;
   } else {
-    const freeLeft = FREE_SESSIONS_REMAINING ?? 0;
+    const freeLeft  = FREE_SESSIONS_REMAINING ?? 0;
+    const extraLeft = EXTRA_CREDITS_COUNT ?? 0;
     proBlock.innerHTML = `
       <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px">🎁 Plan gratuit</div>
       <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:12px;color:var(--text2)">Séances IA offertes restantes</span>
-          <span style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:${freeLeft > 0 ? 'var(--accent)' : 'var(--accent3)'}">${freeLeft}</span>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:4px">
+          <span>Séances offertes restantes</span>
+          <span style="font-weight:700;color:${freeLeft > 0 ? 'var(--accent)' : 'var(--text3)'}">${freeLeft}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2)">
+          <span>Crédits ponctuels</span>
+          <span style="font-weight:700;color:${extraLeft > 0 ? 'var(--accent)' : 'var(--text3)'}">${extraLeft}</span>
         </div>
       </div>
       <div style="background:linear-gradient(135deg,rgba(232,255,71,0.06),rgba(71,200,255,0.04));border:1px solid rgba(232,255,71,0.2);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px">
         <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">🔥 FORGE Pro — 15€/mois</div>
         <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--text2)">
           <div>⚡ 30 séances IA / mois incluses</div>
+          <div>💰 Crédits ponctuels à 5€/10 séances (vs 15€ sans abo)</div>
           <div>📈 Progression et charges calculées automatiquement</div>
           <div>🧠 Insights dashboard mis à jour après chaque séance</div>
-          <div>🎯 Priorité sur les nouvelles features</div>
         </div>
       </div>
-      <button class="btn btn-primary" onclick="goToPro()">Passer à Pro — 15€/mois</button>`;
+      <button class="btn btn-primary" onclick="showModal('modal-convert')" style="margin-bottom:8px">Voir les offres</button>`;
   }
 }
 
 function showNoCreditsModal() {
-  if (IS_PRO) showModal('modal-buy-credits');
-  else showModal('modal-no-credits');
+  if (PAID_SUBSCRIPTION) openBuyCreditsModal();
+  else showModal('modal-convert');
+}
+
+function closeNoCreditsModal(e) {
+  closeModal('modal-convert', e);
 }
 
 function toggleAccountAccordion() {
   const acc = document.getElementById('account-accordion');
   if (!acc) return;
   acc.classList.toggle('open');
-  // Render le contenu au premier dépliage
   if (acc.classList.contains('open')) updateProUI();
 }
 
-function closeNoCreditsModal(e) {
-  if (e && e.target !== document.getElementById('modal-no-credits')) return;
-  document.getElementById('modal-no-credits').classList.remove('visible');
+function toggleRecentSessions() {
+  const acc = document.getElementById('recent-sessions-accordion');
+  if (acc) acc.classList.toggle('open');
 }
 
 async function doOpenPortal() {
@@ -1727,36 +1894,100 @@ async function doOpenPortal() {
   btn.disabled = true; btn.textContent = 'Chargement...';
   try {
     const res = await callMake({ event: 'get_portal_url' });
-    if (res && res.url) {
-      window.location.href = res.url;
-    } else {
-      showToast('Erreur — réessaie', true);
-      btn.disabled = false; btn.textContent = 'Accéder au portail →';
-    }
-  } catch(e) {
-    showToast('Erreur — réessaie', true);
-    btn.disabled = false; btn.textContent = 'Accéder au portail →';
+    if (res && res.url) { window.location.href = res.url; }
+    else { showToast('Erreur — réessaie', true); btn.disabled = false; btn.textContent = 'Accéder au portail →'; }
+  } catch(e) { showToast('Erreur — réessaie', true); btn.disabled = false; btn.textContent = 'Accéder au portail →'; }
+}
+
+// ── MODAL ACHAT CRÉDITS ───────────────────────────────────────────
+let _creditsQty = 1;
+
+function openBuyCreditsModal() {
+  _creditsQty = 1;
+  _refreshCreditsModal();
+  showModal('modal-buy-credits');
+}
+
+function _refreshCreditsModal() {
+  const unitPrice = PAID_SUBSCRIPTION ? 5 : 15;
+  const total     = unitPrice * _creditsQty;
+  const sessions  = _creditsQty * 10;
+
+  // Pricing header
+  document.getElementById('credits-unit-price').textContent  = unitPrice + '€';
+  document.getElementById('credits-pricing-note').textContent = PAID_SUBSCRIPTION
+    ? 'Tarif abonné Pro'
+    : 'Tarif sans abonnement — 3× moins cher avec Pro';
+
+  // Saisie
+  document.getElementById('credits-qty-input').value         = _creditsQty;
+  document.getElementById('credits-sessions-label').textContent = `= ${sessions} séances`;
+
+  // Total
+  document.getElementById('credits-total-price').textContent   = total + '€';
+  document.getElementById('credits-total-sessions').textContent = sessions + ' séances';
+  document.getElementById('credits-buy-label').textContent      = `Acheter — ${total}€`;
+
+  // Presets actifs
+  document.querySelectorAll('.credits-preset').forEach(btn => {
+    btn.classList.toggle('active', Number(btn.dataset.qty) === _creditsQty);
+  });
+}
+
+function selectCreditPreset(qty) {
+  _creditsQty = qty;
+  _refreshCreditsModal();
+}
+
+function adjustCreditQty(delta) {
+  _creditsQty = Math.max(1, Math.min(100, (_creditsQty || 1) + delta));
+  _refreshCreditsModal();
+}
+
+function onCreditQtyInput(val) {
+  const n = parseInt(val);
+  if (!isNaN(n) && n >= 1 && n <= 100) {
+    _creditsQty = n;
+    _refreshCreditsModal();
   }
 }
 
-function buyCredits() {
-  if (!CURRENT_USER) return;
-  const uid   = CURRENT_USER.id || CURRENT_USER.sub || btoa(CURRENT_USER.email);
-  const email = CURRENT_USER.email || '';
-  localStorage.setItem('forge_payment_pending', '1');
-  const url = `${STRIPE_CREDITS_PAYMENT_LINK}?client_reference_id=${encodeURIComponent(uid)}&prefilled_email=${encodeURIComponent(email)}`;
-  window.location.href = url;
+async function confirmBuyCredits() {
+  const btn = document.getElementById('credits-buy-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;border-top-color:var(--bg);margin:0 auto"></div>';
+
+  try {
+    const res = await callMake({
+      event: 'get_credits_url',
+      quantity: _creditsQty,
+      paid_subscription: PAID_SUBSCRIPTION
+    });
+    if (res && res.url) {
+      localStorage.setItem('forge_payment_pending', '1');
+      window.location.href = res.url;
+    } else {
+      showToast('Erreur — réessaie', true);
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><span id="credits-buy-label">Acheter — ${(PAID_SUBSCRIPTION ? 5 : 15) * _creditsQty}€</span>`;
+    }
+  } catch(e) {
+    showToast('Erreur — réessaie', true);
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><span id="credits-buy-label">Acheter — ${(PAID_SUBSCRIPTION ? 5 : 15) * _creditsQty}€</span>`;
+  }
 }
+
+function buyCredits() { openBuyCreditsModal(); }
 
 function goToPro() {
   if (!CURRENT_USER) return;
   const uid   = CURRENT_USER.id || CURRENT_USER.sub || btoa(CURRENT_USER.email);
   const email = CURRENT_USER.email || '';
-  // Sauvegarder le flag avant de quitter — survit à la redirection Stripe
   localStorage.setItem('forge_payment_pending', '1');
-  const url = `${STRIPE_PAYMENT_LINK}?client_reference_id=${encodeURIComponent(uid)}&prefilled_email=${encodeURIComponent(email)}`;
-  window.location.href = url;
+  window.location.href = `${STRIPE_SUBSCRIPTION_LINK}?client_reference_id=${encodeURIComponent(uid)}&prefilled_email=${encodeURIComponent(email)}`;
 }
+
 
 async function pollProStatus() {
   // Appelé au retour de Stripe (?payment=success)
@@ -1771,11 +2002,12 @@ async function pollProStatus() {
     attempts++;
     try {
       const res = await callMake({ event: 'check_pro_status' });
-      if (res && res.pro_plan) {
+      if (res && res.paid_subscription) {
         clearInterval(poll);
         hideOverlay();
-        IS_PRO = true;
+        PAID_SUBSCRIPTION = true;
         PAID_SESSIONS_COUNT = res.paid_sessions_count ?? 30;
+        EXTRA_CREDITS_COUNT = res.extra_credits_count ?? 0;
         updateQuotaUI();
         updateProUI();
         // Nettoyer l'URL
@@ -1817,6 +2049,9 @@ function onAuthSuccess(user, token, isNewUser = false) {
   SESSION_KEY = 'forge_current_session_' + uid;
   const badge = document.getElementById('user-badge-email');
   if (badge) badge.textContent = user.email;
+  // Email dans la carte identité profil
+  const pvEmail = document.getElementById('pv-email');
+  if (pvEmail) pvEmail.textContent = user.email || '';
   loadConfig();
   loadLocalProfile();
 
@@ -1997,24 +2232,53 @@ function absorbServerState(allData) {
   if (allData.user_meta) {
     const meta = allData.user_meta;
     if (meta.free_sessions_remaining !== undefined) FREE_SESSIONS_REMAINING = meta.free_sessions_remaining;
-    if (meta.pro_plan              !== undefined) IS_PRO = !!(meta.pro_plan);
-    if (meta.paid_sessions_count   !== undefined) PAID_SESSIONS_COUNT = meta.paid_sessions_count;
-    if (meta.paid_plan_start_date  !== undefined) PAID_PLAN_START_DATE = meta.paid_plan_start_date;
-    if (meta.next_billing_date     !== undefined) NEXT_BILLING_DATE = meta.next_billing_date;
+    if (meta.paid_subscription       !== undefined) PAID_SUBSCRIPTION = !!(meta.paid_subscription);
+    if (meta.paid_sessions_count     !== undefined) PAID_SESSIONS_COUNT = meta.paid_sessions_count;
+    if (meta.extra_credits_count     !== undefined) EXTRA_CREDITS_COUNT = meta.extra_credits_count;
+    if (meta.paid_plan_start_date    !== undefined) PAID_PLAN_START_DATE = meta.paid_plan_start_date;
+    if (meta.next_billing_date       !== undefined) NEXT_BILLING_DATE = meta.next_billing_date;
     updateQuotaUI();
     updateProUI();
   }
 }
 
 // ── NAV ───────────────────────────────────────────────────────────
+const VIEW_ORDER = ['dashboard', 'seance', 'profile'];
+let _currentView = 'dashboard';
+
 function showView(name) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  if (name === _currentView) return;
+
+  const fromIdx = VIEW_ORDER.indexOf(_currentView);
+  const toIdx   = VIEW_ORDER.indexOf(name);
+  const goRight = toIdx > fromIdx;
+
+  const outEl = document.getElementById('view-' + _currentView);
+  const inEl  = document.getElementById('view-' + name);
+
+  // Retirer les classes d'animation résiduelles
+  outEl.classList.remove('slide-in-right','slide-in-left','slide-out-right','slide-out-left');
+  inEl.classList.remove('slide-in-right','slide-in-left','slide-out-right','slide-out-left');
+
+  // Cacher l'ancienne vue
+  outEl.classList.remove('active');
+
+  // Afficher et animer la nouvelle
+  inEl.classList.add('active');
+  inEl.classList.add(goRight ? 'slide-in-right' : 'slide-in-left');
+
+  // Nettoyer après l'animation
+  setTimeout(() => {
+    inEl.classList.remove('slide-in-right','slide-in-left');
+  }, 300);
+
+  // Nav
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('view-' + name).classList.add('active');
   document.getElementById('nav-' + name).classList.add('active');
-  // Rafraîchir le quota quand on ouvre la vue séance
+
+  _currentView = name;
+
   if (name === 'seance') updateQuotaUI();
-  // Rafraîchir le bloc Pro quand on ouvre le profil
   if (name === 'profile') updateProUI();
 }
 
@@ -2544,6 +2808,16 @@ function setDuration(val, btn) {
   iaDuration = val;
   document.querySelectorAll('.ia-dur-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  document.getElementById('ia-duration-custom').value = '';
+}
+
+function setDurationCustom(val) {
+  const n = parseInt(val);
+  if (!isNaN(n) && n >= 10 && n <= 240) {
+    iaDuration = n;
+    // Désactiver les presets
+    document.querySelectorAll('.ia-dur-btn').forEach(b => b.classList.remove('active'));
+  }
 }
 
 function setEnergy(val, btn) {
@@ -2560,8 +2834,8 @@ function setFocus(val, btn) {
 }
 
 async function generatePlanIA() {
-  // Bloquer si free_sessions épuisées ET pas Pro
-  if (!IS_PRO && FREE_SESSIONS_REMAINING !== null && FREE_SESSIONS_REMAINING <= 0) {
+  // Bloquer si plus aucun crédit disponible
+  if (!hasAnyCredits()) {
     showNoCreditsModal();
     return;
   }
@@ -2875,7 +3149,7 @@ async function submitSession() {
     mode: currentSession.mode,
     started_at: currentSession.startedAt,
     ended_at: new Date().toISOString(),
-    exos: currentSession.exos,           // texte brut — Make/IA parse
+    exos: currentSession.exos,
     ia_plan: currentSession.iaPlan,
     notes: document.getElementById('final-notes').value,
     feeling: currentSession.feeling,
@@ -2883,29 +3157,29 @@ async function submitSession() {
   };
   document.getElementById('submit-session-btn').disabled = true;
   showOverlay('log');
+
   if (!config.webhook) {
     setTimeout(() => {
       hideOverlay();
       document.getElementById('submit-session-btn').disabled = false;
-      showToast('Séance envoyée ✓ (démo)');
+      showToast('Séance enregistrée ✓ (démo)');
       clearSessionLS();
       document.getElementById('resume-banner').classList.remove('visible');
       showSeanceStep(0);
     }, 2000);
     return;
   }
+
   try {
-    await callMake(payload);
-    hideOverlay();
+    const coachComment = await callMake(payload);
+
+    // Nettoyage UI séance
     document.getElementById('submit-session-btn').disabled = false;
-    showToast('Séance enregistrée ✓');
     clearSessionLS();
     document.getElementById('resume-banner').classList.remove('visible');
     document.getElementById('final-notes').value = '';
     document.querySelectorAll('.feeling-btn').forEach(b => b.classList.remove('selected'));
     showSeanceStep(0);
-    // Always refresh dashboard after logging a session
-    // Clear the IA plan so it doesn't reappear on next session
     currentSession.iaPlan = null;
     document.getElementById('ai-plan-card').classList.remove('visible');
     document.getElementById('ia-start-log-btn').style.display = 'none';
@@ -2914,16 +3188,35 @@ async function submitSession() {
     if (formWrapper) formWrapper.classList.remove('collapsed');
     if (formSummary) formSummary.style.display = 'none';
 
-    showToast('Calcul du dashboard IA… ⚡');
-    showOverlay('dashboard');
-    await initApp();
     hideOverlay();
-    showView('dashboard');
+
+    // Afficher le feedback coach si présent → dashboard chargé à la fermeture
+    if (coachComment && typeof coachComment === 'string' && coachComment.trim().length > 0) {
+      document.getElementById('coach-comment-text').textContent = coachComment.trim();
+      showModal('modal-coach');
+      // Le dashboard sera chargé par onCloseCoachModal()
+    } else {
+      // Pas de feedback → charger dashboard directement
+      await _loadDashboardAfterLog();
+    }
+
   } catch(e) {
     hideOverlay();
     document.getElementById('submit-session-btn').disabled = false;
-    showToast('Erreur envoi Make', true);
+    showToast('Erreur envoi', true);
   }
+}
+
+async function _loadDashboardAfterLog() {
+  showOverlay('dashboard');
+  await initApp();
+  hideOverlay();
+  showView('dashboard');
+}
+
+async function onCloseCoachModal() {
+  closeModal('modal-coach');
+  await _loadDashboardAfterLog();
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────────
@@ -3332,6 +3625,7 @@ function showOverlay(type) {
 
   document.getElementById('overlay-icon').textContent = cfg.icon;
   document.getElementById('overlay-ring-color').style.stroke = cfg.color;
+  document.getElementById('overlay-ring-glow').style.stroke  = cfg.color;
   document.getElementById('overlay-sub').textContent = cfg.sub;
   document.getElementById('overlay-message').textContent = msgs[0];
   document.getElementById('forge-overlay').classList.add('visible');
@@ -3343,7 +3637,7 @@ function showOverlay(type) {
     setTimeout(() => {
       el.textContent = msgs[overlayMsgIndex];
       el.classList.remove('changing');
-    }, 350);
+    }, 400);
   }, 2200);
 }
 
