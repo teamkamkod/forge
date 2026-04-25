@@ -440,7 +440,14 @@
   .ai-quota-label { font-size:12px; color:var(--text2); margin-top:2px; }
   /* PRO UPGRADE BANNER */
   .pro-upgrade-banner { background:linear-gradient(135deg,rgba(232,255,71,0.08),rgba(71,200,255,0.06)); border:1px solid rgba(232,255,71,0.25); border-radius:var(--radius); padding:20px; margin-bottom:16px; text-align:center; }
-  /* NO-CREDITS MODAL */
+  /* ACCORDION MON COMPTE */
+  .account-accordion { border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:16px; }
+  .account-accordion-header { display:flex; justify-content:space-between; align-items:center; padding:14px 16px; cursor:pointer; background:var(--card); user-select:none; -webkit-user-select:none; }
+  .account-accordion-title { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text); }
+  .account-accordion-chevron { font-size:10px; color:var(--text3); transition:transform 0.25s; }
+  .account-accordion.open .account-accordion-chevron { transform:rotate(180deg); }
+  .account-accordion-body { display:none; padding:16px; border-top:1px solid var(--border); background:var(--card); }
+  .account-accordion.open .account-accordion-body { display:block; animation:fadeIn 0.2s ease; }
   .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); z-index:800; display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.25s; }
   .modal-backdrop.visible { opacity:1; pointer-events:all; }
   .modal-sheet { width:100%; max-width:430px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius) var(--radius) 0 0; padding:28px 24px 40px; transform:translateY(40px); transition:transform 0.3s cubic-bezier(0.34,1.2,0.64,1); }
@@ -861,10 +868,17 @@
       </button>
     </div>
 
-        <button class="btn btn-primary" onclick="generatePlanIA()" id="ia-gen-btn">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-      Générer ma séance
-    </button>
+    <!-- Bouton génération / achat crédits -->
+    <div id="ia-gen-zone">
+      <button class="btn btn-primary" onclick="generatePlanIA()" id="ia-gen-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Générer ma séance
+      </button>
+      <button class="btn btn-secondary" onclick="showModal('modal-buy-credits')" id="ia-buy-credits-btn" style="display:none">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Acheter des crédits — 5€ / 10 séances
+      </button>
+    </div>
 
     <div class="loading" id="ia-loading" style="margin-top:12px"><div class="spinner" style="border-top-color:var(--accent2)"></div>L'IA prépare ton planning...</div>
 
@@ -1015,7 +1029,7 @@
       <div class="pcard-text" id="pv-context-text" style="margin-top:6px;color:var(--text3)"></div>
     </div>
     <!-- Poids cible -->
-    <div class="card pcard" onclick="openProfileEdit()" style="margin-bottom:24px">
+    <div class="card pcard" onclick="openProfileEdit()" style="margin-bottom:16px">
       <div class="pcard-edit-hint">Modifier ✎</div>
       <div class="card-label">Objectif poids</div>
       <div style="display:flex;align-items:baseline;gap:6px">
@@ -1023,6 +1037,18 @@
         <span style="font-size:12px;color:var(--text2)">kg cible</span>
       </div>
     </div>
+
+    <!-- MON COMPTE — accordion -->
+    <div class="account-accordion" id="account-accordion">
+      <div class="account-accordion-header" onclick="toggleAccountAccordion()">
+        <span class="account-accordion-title">💳 Mon compte</span>
+        <span class="account-accordion-chevron">▼</span>
+      </div>
+      <div class="account-accordion-body">
+        <div id="profile-pro-block"></div>
+      </div>
+    </div>
+
     <!-- PRO CTA BAR — bas de page -->
     <div class="pro-cta-bar hidden" id="pro-cta-profile">
       <div class="pro-cta-bar-text"><strong>FORGE Pro</strong> — séances IA illimitées</div>
@@ -1088,14 +1114,6 @@
       <button class="btn btn-secondary" onclick="cancelProfileEdit()">Annuler</button>
       <button class="btn btn-primary" onclick="saveProfile()">Sauvegarder</button>
     </div>
-
-    <!-- ── FORGE PRO ── -->
-    <div id="profile-pro-block" style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);margin-bottom:24px">
-      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">🔥 FORGE Pro</div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.5">Séances IA illimitées, analyses avancées et priorité sur les nouvelles features.</div>
-      <button class="btn btn-primary" onclick="goToPro()">Passer à Pro — 15€/mois</button>
-    </div>
-
   </div>
 </div>
 
@@ -1120,6 +1138,45 @@
       Passer à Pro — 15€/mois
     </button>
     <button class="btn btn-secondary" onclick="closeNoCreditsModal()" style="font-size:13px;padding:12px">Fermer</button>
+  </div>
+</div>
+
+<!-- ═══ MODAL — PORTAIL STRIPE ═══ -->
+<div class="modal-backdrop" id="modal-stripe-portal" onclick="closeModal('modal-stripe-portal',event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Gérer mon abonnement 💳</div>
+    <div class="modal-body">
+      Tu vas être redirigé vers ton <strong style="color:var(--text)">portail Stripe</strong> sécurisé.<br><br>
+      Tu pourras y consulter tes factures, modifier ton moyen de paiement ou annuler ton abonnement.
+    </div>
+    <button class="btn btn-primary" id="portal-go-btn" onclick="doOpenPortal()" style="margin-bottom:10px">
+      Accéder au portail →
+    </button>
+    <button class="btn btn-secondary" onclick="closeModal('modal-stripe-portal')" style="font-size:13px;padding:12px">Retour</button>
+  </div>
+</div>
+
+<!-- ═══ MODAL — ACHAT CRÉDITS ═══ -->
+<div class="modal-backdrop" id="modal-buy-credits" onclick="closeModal('modal-buy-credits',event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Recharger des crédits ⚡</div>
+    <div class="modal-body">
+      Tu as utilisé tous tes crédits ce mois-ci. Recharge pour continuer à générer des séances IA.
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--text)">Pack crédits</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px">10 séances IA · Valables sans limite de durée</div>
+      </div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--accent)">5€<span style="font-size:13px;font-weight:400;color:var(--text2)">/10 séances</span></div>
+    </div>
+    <button class="btn btn-primary" onclick="buyCredits()" style="margin-bottom:10px">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Acheter des crédits
+    </button>
+    <button class="btn btn-secondary" onclick="closeModal('modal-buy-credits')" style="font-size:13px;padding:12px">Annuler</button>
   </div>
 </div>
 
@@ -1151,8 +1208,11 @@ let CURRENT_USER = null;
 let FREE_SESSIONS_REMAINING = null; // null = not loaded yet
 let IS_PRO = false;
 let PAID_SESSIONS_COUNT = null;
+let PAID_PLAN_START_DATE = null;  // UNIX timestamp
+let NEXT_BILLING_DATE = null;     // UNIX timestamp
 
-const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/test_28E5kEb9m3jO4uUef9ew802';
+const STRIPE_PAYMENT_LINK        = 'https://buy.stripe.com/test_28E5kEb9m3jO4uUef9ew802';
+const STRIPE_CREDITS_PAYMENT_LINK = 'https://buy.stripe.com/test_cNifZi7XacUoe5ugnhew803';
 let OB_STEP = 0;
 const OB_STEPS = 4;
 let obGoals = [];
@@ -1521,6 +1581,22 @@ async function loadUserQuota() {
   await initApp();
 }
 
+// ── HELPERS ───────────────────────────────────────────────────────
+function formatUnixDate(ts) {
+  if (!ts) return '—';
+  const d = new Date(Number(ts) * 1000);
+  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+// ── MODAUX GÉNÉRIQUES ─────────────────────────────────────────────
+function showModal(id) {
+  document.getElementById(id).classList.add('visible');
+}
+function closeModal(id, e) {
+  if (e && e.target !== document.getElementById(id)) return;
+  document.getElementById(id).classList.remove('visible');
+}
+
 // ── PRO PLAN ──────────────────────────────────────────────────────
 const PRO_CTA_IDS = ['pro-cta-dashboard','pro-cta-seance0','pro-cta-profile'];
 
@@ -1530,17 +1606,21 @@ function updateQuotaBadge() {
     const el = document.getElementById(id);
     if (!el) return;
 
-    if (IS_PRO) {
-      const n = PAID_SESSIONS_COUNT !== null ? PAID_SESSIONS_COUNT : '∞';
+    if (IS_PRO && PAID_SESSIONS_COUNT > 0) {
       el.className = 'quota-badge pro';
       el.onclick = null;
-      el.innerHTML = `<span class="quota-badge-count">${n}</span><span class="quota-badge-icon">⚡</span>`;
-    } else if (FREE_SESSIONS_REMAINING !== null && FREE_SESSIONS_REMAINING > 0) {
+      el.innerHTML = `<span class="quota-badge-count">${PAID_SESSIONS_COUNT}</span><span class="quota-badge-icon">⚡</span>`;
+    } else if (IS_PRO && PAID_SESSIONS_COUNT <= 0) {
+      // Pro mais plus de crédits → badge "Recharger"
+      el.className = 'quota-badge cta';
+      el.onclick = () => showModal('modal-buy-credits');
+      el.innerHTML = `<span class="quota-badge-count">Recharger ⚡</span>`;
+    } else if (!IS_PRO && FREE_SESSIONS_REMAINING !== null && FREE_SESSIONS_REMAINING > 0) {
       el.className = 'quota-badge';
       el.onclick = null;
       el.innerHTML = `<span class="quota-badge-count">${FREE_SESSIONS_REMAINING}</span><span class="quota-badge-icon">🎁</span>`;
     } else {
-      // quota épuisé → CTA
+      // Free + quota épuisé → CTA Pro
       el.className = 'quota-badge cta';
       el.onclick = () => goToPro();
       el.innerHTML = `<span class="quota-badge-count">Passer Pro →</span>`;
@@ -1549,49 +1629,123 @@ function updateQuotaBadge() {
 }
 
 function handleQuotaBadgeClick() {
-  if (!IS_PRO && (FREE_SESSIONS_REMAINING === null || FREE_SESSIONS_REMAINING <= 0)) {
-    goToPro();
-  }
+  if (IS_PRO && PAID_SESSIONS_COUNT <= 0) showModal('modal-buy-credits');
+  else if (!IS_PRO && (FREE_SESSIONS_REMAINING === null || FREE_SESSIONS_REMAINING <= 0)) goToPro();
+}
+
+function updateSeanceIAButtons() {
+  // Pro sans crédits → masquer "Générer", afficher "Acheter crédits"
+  const genBtn        = document.getElementById('ia-gen-btn');
+  const buyCreditsBtn = document.getElementById('ia-buy-credits-btn');
+  if (!genBtn || !buyCreditsBtn) return;
+  const proNoCredits = IS_PRO && PAID_SESSIONS_COUNT !== null && PAID_SESSIONS_COUNT <= 0;
+  genBtn.style.display        = proNoCredits ? 'none' : 'flex';
+  buyCreditsBtn.style.display = proNoCredits ? 'flex' : 'none';
 }
 
 function updateProUI() {
-  // Badges quota dans les headers
   updateQuotaBadge();
+  updateSeanceIAButtons();
 
-  // Barres CTA : visibles si pas Pro, cachées si Pro
+  // Barres CTA bas de page : visibles si pas Pro
   PRO_CTA_IDS.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('hidden', IS_PRO);
   });
 
-  // Bloc profil edit — Pro status ou bouton achat
+  // Section abonnement dans le profil edit
   const proBlock = document.getElementById('profile-pro-block');
   if (!proBlock) return;
+
   if (IS_PRO) {
     proBlock.innerHTML = `
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
         <div style="font-size:13px;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.5px">⚡ FORGE PRO</div>
         <span style="font-size:10px;background:rgba(71,200,255,0.15);color:var(--accent2);padding:2px 8px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.06em">ACTIF</span>
       </div>
-      <div style="font-size:12px;color:var(--text2);line-height:1.6">
-        ${PAID_SESSIONS_COUNT !== null ? `<strong style="color:var(--accent2)">${PAID_SESSIONS_COUNT} séances</strong> restantes ce mois.` : 'Séances illimitées actives.'}
-      </div>`;
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px">Crédits restants</span>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:${PAID_SESSIONS_COUNT > 0 ? 'var(--accent2)' : 'var(--accent3)'}">${PAID_SESSIONS_COUNT ?? '—'} <span style="font-size:12px;font-weight:400;color:var(--text2)">séances</span></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);padding-top:10px;border-top:1px solid var(--border)">
+          <span>Souscription</span><span style="color:var(--text)">${formatUnixDate(PAID_PLAN_START_DATE)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-top:6px">
+          <span>Prochain renouvellement</span><span style="color:var(--text)">${formatUnixDate(NEXT_BILLING_DATE)}</span>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="showModal('modal-buy-credits')" style="margin-bottom:8px">
+        ⚡ Acheter des crédits — 5€ / 10 séances
+      </button>
+      <button class="btn btn-secondary" onclick="showModal('modal-stripe-portal')" style="font-size:13px;padding:12px">
+        💳 Gérer mon abonnement
+      </button>`;
   } else {
+    const freeLeft = FREE_SESSIONS_REMAINING ?? 0;
     proBlock.innerHTML = `
-      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">🔥 FORGE Pro</div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.5">Séances IA illimitées, analyses avancées et priorité sur les nouvelles features.</div>
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px">🎁 Plan gratuit</div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;color:var(--text2)">Séances IA offertes restantes</span>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:${freeLeft > 0 ? 'var(--accent)' : 'var(--accent3)'}">${freeLeft}</span>
+        </div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(232,255,71,0.06),rgba(71,200,255,0.04));border:1px solid rgba(232,255,71,0.2);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px">
+        <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">🔥 FORGE Pro — 15€/mois</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--text2)">
+          <div>⚡ 30 séances IA / mois incluses</div>
+          <div>📈 Progression et charges calculées automatiquement</div>
+          <div>🧠 Insights dashboard mis à jour après chaque séance</div>
+          <div>🎯 Priorité sur les nouvelles features</div>
+        </div>
+      </div>
       <button class="btn btn-primary" onclick="goToPro()">Passer à Pro — 15€/mois</button>`;
   }
 }
 
 function showNoCreditsModal() {
-  document.getElementById('modal-no-credits').classList.add('visible');
+  if (IS_PRO) showModal('modal-buy-credits');
+  else showModal('modal-no-credits');
+}
+
+function toggleAccountAccordion() {
+  const acc = document.getElementById('account-accordion');
+  if (!acc) return;
+  acc.classList.toggle('open');
+  // Render le contenu au premier dépliage
+  if (acc.classList.contains('open')) updateProUI();
 }
 
 function closeNoCreditsModal(e) {
-  // Ferme si clic sur le backdrop (pas sur la sheet)
   if (e && e.target !== document.getElementById('modal-no-credits')) return;
   document.getElementById('modal-no-credits').classList.remove('visible');
+}
+
+async function doOpenPortal() {
+  const btn = document.getElementById('portal-go-btn');
+  btn.disabled = true; btn.textContent = 'Chargement...';
+  try {
+    const res = await callMake({ event: 'get_portal_url' });
+    if (res && res.url) {
+      window.location.href = res.url;
+    } else {
+      showToast('Erreur — réessaie', true);
+      btn.disabled = false; btn.textContent = 'Accéder au portail →';
+    }
+  } catch(e) {
+    showToast('Erreur — réessaie', true);
+    btn.disabled = false; btn.textContent = 'Accéder au portail →';
+  }
+}
+
+function buyCredits() {
+  if (!CURRENT_USER) return;
+  const uid   = CURRENT_USER.id || CURRENT_USER.sub || btoa(CURRENT_USER.email);
+  const email = CURRENT_USER.email || '';
+  localStorage.setItem('forge_payment_pending', '1');
+  const url = `${STRIPE_CREDITS_PAYMENT_LINK}?client_reference_id=${encodeURIComponent(uid)}&prefilled_email=${encodeURIComponent(email)}`;
+  window.location.href = url;
 }
 
 function goToPro() {
@@ -1842,15 +1996,11 @@ function absorbServerState(allData) {
   // User meta (quota + plan)
   if (allData.user_meta) {
     const meta = allData.user_meta;
-    if (meta.free_sessions_remaining !== undefined) {
-      FREE_SESSIONS_REMAINING = meta.free_sessions_remaining;
-    }
-    if (meta.pro_plan !== undefined) {
-      IS_PRO = !!(meta.pro_plan);
-    }
-    if (meta.paid_sessions_count !== undefined) {
-      PAID_SESSIONS_COUNT = meta.paid_sessions_count;
-    }
+    if (meta.free_sessions_remaining !== undefined) FREE_SESSIONS_REMAINING = meta.free_sessions_remaining;
+    if (meta.pro_plan              !== undefined) IS_PRO = !!(meta.pro_plan);
+    if (meta.paid_sessions_count   !== undefined) PAID_SESSIONS_COUNT = meta.paid_sessions_count;
+    if (meta.paid_plan_start_date  !== undefined) PAID_PLAN_START_DATE = meta.paid_plan_start_date;
+    if (meta.next_billing_date     !== undefined) NEXT_BILLING_DATE = meta.next_billing_date;
     updateQuotaUI();
     updateProUI();
   }
