@@ -54,11 +54,20 @@
   .view.active { display: block; }
   @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
 
-  /* HEADER */
-  .header { padding: 20px 0 16px; display: flex; justify-content: space-between; align-items: flex-end; }
-  .header-title { font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 900; letter-spacing: -0.02em; line-height: 1; }
-  .header-sub { font-size: 13px; color: var(--text2); font-weight: 300; }
-  .header-date { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; color: var(--text2); text-align: right; line-height: 1.5; }
+  /* HEADER UNIFIÉ */
+  .app-header { padding: 20px 0 14px; display: flex; justify-content: space-between; align-items: center; }
+  .app-header-left { display: flex; flex-direction: column; gap: 1px; }
+  .app-header-title { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 900; letter-spacing: -0.02em; line-height: 1; }
+  .app-header-sub { font-size: 12px; color: var(--text2); font-weight: 300; }
+  /* Badge quota */
+  .quota-badge { display: flex; align-items: center; gap: 6px; background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; padding: 6px 12px; cursor: default; transition: all 0.2s; text-decoration: none; }
+  .quota-badge.cta { background: var(--accent); border-color: var(--accent); cursor: pointer; }
+  .quota-badge.cta:active { background: #d4eb30; transform: scale(0.97); }
+  .quota-badge-count { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); line-height: 1; }
+  .quota-badge.cta .quota-badge-count { color: var(--bg); }
+  .quota-badge-icon { font-size: 14px; line-height: 1; }
+  .quota-badge.pro .quota-badge-count { color: var(--accent2); }
+  .quota-badge.pro { border-color: rgba(71,200,255,0.3); }
 
   /* CARDS */
   .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; }
@@ -425,17 +434,27 @@
   .ob-btn:disabled { opacity:.5; cursor:not-allowed; }
   .ob-btn-ghost { background:transparent; color:var(--text2); border:1px solid var(--border); margin-top:10px; }
 
-  /* AI TOKEN BANNER */
+  /* AI QUOTA BANNER */
   .ai-quota-banner { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:16px; text-align:center; }
   .ai-quota-count { font-size:32px; font-weight:900; color:var(--accent); font-family:'Barlow Condensed',sans-serif; }
   .ai-quota-label { font-size:12px; color:var(--text2); margin-top:2px; }
-  .ai-token-form { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin-bottom:16px; }
-  .ai-token-form label { font-size:12px; color:var(--text2); text-transform:uppercase; letter-spacing:.5px; display:block; margin-bottom:8px; }
-  .ai-token-form input { width:100%; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px; color:var(--text); font-family:monospace; font-size:13px; outline:none; box-sizing:border-box; }
-  .ai-token-form input:focus { border-color:var(--accent); }
-  .ai-provider-tabs { display:flex; gap:8px; margin-bottom:14px; }
-  .ai-provider-tab { flex:1; padding:10px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--bg3); color:var(--text2); font-size:13px; font-weight:600; cursor:pointer; text-align:center; transition:all .2s; }
-  .ai-provider-tab.active { border-color:var(--accent); color:var(--accent); background:rgba(var(--accent-rgb),.1); }
+  /* PRO UPGRADE BANNER */
+  .pro-upgrade-banner { background:linear-gradient(135deg,rgba(232,255,71,0.08),rgba(71,200,255,0.06)); border:1px solid rgba(232,255,71,0.25); border-radius:var(--radius); padding:20px; margin-bottom:16px; text-align:center; }
+  /* NO-CREDITS MODAL */
+  .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); z-index:800; display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.25s; }
+  .modal-backdrop.visible { opacity:1; pointer-events:all; }
+  .modal-sheet { width:100%; max-width:430px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius) var(--radius) 0 0; padding:28px 24px 40px; transform:translateY(40px); transition:transform 0.3s cubic-bezier(0.34,1.2,0.64,1); }
+  .modal-backdrop.visible .modal-sheet { transform:translateY(0); }
+  .modal-handle { width:36px; height:4px; background:var(--border); border-radius:2px; margin:0 auto 24px; }
+  .modal-title { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:900; letter-spacing:-0.01em; margin-bottom:6px; }
+  .modal-body { font-size:13px; color:var(--text2); line-height:1.6; margin-bottom:24px; }
+  /* PRO CTA BAR — persistant, toutes vues */
+  .pro-cta-bar { display:flex; align-items:center; justify-content:space-between; gap:12px; background:linear-gradient(90deg,rgba(232,255,71,0.07),rgba(71,200,255,0.05)); border:1px solid rgba(232,255,71,0.2); border-radius:var(--radius-sm); padding:11px 14px; margin-bottom:12px; }
+  .pro-cta-bar.hidden { display:none; }
+  .pro-cta-bar-text { font-size:12px; color:var(--text2); line-height:1.4; }
+  .pro-cta-bar-text strong { color:var(--text); font-weight:600; }
+  .pro-cta-bar-btn { flex-shrink:0; background:var(--accent); color:var(--bg); border:none; border-radius:var(--radius-sm); padding:8px 14px; font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; cursor:pointer; white-space:nowrap; transition:all .2s; }
+  .pro-cta-bar-btn:active { background:#d4eb30; transform:scale(0.97); }
 
   /* EMPTY STATE BANNER */
   .first-session-banner { background:linear-gradient(135deg,rgba(var(--accent-rgb),.08),rgba(var(--accent-rgb),.03)); border:1px solid rgba(var(--accent-rgb),.25); border-radius:var(--radius); padding:16px 18px; margin-bottom:16px; display:flex; align-items:center; gap:14px; }
@@ -578,24 +597,24 @@
         </div>
       </div>
 
-      <!-- Step 4 : IA & token -->
+      <!-- Step 4 : Bienvenue & séances offertes -->
       <div class="ob-step" id="ob-step-3">
-        <div class="ob-title">Ton assistant IA ✨</div>
-        <div class="ob-subtitle">FORGE inclut <strong style="color:var(--accent)">3 séances IA offertes</strong>. Tu peux ensuite utiliser ton propre token pour continuer sans limite.</div>
-        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;text-align:center;">
-          <div style="font-size:48px;margin-bottom:8px">🎁</div>
-          <div style="font-size:15px;font-weight:700;color:var(--text)">3 séances offertes</div>
-          <div style="font-size:13px;color:var(--text2);margin-top:4px">Aucune carte requise. Génère tes premières séances gratuitement.</div>
+        <div class="ob-title">C'est parti ! 🚀</div>
+        <div class="ob-subtitle">FORGE est prêt à te coacher. Voici ce qui t'attend.</div>
+        <div style="background:var(--bg2);border:1px solid rgba(232,255,71,0.3);border-radius:var(--radius);padding:24px;margin-bottom:16px;text-align:center;">
+          <div style="font-size:48px;margin-bottom:10px">🎁</div>
+          <div style="font-size:18px;font-weight:700;color:var(--accent);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.04em;margin-bottom:4px">3 SÉANCES IA OFFERTES</div>
+          <div style="font-size:13px;color:var(--text2);margin-top:4px;line-height:1.6">Aucune carte requise.<br>L'IA analyse ton historique et programme chaque séance.</div>
         </div>
-        <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Tu as déjà un token ? Tu peux l'ajouter maintenant (optionnel).</div>
-        <div class="ai-provider-tabs">
-          <div class="ai-provider-tab active" id="ob-tab-openai" onclick="obSelectProvider('openai')">OpenAI</div>
-          <div class="ai-provider-tab" id="ob-tab-claude" onclick="obSelectProvider('claude')">Claude</div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:12px">
+          <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Ce que tu débloques</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2)"><span style="color:var(--accent)">⚡</span> Plans IA personnalisés selon ton historique</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2)"><span style="color:var(--accent)">📈</span> Progression et charges calculées automatiquement</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2)"><span style="color:var(--accent)">🧠</span> Dashboard et insights mis à jour après chaque séance</div>
+          </div>
         </div>
-        <div class="ob-field">
-          <label id="ob-token-label">Token OpenAI (optionnel)</label>
-          <input type="password" id="ob-ai-token" placeholder="sk-...">
-        </div>
+        <div style="font-size:12px;color:var(--text3);text-align:center;line-height:1.5">Après tes 3 séances offertes, passe à <strong style="color:var(--text2)">FORGE Pro</strong> pour continuer.</div>
       </div>
 
     </div>
@@ -627,9 +646,12 @@
 
 <!-- ═══ VIEW: DASHBOARD ═══ -->
 <div class="view active" id="view-dashboard">
-  <div class="header">
-    <div><div class="header-title">FORGE</div><div class="header-sub">Training Dashboard</div></div>
-    <div class="header-date" id="header-date"></div>
+  <div class="app-header">
+    <div class="app-header-left">
+      <div class="app-header-title">FORGE</div>
+      <div class="app-header-sub">Training Dashboard</div>
+    </div>
+    <div id="quota-badge-dashboard" class="quota-badge" onclick="handleQuotaBadgeClick()"></div>
   </div>
   <div id="config-warning" class="config-banner" style="display:none">
     ⚙️ Webhook non configuré — <a onclick="showView('profile')">configure dans Profil</a>
@@ -672,6 +694,11 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
     Actualiser
   </button>
+  <!-- PRO CTA BAR — bas de page -->
+  <div class="pro-cta-bar hidden" id="pro-cta-dashboard">
+    <div class="pro-cta-bar-text"><strong>FORGE Pro</strong> — séances IA illimitées</div>
+    <button class="pro-cta-bar-btn" onclick="goToPro()">15€/mois →</button>
+  </div>
 </div>
 
 <!-- ═══ VIEW: SÉANCE (IA + Log fusionnés) ═══ -->
@@ -679,9 +706,12 @@
 
   <!-- STEP 0 — Choix entrée -->
   <div id="seance-step-0">
-    <div class="header">
-      <div><div class="header-title">SÉANCE</div><div class="header-sub">Génère ou logge</div></div>
-      <div class="header-date" id="header-date-2"></div>
+    <div class="app-header">
+      <div class="app-header-left">
+        <div class="app-header-title">SÉANCE</div>
+        <div class="app-header-sub">Génère ou logge</div>
+      </div>
+      <div id="quota-badge-seance" class="quota-badge" onclick="handleQuotaBadgeClick()"></div>
     </div>
 
     <!-- Banner session en cours -->
@@ -714,7 +744,11 @@
       </div>
       <div id="hist-list" style="display:none"></div>
     </div>
-
+    <!-- PRO CTA BAR — bas de page -->
+    <div class="pro-cta-bar hidden" id="pro-cta-seance0">
+      <div class="pro-cta-bar-text"><strong>FORGE Pro</strong> — séances IA illimitées</div>
+      <button class="pro-cta-bar-btn" onclick="goToPro()">15€/mois →</button>
+    </div>
   </div>
 
   <!-- STEP 1 IA — formulaire structuré -->
@@ -817,20 +851,14 @@
       <div class="ai-quota-label">séances IA restantes</div>
     </div>
 
-    <!-- AI Token Form (shown when quota = 0) -->
-    <div id="ai-token-section" class="ai-token-form" style="display:none">
-      <div style="text-align:center;margin-bottom:16px">
-        <div style="font-size:24px;margin-bottom:6px">⚡</div>
-        <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">Séances gratuites épuisées</div>
-        <div style="font-size:13px;color:var(--text2)">Ajoute ton token pour continuer sans limite.</div>
-      </div>
-      <div class="ai-provider-tabs">
-        <div class="ai-provider-tab active" id="main-tab-openai" onclick="mainSelectProvider('openai')">OpenAI</div>
-        <div class="ai-provider-tab" id="main-tab-claude" onclick="mainSelectProvider('claude')">Claude</div>
-      </div>
-      <label id="main-token-label">Token OpenAI</label>
-      <input type="password" id="main-ai-token" placeholder="sk-..." style="margin-top:8px;margin-bottom:12px">
-      <button class="btn btn-primary" onclick="saveAiToken()" style="width:100%">Sauvegarder mon token</button>
+    <!-- Pro upgrade banner (shown when quota = 0) -->
+    <div id="ai-token-section" class="pro-upgrade-banner" style="display:none">
+      <div style="font-size:28px;margin-bottom:8px">🔒</div>
+      <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.04em">SÉANCES GRATUITES ÉPUISÉES</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.5">Passe à FORGE Pro pour continuer à générer des séances IA illimitées.</div>
+      <button class="btn btn-primary" style="max-width:240px;margin:0 auto" onclick="goToPro()">
+        Passer à Pro — 15€/mois
+      </button>
     </div>
 
         <button class="btn btn-primary" onclick="generatePlanIA()" id="ia-gen-btn">
@@ -947,11 +975,17 @@
 
 <!-- ═══ VIEW: PROFILE ═══ -->
 <div class="view" id="view-profile">
-  <div class="header">
-    <div><div class="header-title">PROFIL</div><div class="header-sub">Identité & objectifs</div></div>
-    <div class="user-badge">
-      <span class="user-badge-name" id="user-badge-email"></span>
-      <button class="user-signout-btn" onclick="authSignOut()">Déconnexion</button>
+  <div class="app-header">
+    <div class="app-header-left">
+      <div class="app-header-title">PROFIL</div>
+      <div class="app-header-sub">Identité & objectifs</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div id="quota-badge-profile" class="quota-badge" onclick="handleQuotaBadgeClick()"></div>
+      <div class="user-badge">
+        <span class="user-badge-name" id="user-badge-email"></span>
+        <button class="user-signout-btn" onclick="authSignOut()">Déconnexion</button>
+      </div>
     </div>
   </div>
 
@@ -988,6 +1022,11 @@
         <span class="pcard-val" id="pv-weight-target">—</span>
         <span style="font-size:12px;color:var(--text2)">kg cible</span>
       </div>
+    </div>
+    <!-- PRO CTA BAR — bas de page -->
+    <div class="pro-cta-bar hidden" id="pro-cta-profile">
+      <div class="pro-cta-bar-text"><strong>FORGE Pro</strong> — séances IA illimitées</div>
+      <button class="pro-cta-bar-btn" onclick="goToPro()">15€/mois →</button>
     </div>
   </div>
 
@@ -1050,22 +1089,37 @@
       <button class="btn btn-primary" onclick="saveProfile()">Sauvegarder</button>
     </div>
 
-    <!-- ── TOKEN IA ── -->
-    <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
-      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">🤖 Token IA personnel</div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.5">Utilise ton propre token OpenAI ou Claude pour des séances IA illimitées.</div>
-      <div class="ai-provider-tabs">
-        <div class="ai-provider-tab active" id="profile-tab-openai" onclick="profileSelectProvider('openai')">OpenAI</div>
-        <div class="ai-provider-tab" id="profile-tab-claude" onclick="profileSelectProvider('claude')">Claude</div>
-      </div>
-      <div style="margin-bottom:12px">
-        <label style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px" id="profile-token-label">Token OpenAI</label>
-        <input type="password" id="profile-ai-token" placeholder="sk-..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;color:var(--text);font-family:monospace;font-size:13px;outline:none;box-sizing:border-box">
-      </div>
-      <div id="profile-token-status" style="font-size:12px;color:var(--text2);margin-bottom:12px;min-height:16px"></div>
-      <button class="btn btn-primary" onclick="saveProfileAiToken()" style="width:100%">Sauvegarder le token</button>
+    <!-- ── FORGE PRO ── -->
+    <div id="profile-pro-block" style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);margin-bottom:24px">
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">🔥 FORGE Pro</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.5">Séances IA illimitées, analyses avancées et priorité sur les nouvelles features.</div>
+      <button class="btn btn-primary" onclick="goToPro()">Passer à Pro — 15€/mois</button>
     </div>
 
+  </div>
+</div>
+
+<!-- ═══ MODAL — NO CREDITS ═══ -->
+<div class="modal-backdrop" id="modal-no-credits" onclick="closeNoCreditsModal(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Crédits épuisés 🔒</div>
+    <div class="modal-body">
+      Tes <strong style="color:var(--text)">3 séances IA offertes</strong> ont été utilisées.<br><br>
+      Passe à <strong style="color:var(--accent)">FORGE Pro</strong> pour continuer à générer des séances personnalisées, sans limite.
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--text)">FORGE Pro</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px">30 séances IA / mois · Insights avancés</div>
+      </div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--accent)">15€<span style="font-size:13px;font-weight:400;color:var(--text2)">/mois</span></div>
+    </div>
+    <button class="btn btn-primary" onclick="goToPro()" style="margin-bottom:10px">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Passer à Pro — 15€/mois
+    </button>
+    <button class="btn btn-secondary" onclick="closeNoCreditsModal()" style="font-size:13px;padding:12px">Fermer</button>
   </div>
 </div>
 
@@ -1095,11 +1149,14 @@ let PROFILE_KEY = 'forge_profile';
 let SESSION_KEY = 'forge_current_session';
 let CURRENT_USER = null;
 let FREE_SESSIONS_REMAINING = null; // null = not loaded yet
+let IS_PRO = false;
+let PAID_SESSIONS_COUNT = null;
+
+const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/test_28E5kEb9m3jO4uUef9ew802';
 let OB_STEP = 0;
 const OB_STEPS = 4;
 let obGoals = [];
 let obEquipment = [];
-let obProvider = 'openai';
 
 const WEBHOOK_URL = 'https://hook.eu1.make.com/al8v39pzju7ngrcv59g3clfjq14c0u54';
 let config  = { webhook: WEBHOOK_URL };
@@ -1320,14 +1377,6 @@ function obChip(el, group) {
   }
 }
 
-function obSelectProvider(p) {
-  obProvider = p;
-  document.getElementById('ob-tab-openai').classList.toggle('active', p === 'openai');
-  document.getElementById('ob-tab-claude').classList.toggle('active', p === 'claude');
-  document.getElementById('ob-token-label').textContent = p === 'openai' ? 'Token OpenAI (optionnel)' : 'Token Claude (optionnel)';
-  document.getElementById('ob-ai-token').placeholder = p === 'openai' ? 'sk-...' : 'sk-ant-...';
-}
-
 function obValidateStep() {
   // Required fields per step
   const required = {
@@ -1405,7 +1454,6 @@ async function obFinish() {
     equipment:   obEquipment.join(', '),
     constraints: document.getElementById('ob-constraints').value.trim(),
   };
-  const aiToken = document.getElementById('ob-ai-token').value.trim();
 
   // Save profile locally immediately — Make calls are best-effort
   profile = { ...profile, ...obProfile };
@@ -1416,9 +1464,6 @@ async function obFinish() {
     try {
       await callMake({ event: 'init_user', profile: obProfile });
     } catch(e) { console.warn('[ob] init_user failed:', e.message); }
-    try {
-      if (aiToken) await callMake({ event: 'save_ai_token', ai_token: aiToken, ai_provider: obProvider });
-    } catch(e) { console.warn('[ob] save_ai_token failed:', e.message); }
   })();
 
   // Transition immediately — don't wait for Make
@@ -1431,87 +1476,169 @@ async function obFinish() {
   updateQuotaUI();
 }
 
-// ── AI QUOTA & TOKEN ──────────────────────────────────────────────
+// ── AI QUOTA ──────────────────────────────────────────────────────
 function updateQuotaUI() {
-  const banner = document.getElementById('ai-quota-banner');
-  const tokenSection = document.getElementById('ai-token-section');
-  const genBtn = document.getElementById('ia-gen-btn');
+  const banner    = document.getElementById('ai-quota-banner');
+  const countEl   = document.getElementById('ai-quota-count');
+  const labelEl   = document.getElementById('ai-quota-label');
+  const proSection = document.getElementById('ai-token-section');
+  const genBtn    = document.getElementById('ia-gen-btn');
+
+  // Toujours mettre à jour les badges header
+  updateQuotaBadge();
+
+  if (IS_PRO) {
+    // Pro user — affiche paid_sessions_count
+    const remaining = PAID_SESSIONS_COUNT !== null ? PAID_SESSIONS_COUNT : '∞';
+    banner.style.display = 'block';
+    countEl.textContent = remaining;
+    countEl.style.color = 'var(--accent2)';
+    labelEl.innerHTML = 'séances Pro restantes &nbsp;<span style="font-size:10px;background:rgba(71,200,255,0.15);color:var(--accent2);padding:2px 7px;border-radius:10px;font-family:\'Barlow Condensed\',sans-serif;font-weight:700;letter-spacing:.06em">PRO ⚡</span>';
+    if (proSection) proSection.style.display = 'none';
+    if (genBtn) genBtn.disabled = (PAID_SESSIONS_COUNT !== null && PAID_SESSIONS_COUNT <= 0);
+    return;
+  }
+
+  // Free user
   if (FREE_SESSIONS_REMAINING === null) return;
+  countEl.style.color = 'var(--accent)';
+  labelEl.textContent = 'séances IA restantes';
 
   if (FREE_SESSIONS_REMAINING > 0) {
     banner.style.display = 'block';
-    document.getElementById('ai-quota-count').textContent = FREE_SESSIONS_REMAINING;
-    tokenSection.style.display = 'none';
+    countEl.textContent = FREE_SESSIONS_REMAINING;
+    if (proSection) proSection.style.display = 'none';
     if (genBtn) genBtn.disabled = false;
   } else {
-    // Check if user has their own token saved
-    if (window._userHasToken) {
-      banner.style.display = 'none';
-      tokenSection.style.display = 'none';
-      if (genBtn) genBtn.disabled = false;
-    } else {
-      banner.style.display = 'none';
-      tokenSection.style.display = 'block';
-      if (genBtn) genBtn.disabled = true;
-    }
-  }
-}
-
-function mainSelectProvider(p) {
-  document.getElementById('main-tab-openai').classList.toggle('active', p === 'openai');
-  document.getElementById('main-tab-claude').classList.toggle('active', p === 'claude');
-  document.getElementById('main-token-label').textContent = p === 'openai' ? 'Token OpenAI' : 'Token Claude';
-  document.getElementById('main-ai-token').placeholder = p === 'openai' ? 'sk-...' : 'sk-ant-...';
-  window._mainProvider = p;
-}
-window._mainProvider = 'openai';
-
-async function saveAiToken() {
-  const token = document.getElementById('main-ai-token').value.trim();
-  if (!token) { showToast('Saisis un token valide', true); return; }
-  try {
-    await callMake({ event: 'save_ai_token', ai_token: token, ai_provider: window._mainProvider });
-    window._userHasToken = true;
-    document.getElementById('ai-token-section').style.display = 'none';
-    document.getElementById('ia-gen-btn').disabled = false;
-    showToast('Token sauvegardé ✓');
-  } catch(e) {
-    showToast('Erreur sauvegarde', true);
-  }
-}
-
-function profileSelectProvider(p) {
-  document.getElementById('profile-tab-openai').classList.toggle('active', p === 'openai');
-  document.getElementById('profile-tab-claude').classList.toggle('active', p === 'claude');
-  document.getElementById('profile-token-label').textContent = p === 'openai' ? 'Token OpenAI' : 'Token Claude';
-  document.getElementById('profile-ai-token').placeholder = p === 'openai' ? 'sk-...' : 'sk-ant-...';
-  window._profileProvider = p;
-}
-window._profileProvider = 'openai';
-
-async function saveProfileAiToken() {
-  const token = document.getElementById('profile-ai-token').value.trim();
-  const statusEl = document.getElementById('profile-token-status');
-  if (!token) { statusEl.textContent = '⚠️ Saisis un token valide'; statusEl.style.color = 'var(--danger, #ef4444)'; return; }
-  statusEl.textContent = 'Sauvegarde...'; statusEl.style.color = 'var(--text2)';
-  try {
-    await callMake({ event: 'save_ai_token', ai_token: token, ai_provider: window._profileProvider });
-    window._userHasToken = true;
-    statusEl.textContent = '✓ Token sauvegardé';
-    statusEl.style.color = 'var(--accent)';
-    document.getElementById('profile-ai-token').value = '';
-    document.getElementById('profile-ai-token').placeholder = '••••••••••••••••';
-    updateQuotaUI();
-    setTimeout(() => { statusEl.textContent = ''; }, 3000);
-  } catch(e) {
-    statusEl.textContent = '✗ Erreur — réessaie';
-    statusEl.style.color = 'var(--danger, #ef4444)';
+    banner.style.display = 'none';
+    if (proSection) proSection.style.display = 'block';
+    if (genBtn) genBtn.disabled = true;
   }
 }
 
 async function loadUserQuota() {
   // Legacy alias → now handled by initApp/absorbServerState
   await initApp();
+}
+
+// ── PRO PLAN ──────────────────────────────────────────────────────
+const PRO_CTA_IDS = ['pro-cta-dashboard','pro-cta-seance0','pro-cta-profile'];
+
+function updateQuotaBadge() {
+  const BADGE_IDS = ['quota-badge-dashboard','quota-badge-seance','quota-badge-profile'];
+  BADGE_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    if (IS_PRO) {
+      const n = PAID_SESSIONS_COUNT !== null ? PAID_SESSIONS_COUNT : '∞';
+      el.className = 'quota-badge pro';
+      el.onclick = null;
+      el.innerHTML = `<span class="quota-badge-count">${n}</span><span class="quota-badge-icon">⚡</span>`;
+    } else if (FREE_SESSIONS_REMAINING !== null && FREE_SESSIONS_REMAINING > 0) {
+      el.className = 'quota-badge';
+      el.onclick = null;
+      el.innerHTML = `<span class="quota-badge-count">${FREE_SESSIONS_REMAINING}</span><span class="quota-badge-icon">🎁</span>`;
+    } else {
+      // quota épuisé → CTA
+      el.className = 'quota-badge cta';
+      el.onclick = () => goToPro();
+      el.innerHTML = `<span class="quota-badge-count">Passer Pro →</span>`;
+    }
+  });
+}
+
+function handleQuotaBadgeClick() {
+  if (!IS_PRO && (FREE_SESSIONS_REMAINING === null || FREE_SESSIONS_REMAINING <= 0)) {
+    goToPro();
+  }
+}
+
+function updateProUI() {
+  // Badges quota dans les headers
+  updateQuotaBadge();
+
+  // Barres CTA : visibles si pas Pro, cachées si Pro
+  PRO_CTA_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('hidden', IS_PRO);
+  });
+
+  // Bloc profil edit — Pro status ou bouton achat
+  const proBlock = document.getElementById('profile-pro-block');
+  if (!proBlock) return;
+  if (IS_PRO) {
+    proBlock.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div style="font-size:13px;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.5px">⚡ FORGE PRO</div>
+        <span style="font-size:10px;background:rgba(71,200,255,0.15);color:var(--accent2);padding:2px 8px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.06em">ACTIF</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6">
+        ${PAID_SESSIONS_COUNT !== null ? `<strong style="color:var(--accent2)">${PAID_SESSIONS_COUNT} séances</strong> restantes ce mois.` : 'Séances illimitées actives.'}
+      </div>`;
+  } else {
+    proBlock.innerHTML = `
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">🔥 FORGE Pro</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.5">Séances IA illimitées, analyses avancées et priorité sur les nouvelles features.</div>
+      <button class="btn btn-primary" onclick="goToPro()">Passer à Pro — 15€/mois</button>`;
+  }
+}
+
+function showNoCreditsModal() {
+  document.getElementById('modal-no-credits').classList.add('visible');
+}
+
+function closeNoCreditsModal(e) {
+  // Ferme si clic sur le backdrop (pas sur la sheet)
+  if (e && e.target !== document.getElementById('modal-no-credits')) return;
+  document.getElementById('modal-no-credits').classList.remove('visible');
+}
+
+function goToPro() {
+  if (!CURRENT_USER) return;
+  const uid   = CURRENT_USER.id || CURRENT_USER.sub || btoa(CURRENT_USER.email);
+  const email = CURRENT_USER.email || '';
+  // Sauvegarder le flag avant de quitter — survit à la redirection Stripe
+  localStorage.setItem('forge_payment_pending', '1');
+  const url = `${STRIPE_PAYMENT_LINK}?client_reference_id=${encodeURIComponent(uid)}&prefilled_email=${encodeURIComponent(email)}`;
+  window.location.href = url;
+}
+
+async function pollProStatus() {
+  // Appelé au retour de Stripe (?payment=success)
+  // Poll check_pro_status toutes les 2s, max 10 tentatives
+  const overlay = document.getElementById('forge-overlay');
+  showOverlay('pro');
+
+  let attempts = 0;
+  const maxAttempts = 10;
+
+  const poll = setInterval(async () => {
+    attempts++;
+    try {
+      const res = await callMake({ event: 'check_pro_status' });
+      if (res && res.pro_plan) {
+        clearInterval(poll);
+        hideOverlay();
+        IS_PRO = true;
+        PAID_SESSIONS_COUNT = res.paid_sessions_count ?? 30;
+        updateQuotaUI();
+        updateProUI();
+        // Nettoyer l'URL
+        window.history.replaceState({}, '', window.location.pathname);
+        showToast('Bienvenue dans FORGE Pro 🔥');
+        showView('dashboard');
+        return;
+      }
+    } catch(e) { /* Make pas encore prêt */ }
+
+    if (attempts >= maxAttempts) {
+      clearInterval(poll);
+      hideOverlay();
+      showToast('Activation en cours — rafraîchis dans quelques secondes', true);
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, 2000);
 }
 
 async function initApp() {
@@ -1539,12 +1666,21 @@ function onAuthSuccess(user, token, isNewUser = false) {
   loadConfig();
   loadLocalProfile();
 
-  // Always go to app — initApp redirects to onboarding if profile empty
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app-wrapper').style.display = 'block';
   loadProfileFields();
   checkSessionInProgress();
-  initApp();
+  initApp().then(() => {
+    updateProUI();
+    // Détecter retour Stripe — via URL param OU localStorage flag
+    const params = new URLSearchParams(window.location.search);
+    const fromStripe = params.get('payment') === 'success' || localStorage.getItem('forge_payment_pending') === '1';
+    if (fromStripe) {
+      localStorage.removeItem('forge_payment_pending');
+      window.history.replaceState({}, '', window.location.pathname);
+      pollProStatus();
+    }
+  });
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -1703,24 +1839,20 @@ function absorbServerState(allData) {
     try { renderHistory(allData.sessions); } catch(e) {}
   }
 
-  // User meta (quota, token)
+  // User meta (quota + plan)
   if (allData.user_meta) {
     const meta = allData.user_meta;
     if (meta.free_sessions_remaining !== undefined) {
       FREE_SESSIONS_REMAINING = meta.free_sessions_remaining;
     }
-    if (meta.ai_token !== undefined) {
-      window._userHasToken = !!(meta.ai_token);
-      if (meta.ai_token && meta.ai_provider) {
-        profileSelectProvider(meta.ai_provider);
-        mainSelectProvider(meta.ai_provider);
-      }
-      const inp = document.getElementById('profile-ai-token');
-      if (inp) inp.placeholder = meta.ai_token
-        ? '••••••••••••••••  (token existant)'
-        : 'sk-...';
+    if (meta.pro_plan !== undefined) {
+      IS_PRO = !!(meta.pro_plan);
+    }
+    if (meta.paid_sessions_count !== undefined) {
+      PAID_SESSIONS_COUNT = meta.paid_sessions_count;
     }
     updateQuotaUI();
+    updateProUI();
   }
 }
 
@@ -1730,6 +1862,10 @@ function showView(name) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
   document.getElementById('nav-' + name).classList.add('active');
+  // Rafraîchir le quota quand on ouvre la vue séance
+  if (name === 'seance') updateQuotaUI();
+  // Rafraîchir le bloc Pro quand on ouvre le profil
+  if (name === 'profile') updateProUI();
 }
 
 // ── HEADER DATE ───────────────────────────────────────────────────
@@ -1738,8 +1874,7 @@ function setHeaderDate() {
   const D = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
   const M = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
   const txt = `${D[now.getDay()]}<br>${now.getDate()} ${M[now.getMonth()]}`;
-  document.getElementById('header-date').innerHTML = txt;
-  document.getElementById('header-date-2').innerHTML = txt;
+  // header-date supprimé — remplacé par app-header
 }
 
 // ── SESSION PERSISTENCE ───────────────────────────────────────────
@@ -1805,6 +1940,7 @@ function toggleIAForm() {
 
 function startSeanceIA() {
   showSeanceStep('ia');
+  updateQuotaUI();
 }
 
 function startSeanceLibre() {
@@ -2274,6 +2410,11 @@ function setFocus(val, btn) {
 }
 
 async function generatePlanIA() {
+  // Bloquer si free_sessions épuisées ET pas Pro
+  if (!IS_PRO && FREE_SESSIONS_REMAINING !== null && FREE_SESSIONS_REMAINING <= 0) {
+    showNoCreditsModal();
+    return;
+  }
   document.getElementById('ai-plan-card').classList.remove('visible');
   document.getElementById('ia-start-log-btn').style.display = 'none';
   document.getElementById('ia-gen-btn').disabled = true;
@@ -3015,13 +3156,20 @@ const OVERLAY_MESSAGES = {
     "Optimisation des charges...",
     "Finalisation du programme...",
     "Derniers ajustements..."
+  ],
+  pro: [
+    "Vérification du paiement...",
+    "Activation de ton abonnement...",
+    "Mise à jour de ton compte...",
+    "Presque prêt..."
   ]
 };
 
 const OVERLAY_CONFIG = {
   dashboard: { icon: '📊', color: '#e8ff47', sub: 'ANALYSE EN COURS' },
   log:       { icon: '💾', color: '#ff6b47', sub: 'ENREGISTREMENT' },
-  generate:  { icon: '⚡', color: '#47c8ff', sub: 'GÉNÉRATION IA' }
+  generate:  { icon: '⚡', color: '#47c8ff', sub: 'GÉNÉRATION IA' },
+  pro:       { icon: '🔥', color: '#47c8ff', sub: 'ACTIVATION PRO' }
 };
 
 let overlayInterval = null;
