@@ -392,7 +392,23 @@
   .overlay-dot:nth-child(3) { animation-delay: 0.5s; }
   @keyframes dot-pulse { 0%,80%,100%{opacity:0.2;transform:scale(1)} 40%{opacity:1;transform:scale(1.8)} }
 
-  /* HISTORY CARDS */
+  /* ── REST TIMER OVERLAY ────────────────────────────────────────── */
+  .rest-overlay { position:fixed; inset:0; z-index:600; background:rgba(10,10,12,0.97); backdrop-filter:blur(24px); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; padding:40px; opacity:0; pointer-events:none; transition:opacity 0.3s ease; }
+  .rest-overlay.visible { opacity:1; pointer-events:all; }
+  .rest-label { font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--text3); margin-bottom:32px; }
+  .rest-ring-wrap { position:relative; width:180px; height:180px; margin-bottom:32px; }
+  .rest-ring-wrap svg { width:180px; height:180px; transform:rotate(-90deg); }
+  .rest-ring-track { fill:none; stroke:rgba(255,255,255,0.04); stroke-width:4; }
+  .rest-ring-progress { fill:none; stroke:var(--accent2); stroke-width:4; stroke-linecap:round; stroke-dasharray:502; stroke-dashoffset:0; transition:stroke-dashoffset 1s linear, stroke .5s; }
+  .rest-ring-count { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; }
+  .rest-seconds { font-family:'Barlow Condensed',sans-serif; font-size:72px; font-weight:900; color:var(--text); line-height:1; letter-spacing:-.02em; }
+  .rest-unit { font-size:12px; color:var(--text3); letter-spacing:.1em; text-transform:uppercase; }
+  .rest-next-wrap { text-align:center; margin-bottom:36px; max-width:280px; }
+  .rest-next-label { font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:.12em; margin-bottom:8px; }
+  .rest-next-name { font-family:'Barlow Condensed',sans-serif; font-size:20px; font-weight:700; color:var(--text); margin-bottom:4px; line-height:1.2; }
+  .rest-next-detail { font-size:13px; color:var(--text2); }
+  .rest-skip-btn { background:none; border:1px solid rgba(255,255,255,0.12); border-radius:var(--radius); padding:12px 32px; font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; letter-spacing:.08em; color:var(--text2); cursor:pointer; transition:all .2s; text-transform:uppercase; }
+  .rest-skip-btn:active { background:rgba(255,255,255,0.06); }
   .hist-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 8px; overflow: hidden; transition: border-color 0.2s; }
   .hist-card.expanded { border-color: rgba(71,200,255,0.35); }
   .hist-card-header { display: flex; align-items: center; gap: 12px; padding: 14px; cursor: pointer; user-select: none; -webkit-user-select: none; }
@@ -428,31 +444,54 @@
   .divider { height: 1px; background: var(--border); margin: 16px 0; }
 
   /* ONBOARDING */
-  .onboarding-screen { position:fixed; inset:0; background:var(--bg); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:0; overflow:hidden; }
-  .ob-header { width:100%; max-width:480px; padding:24px 24px 0; }
-  .ob-logo { font-family:'Barlow Condensed',sans-serif; font-size:28px; font-weight:900; letter-spacing:2px; color:var(--text); margin-bottom:4px; }
+  /* ── ONBOARDING ── */
+  .onboarding-screen { position:fixed; inset:0; background:var(--bg); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; overflow:hidden; }
+  .ob-header { width:100%; max-width:480px; padding:24px 24px 0; flex-shrink:0; }
+  .ob-logo { font-family:'Barlow Condensed',sans-serif; font-size:28px; font-weight:900; letter-spacing:2px; color:var(--text); }
   .ob-logo span { color:var(--accent); }
-  .ob-progress { display:flex; gap:6px; margin-top:16px; margin-bottom:0; }
+  .ob-tagline { font-size:13px; color:var(--text2); margin-top:2px; }
+  .ob-progress { display:flex; gap:6px; margin-top:16px; }
   .ob-progress-dot { flex:1; height:3px; border-radius:2px; background:var(--border); transition:background 0.3s; }
   .ob-progress-dot.active { background:var(--accent); }
+
+  /* Form step */
   .ob-body { width:100%; max-width:480px; padding:24px; flex:1; overflow-y:auto; }
-  .ob-step { display:none; }
+  .ob-step { display:none; animation:fadeIn .25s ease; }
   .ob-step.visible { display:block; }
   .ob-title { font-size:22px; font-weight:700; color:var(--text); margin-bottom:6px; }
   .ob-subtitle { font-size:13px; color:var(--text2); margin-bottom:24px; line-height:1.5; }
   .ob-field { margin-bottom:16px; }
   .ob-field label { font-size:12px; color:var(--text2); margin-bottom:6px; display:block; text-transform:uppercase; letter-spacing:.5px; }
-  .ob-field input, .ob-field select, .ob-field textarea { width:100%; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; color:var(--text); font-family:'Barlow',sans-serif; font-size:14px; outline:none; transition:border-color .2s; box-sizing:border-box; }
-  .ob-field textarea { resize:none; height:80px; }
-  .ob-field input:focus, .ob-field select:focus, .ob-field textarea:focus { border-color:var(--accent); }
+  .ob-field input, .ob-field select { width:100%; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; color:var(--text); font-family:'Barlow',sans-serif; font-size:14px; outline:none; transition:border-color .2s; box-sizing:border-box; }
+  .ob-field input:focus, .ob-field select:focus { border-color:var(--accent); }
   .ob-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-  .ob-chips { display:flex; flex-wrap:wrap; gap:8px; }
-  .ob-chip { padding:8px 14px; border-radius:20px; border:1px solid var(--border); background:var(--bg3); color:var(--text2); font-size:13px; cursor:pointer; transition:all .2s; }
-  .ob-chip.active { border-color:var(--accent); background:rgba(var(--accent-rgb),.12); color:var(--accent); font-weight:600; }
-  .ob-footer { width:100%; max-width:480px; padding:16px 24px 32px; }
+  .ob-footer { width:100%; max-width:480px; padding:12px 24px 32px; flex-shrink:0; }
   .ob-btn { width:100%; padding:16px; background:var(--accent); color:#000; border:none; border-radius:var(--radius); font-family:'Barlow Condensed',sans-serif; font-size:17px; font-weight:700; letter-spacing:1px; cursor:pointer; transition:opacity .2s; }
   .ob-btn:disabled { opacity:.5; cursor:not-allowed; }
-  .ob-btn-ghost { background:transparent; color:var(--text2); border:1px solid var(--border); margin-top:10px; }
+
+  /* Chat onboarding */
+  .ob-chat { width:100%; max-width:480px; flex:1; display:flex; flex-direction:column; overflow:hidden; }
+  .ob-chat-messages { flex:1; overflow-y:auto; padding:16px 24px; display:flex; flex-direction:column; gap:14px; scroll-behavior:smooth; }
+  /* Bulle coach */
+  .ob-bubble-coach { display:flex; align-items:flex-end; gap:8px; }
+  .ob-avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--accent),#47c8ff); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+  .ob-bubble-coach .ob-bubble-text { background:var(--bg2); border:1px solid var(--border); border-radius:18px 18px 18px 4px; padding:12px 16px; font-size:14px; color:var(--text); line-height:1.55; max-width:80%; }
+  /* Bulle user */
+  .ob-bubble-user { display:flex; justify-content:flex-end; }
+  .ob-bubble-user .ob-bubble-text { background:var(--accent); color:#000; border-radius:18px 18px 4px 18px; padding:12px 16px; font-size:14px; line-height:1.55; max-width:80%; font-weight:500; }
+  /* Typing indicator */
+  .ob-typing { display:flex; align-items:flex-end; gap:8px; }
+  .ob-typing-dots { background:var(--bg2); border:1px solid var(--border); border-radius:18px 18px 18px 4px; padding:12px 16px; display:flex; gap:5px; align-items:center; }
+  .ob-typing-dot { width:6px; height:6px; border-radius:50%; background:var(--text3); animation:dot-pulse 1.4s ease-in-out infinite; }
+  .ob-typing-dot:nth-child(2) { animation-delay:.2s; }
+  .ob-typing-dot:nth-child(3) { animation-delay:.4s; }
+  /* Input chat */
+  .ob-chat-input-wrap { padding:12px 24px 32px; display:flex; gap:10px; align-items:flex-end; border-top:1px solid var(--border); flex-shrink:0; }
+  .ob-chat-input { flex:1; background:var(--bg3); border:1px solid var(--border); border-radius:20px; padding:12px 16px; color:var(--text); font-family:'Barlow',sans-serif; font-size:14px; outline:none; resize:none; max-height:120px; line-height:1.4; transition:border-color .2s; }
+  .ob-chat-input:focus { border-color:var(--accent); }
+  .ob-chat-send { width:40px; height:40px; border-radius:50%; background:var(--accent); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .2s; }
+  .ob-chat-send:disabled { opacity:.4; cursor:not-allowed; }
+  .ob-chat-send:active { transform:scale(.93); }
 
   /* AI QUOTA BANNER */
   .ai-quota-banner { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:16px; text-align:center; }
@@ -460,7 +499,62 @@
   .ai-quota-label { font-size:12px; color:var(--text2); margin-top:2px; }
   /* PRO UPGRADE BANNER */
   .pro-upgrade-banner { background:linear-gradient(135deg,rgba(232,255,71,0.08),rgba(71,200,255,0.06)); border:1px solid rgba(232,255,71,0.25); border-radius:var(--radius); padding:20px; margin-bottom:16px; text-align:center; }
-  /* CREDITS PRESET BUTTONS */
+  /* ── CALENDRIER ─────────────────────────────────────────────────── */
+  .cal-view-btn { padding:5px 12px; border-radius:20px; border:1px solid var(--border); background:var(--bg3); color:var(--text2); font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; letter-spacing:.06em; cursor:pointer; transition:all .2s; }
+  .cal-view-btn.active { background:var(--accent); border-color:var(--accent); color:#000; }
+  .cal-nav-btn { width:32px; height:32px; border-radius:50%; border:1px solid var(--border); background:var(--bg3); color:var(--text); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+  .cal-nav-btn:active { background:var(--border); }
+  .cal-nav-label { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:700; color:var(--text); letter-spacing:.04em; }
+  .cal-weekdays { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin-bottom:4px; }
+  .cal-weekdays div { text-align:center; font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.08em; padding:4px 0; }
+  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+  /* Cellule jour */
+  .cal-cell { min-height:64px; border-radius:6px; padding:4px; background:var(--bg2); border:1px solid transparent; transition:border-color .2s; display:flex; flex-direction:column; gap:2px; }
+  .cal-cell.today { border-color:var(--accent); }
+  .cal-cell.other-month { opacity:.3; }
+  .cal-cell-num { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; color:var(--text2); }
+  .cal-cell.today .cal-cell-num { color:var(--accent); }
+  /* Événements dans la cellule */
+  .cal-event { border-radius:3px; padding:2px 4px; font-size:10px; font-weight:700; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer; }
+  .cal-event.ia { background:rgba(232,255,71,0.15); color:var(--accent); border:1px solid rgba(232,255,71,0.3); }
+  .cal-event.libre { background:rgba(71,200,255,0.15); color:var(--accent2); border:1px solid rgba(71,200,255,0.3); }
+  .cal-event.planned { background:var(--bg3); color:var(--text3); border:1px solid var(--border); cursor:pointer; }
+  .cal-event.planned:active { border-color:var(--accent); color:var(--accent); }
+  .cal-event.skipped { background:rgba(239,68,68,0.08); color:#ef4444; border:1px solid rgba(239,68,68,0.2); opacity:0.7; cursor:default; }
+  /* Vue semaine */
+  .cal-week-grid { display:flex; flex-direction:column; gap:8px; }
+  .cal-week-row { display:grid; grid-template-columns:52px 1fr; gap:10px; align-items:start; min-height:52px; }
+  .cal-week-day-label { text-align:right; }
+  .cal-week-day-name { font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:.06em; }
+  .cal-week-day-num { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:900; color:var(--text2); line-height:1; }
+  .cal-week-day-num.today-num { color:var(--accent); }
+  .cal-week-events { display:flex; flex-direction:column; gap:4px; padding-top:2px; }
+  .cal-week-empty { font-size:12px; color:var(--text3); padding:8px 0; }
+  /* Légende */
+  .cal-legend { display:flex; gap:16px; flex-wrap:wrap; margin-top:16px; margin-bottom:8px; }
+  .cal-legend-item { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--text3); }
+  .cal-legend-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .lia-set-row { display:flex; align-items:center; gap:8px; padding:10px 14px; border-bottom:1px solid var(--border); transition:background .2s; }
+  .lia-set-row:last-child { border-bottom:none; }
+  .lia-set-row.done { opacity:0.55; }
+  .lia-set-row.current { background:rgba(232,255,71,0.04); }
+  .lia-set-row.upcoming { opacity:0.4; }
+  .lia-set-num { font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.06em; min-width:52px; flex-shrink:0; }
+  .lia-set-inputs { display:flex; align-items:center; gap:6px; flex:1; }
+  .lia-set-input { width:52px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); padding:7px 6px; color:var(--text); font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:700; text-align:center; outline:none; }
+  .lia-set-input:focus { border-color:var(--accent); }
+  .lia-set-validate-btn { width:36px; height:36px; border-radius:50%; background:var(--accent); border:none; color:#000; font-size:16px; font-weight:700; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+  .lia-set-validate-btn:active { transform:scale(.93); background:#d4eb30; }
+  .lia-set-done-vals { flex:1; font-size:13px; color:var(--text2); }
+  .lia-set-check { color:var(--accent); font-size:16px; font-weight:700; }
+  .template-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px 16px; margin-bottom:8px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:border-color .2s; }
+  .template-card:active { border-color:var(--accent); }
+  .template-card-icon { font-size:20px; flex-shrink:0; }
+  .template-card-body { flex:1; min-width:0; }
+  .template-card-name { font-size:14px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .template-card-meta { font-size:11px; color:var(--text3); margin-top:2px; }
+  .template-card-del { flex-shrink:0; background:none; border:none; color:var(--text3); font-size:16px; cursor:pointer; padding:4px 6px; border-radius:4px; transition:color .2s; }
+  .template-card-del:hover { color:#ef4444; }
   .credits-preset { flex:1; padding:10px 6px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--bg3); color:var(--text2); font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; letter-spacing:.04em; cursor:pointer; text-align:center; transition:all .15s; line-height:1.2; }
   .credits-preset.active { border-color:var(--accent); color:var(--accent); background:rgba(232,255,71,0.08); }
   .credits-preset-sub { font-size:10px; font-weight:400; color:var(--text3); margin-top:2px; }
@@ -548,19 +642,21 @@
 <!-- ═══ ONBOARDING ═══ -->
 <div id="onboarding-screen" style="display:none">
   <div class="onboarding-screen">
+
+    <!-- Header commun -->
     <div class="ob-header">
       <div class="ob-logo">FOR<span>GE</span></div>
-      <div style="font-size:13px;color:var(--text2);margin-top:2px">Configurons ton profil</div>
+      <div class="ob-tagline" id="ob-tagline">Configurons ton profil</div>
       <div class="ob-progress" id="ob-progress"></div>
     </div>
-    <div class="ob-body">
 
-      <!-- Step 1 : Identité -->
+    <!-- ── PHASE 1 : Form identité ── -->
+    <div class="ob-body" id="ob-form-phase">
       <div class="ob-step visible" id="ob-step-0">
         <div class="ob-title">Parle-moi de toi 👋</div>
-        <div class="ob-subtitle">Ces infos permettront à l'IA de personnaliser chaque séance.</div>
+        <div class="ob-subtitle">Quelques infos de base pour que ton coach te connaisse.</div>
         <div class="ob-row">
-          <div class="ob-field"><label>Prénom</label><input type="text" id="ob-name" placeholder="Alexandre"></div>
+          <div class="ob-field"><label>Prénom</label><input type="text" id="ob-name" placeholder="Alexandre" onkeydown="if(event.key==='Enter')obNext()"></div>
           <div class="ob-field"><label>Âge</label><input type="number" id="ob-age" placeholder="28" min="14" max="90"></div>
         </div>
         <div class="ob-row">
@@ -573,91 +669,29 @@
             <option value="">-- Sélectionner --</option>
             <option value="homme">Homme</option>
             <option value="femme">Femme</option>
-            <option value="autre">Autre</option>
+            <option value="autre">Autre / Non précisé</option>
           </select>
         </div>
+        <div id="ob-step-error" style="display:none;font-size:13px;color:#ef4444;margin-top:8px"></div>
       </div>
-
-      <!-- Step 2 : Objectif -->
-      <div class="ob-step" id="ob-step-1">
-        <div class="ob-title">Ton objectif principal 🎯</div>
-        <div class="ob-subtitle">L'IA adapte la programmation en fonction.</div>
-        <div class="ob-chips" id="ob-goals">
-          <div class="ob-chip" onclick="obChip(this,'goals')">Prise de masse</div>
-          <div class="ob-chip" onclick="obChip(this,'goals')">Perte de gras</div>
-          <div class="ob-chip" onclick="obChip(this,'goals')">Force / Performance</div>
-          <div class="ob-chip" onclick="obChip(this,'goals')">Remise en forme</div>
-          <div class="ob-chip" onclick="obChip(this,'goals')">Endurance</div>
-          <div class="ob-chip" onclick="obChip(this,'goals')">Mobilité / Santé</div>
-        </div>
-        <div class="ob-field" style="margin-top:20px"><label>Niveau</label>
-          <select id="ob-level">
-            <option value="">-- Sélectionner --</option>
-            <option value="débutant">Débutant (< 1 an)</option>
-            <option value="intermédiaire">Intermédiaire (1–3 ans)</option>
-            <option value="avancé">Avancé (3+ ans)</option>
-          </select>
-        </div>
-        <div class="ob-field"><label>Séances par semaine</label>
-          <select id="ob-freq">
-            <option value="">-- Sélectionner --</option>
-            <option value="2">2×</option>
-            <option value="3">3×</option>
-            <option value="4">4×</option>
-            <option value="5">5×</option>
-            <option value="6">6×</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Step 3 : Contexte & contraintes -->
-      <div class="ob-step" id="ob-step-2">
-        <div class="ob-title">Ton contexte 🏋️</div>
-        <div class="ob-subtitle">Équipement disponible et contraintes physiques.</div>
-        <div class="ob-field"><label>Équipement</label>
-          <div class="ob-chips" id="ob-equipment">
-            <div class="ob-chip" onclick="obChip(this,'equipment')">Salle complète</div>
-            <div class="ob-chip" onclick="obChip(this,'equipment')">Haltères</div>
-            <div class="ob-chip" onclick="obChip(this,'equipment')">Barres + disques</div>
-            <div class="ob-chip" onclick="obChip(this,'equipment')">Machines guidées</div>
-            <div class="ob-chip" onclick="obChip(this,'equipment')">Élastiques</div>
-            <div class="ob-chip" onclick="obChip(this,'equipment')">Poids du corps</div>
-          </div>
-        </div>
-        <div class="ob-field" style="margin-top:16px"><label>Contraintes / blessures (optionnel)</label>
-          <textarea id="ob-constraints" placeholder="Ex: épaule droite fragile, pas de squat lourd..."></textarea>
-        </div>
-      </div>
-
-      <!-- Step 4 : Bienvenue & séances offertes -->
-      <div class="ob-step" id="ob-step-3">
-        <div class="ob-title">C'est parti ! 🚀</div>
-        <div class="ob-subtitle">FORGE est prêt à te coacher. Voici ce qui t'attend.</div>
-        <div style="background:var(--bg2);border:1px solid rgba(232,255,71,0.3);border-radius:var(--radius);padding:24px;margin-bottom:16px;text-align:center;">
-          <div style="font-size:48px;margin-bottom:10px">🎁</div>
-          <div style="font-size:18px;font-weight:700;color:var(--accent);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.04em;margin-bottom:4px">3 SÉANCES IA OFFERTES</div>
-          <div style="font-size:13px;color:var(--text2);margin-top:4px;line-height:1.6">Aucune carte requise.<br>L'IA analyse ton historique et programme chaque séance.</div>
-        </div>
-        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:12px">
-          <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Ce que tu débloques</div>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2)"><span style="color:var(--accent)">⚡</span> Plans IA personnalisés selon ton historique</div>
-            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2)"><span style="color:var(--accent)">📈</span> Progression et charges calculées automatiquement</div>
-            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2)"><span style="color:var(--accent)">🧠</span> Dashboard et insights mis à jour après chaque séance</div>
-          </div>
-        </div>
-        <div style="font-size:12px;color:var(--text3);text-align:center;line-height:1.5">Après tes 3 séances offertes, passe à <strong style="color:var(--text2)">FORGE Pro</strong> pour continuer.</div>
-      </div>
-
     </div>
-    <div class="ob-footer">
-      <div id="ob-step-error" style="display:none;font-size:13px;color:#ef4444;margin-bottom:10px;text-align:center"></div>
+    <div class="ob-footer" id="ob-form-footer">
       <button class="ob-btn" id="ob-next-btn" onclick="obNext()">Continuer →</button>
-      <div style="display:flex;gap:10px;margin-top:10px">
-        <button class="ob-btn ob-btn-ghost" id="ob-prev-btn" onclick="obPrev()" style="display:none;flex:1;padding:12px;border-radius:var(--radius);font-size:14px;cursor:pointer">← Retour</button>
-        <button class="ob-btn ob-btn-ghost" id="ob-skip-btn" onclick="obSkip()" style="display:none;flex:1;padding:12px;border-radius:var(--radius);font-size:14px;cursor:pointer">Passer</button>
+    </div>
+
+    <!-- ── PHASE 2 : Chat IA ── -->
+    <div class="ob-chat" id="ob-chat-phase" style="display:none">
+      <div class="ob-chat-messages" id="ob-chat-messages"></div>
+      <div class="ob-chat-input-wrap" id="ob-chat-input-wrap">
+        <textarea class="ob-chat-input" id="ob-chat-input" placeholder="Réponds ici..." rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();obChatSend()}"
+          oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+        <button class="ob-chat-send" id="ob-chat-send-btn" onclick="obChatSend()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
       </div>
     </div>
+
   </div>
 </div>
 
@@ -726,6 +760,12 @@
   <div class="card">
     <div class="card-label">Insights IA</div>
     <div id="insights-list"><div class="loading visible" id="insights-loading"><div class="spinner"></div>Analyse en cours...</div></div>
+    <div id="insights-locked" style="display:none;text-align:center;padding:16px 0">
+      <div style="font-size:22px;margin-bottom:8px">🔒</div>
+      <button onclick="showModal('modal-convert')" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(232,255,71,0.12),rgba(71,200,255,0.08));border:1px solid rgba(232,255,71,0.3);border-radius:20px;padding:8px 16px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--accent);cursor:pointer;letter-spacing:.04em">
+        Dispo sur FORGE Pro ⚡
+      </button>
+    </div>
   </div>
   <div class="account-accordion" id="recent-sessions-accordion">
     <div class="account-accordion-header" onclick="toggleRecentSessions()">
@@ -779,6 +819,14 @@
         <div class="entry-btn-label">Séance libre</div>
         <div class="entry-btn-sub">Logge au fil de l'eau, texte ou vocal</div>
       </button>
+    </div>
+
+    <!-- TEMPLATES -->
+    <div style="margin-top:8px;padding-bottom:8px" id="templates-section">
+      <div class="card-label" style="margin-bottom:10px">⭐ Mes templates</div>
+      <div id="templates-list">
+        <div style="font-size:13px;color:var(--text3);text-align:center;padding:16px 0">Aucun template sauvegardé</div>
+      </div>
     </div>
 
     <!-- HISTORIQUE -->
@@ -1020,9 +1068,12 @@
           <button class="feeling-btn" onclick="setFeeling(5,this)">🔥</button>
         </div>
       </div>
-      <button class="btn btn-primary" onclick="submitSession()" id="submit-session-btn">
+      <button class="btn btn-primary" onclick="submitSession(false)" id="submit-session-btn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
         Enregistrer la séance
+      </button>
+      <button class="btn btn-secondary" onclick="submitSession(true)" id="submit-template-btn" style="margin-top:8px;font-size:13px">
+        ⭐ Enregistrer comme template
       </button>
       <div class="loading" id="submit-loading" style="margin-top:10px"><div class="spinner"></div>Enregistrement...</div>
       <button class="btn btn-danger" onclick="confirmAbandon()" style="margin-top:10px;font-size:13px;padding:10px">
@@ -1030,6 +1081,51 @@
       </button>
     </div>
   </div>
+</div>
+
+<!-- ═══ VIEW: PLANNING ═══ -->
+<div class="view" id="view-planning">
+  <div class="app-header">
+    <div class="app-header-left">
+      <div class="app-header-title">PLANNING</div>
+      <div class="app-header-sub" id="cal-period-label">4 semaines</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <button class="cal-view-btn active" id="cal-btn-month" onclick="setCalView('month')">Mois</button>
+      <button class="cal-view-btn" id="cal-btn-week" onclick="setCalView('week')">Semaine</button>
+    </div>
+  </div>
+
+  <!-- Navigation mois/semaine -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <button class="cal-nav-btn" onclick="calNav(-1)">‹</button>
+    <div class="cal-nav-label" id="cal-nav-label">Juin 2025</div>
+    <button class="cal-nav-btn" onclick="calNav(1)">›</button>
+  </div>
+
+  <!-- Grille calendrier -->
+  <div id="cal-grid-wrap">
+    <!-- En-têtes jours -->
+    <div class="cal-weekdays">
+      <div>Lun</div><div>Mar</div><div>Mer</div><div>Jeu</div>
+      <div>Ven</div><div>Sam</div><div>Dim</div>
+    </div>
+    <!-- Cellules -->
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+
+  <!-- Légende -->
+  <div class="cal-legend">
+    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--accent)"></div>Séance IA</div>
+    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--accent2)"></div>Séance libre</div>
+    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--border)"></div>Planifié</div>
+    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--accent3)"></div>Skipped</div>
+  </div>
+
+  <!-- CTA prolonger -->
+  <button class="btn btn-secondary" style="width:100%;margin-top:8px;margin-bottom:24px;opacity:0.5;cursor:not-allowed">
+    🔄 Prolonger mon planning — bientôt disponible
+  </button>
 </div>
 
 <!-- ═══ VIEW: PROFILE ═══ -->
@@ -1128,26 +1224,14 @@
     <div class="card">
       <div class="card-label">🎯 Objectifs</div>
       <div class="profile-field"><label class="input-label">Objectif principal</label>
-        <select id="p-goal">
-          <option value="prise de masse">Prise de masse</option>
-          <option value="force">Force / Performance</option>
-          <option value="sèche">Sèche / Définition</option>
-          <option value="endurance">Endurance</option>
-          <option value="santé">Santé générale</option>
-        </select>
+        <input type="text" id="p-goal" placeholder="Ex: prise de masse, marathon en 4h...">
       </div>
       <div class="input-row">
-        <div><label class="input-label">Séances / semaine</label><input type="number" id="p-sessions-week" placeholder="4" min="1" max="7"></div>
+        <div><label class="input-label">Séances / semaine</label><input type="text" id="p-sessions-week" placeholder="Ex: 4, 5 séances/sem..."></div>
         <div><label class="input-label">Poids cible (kg)</label><input type="number" id="p-weight-target" placeholder="—" step="0.1"></div>
       </div>
       <div class="profile-field"><label class="input-label">Équipements</label>
-        <select id="p-equipment">
-          <option value="salle complète">Salle complète</option>
-          <option value="salle standard">Salle standard</option>
-          <option value="home gym complet">Home gym complet</option>
-          <option value="home gym basique">Home gym basique (haltères, barre)</option>
-          <option value="poids de corps">Poids de corps uniquement</option>
-        </select>
+        <input type="text" id="p-equipment" placeholder="Ex: salle complète, haltères, extérieur...">
       </div>
     </div>
     <div class="card">
@@ -1315,7 +1399,57 @@
   </div>
 </div>
 
-<!-- NAV — 3 onglets -->
+<!-- ═══ MODAL — NOM DU TEMPLATE ═══ -->
+<div class="modal-backdrop" id="modal-template-name" onclick="closeModal('modal-template-name',event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Nom du template ⭐</div>
+    <div class="modal-body" style="margin-bottom:16px">Donne un nom à cette séance pour la retrouver facilement.</div>
+    <input type="text" id="template-name-input" placeholder="Ex: Push — Pecto / Épaules"
+      style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;outline:none;box-sizing:border-box;margin-bottom:16px"
+      onkeydown="if(event.key==='Enter')confirmSaveTemplate()">
+    <button class="btn btn-primary" onclick="confirmSaveTemplate()" style="margin-bottom:10px">
+      Sauvegarder ⭐
+    </button>
+    <button class="btn btn-secondary" onclick="closeModal('modal-template-name')" style="font-size:13px;padding:12px">Annuler</button>
+  </div>
+</div>
+
+<!-- ═══ MODAL — SUPPRIMER TEMPLATE ═══ -->
+<div class="modal-backdrop" id="modal-delete-template" onclick="closeModal('modal-delete-template',event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Supprimer ce template ?</div>
+    <div class="modal-body">La séance restera dans ton historique, mais elle ne sera plus disponible comme template.</div>
+    <button class="btn btn-danger" onclick="confirmDeleteTemplate()" style="margin-bottom:10px">
+      Supprimer
+    </button>
+    <button class="btn btn-secondary" onclick="closeModal('modal-delete-template')" style="font-size:13px;padding:12px">Annuler</button>
+  </div>
+</div>
+
+<!-- ═══ REST TIMER OVERLAY ═══ -->
+<div class="rest-overlay" id="rest-overlay">
+  <div class="rest-label">Temps de repos</div>
+  <div class="rest-ring-wrap">
+    <svg viewBox="0 0 180 180">
+      <circle class="rest-ring-track" cx="90" cy="90" r="80"/>
+      <circle class="rest-ring-progress" id="rest-ring-progress" cx="90" cy="90" r="80"/>
+    </svg>
+    <div class="rest-ring-count">
+      <div class="rest-seconds" id="rest-seconds">90</div>
+      <div class="rest-unit">sec</div>
+    </div>
+  </div>
+  <div class="rest-next-wrap">
+    <div class="rest-next-label">Coming Next</div>
+    <div class="rest-next-name" id="rest-next-name">—</div>
+    <div class="rest-next-detail" id="rest-next-detail"></div>
+  </div>
+  <button class="rest-skip-btn" onclick="skipRestTimer()">Skip →</button>
+</div>
+
+<!-- NAV — 4 onglets -->
 <nav class="nav">
   <button class="nav-item active" id="nav-dashboard" onclick="showView('dashboard')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
@@ -1325,6 +1459,10 @@
     <div class="nav-badge" id="seance-badge"></div>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
     Séance
+  </button>
+  <button class="nav-item" id="nav-planning" onclick="showView('planning')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Planning
   </button>
   <button class="nav-item" id="nav-profile" onclick="showView('profile')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -1356,8 +1494,7 @@ function hasAnyCredits() {
 
 const STRIPE_SUBSCRIPTION_LINK    = 'https://buy.stripe.com/test_28E5kEb9m3jO4uUef9ew802';
 // Credits links définis dynamiquement selon paid_subscription (voir buyCredits())
-let OB_STEP = 0;
-const OB_STEPS = 4;
+let OB_STEP = 0; // gardé pour compat
 let obGoals = [];
 let obEquipment = [];
 
@@ -1367,16 +1504,19 @@ let profile = { name:'', age:'', weight:'', height:'', level:'confirmé', goal:'
 
 // Session courante
 let currentSession = {
-  mode: null,          // 'ia' | 'libre'
-  type: 'musculation', // musculation | running | cardio | autre
+  mode: null,
+  type: 'musculation',
   startedAt: null,
-  exos: [],            // [{id, text, savedAt}]
-  iaPlan: null,        // plan IA si mode ia
-  iaExoIdx: 0,         // index de l'exercice IA en cours
+  exos: [],
+  iaPlan: null,
+  iaExoIdx: 0,
+  currentSetIdx: {},  // { slotIdx: setIdx } — série courante par slot
   feeling: null
 };
 
 let allSessions = [];   // 100 dernières séances — chargées avec le dashboard
+let TEMPLATE_IDS = []; // IDs des sessions marquées is_template
+let trainingPlan = []; // placeholders du plan 4 semaines
 let mainChart = null;
 let currentChartType = 'volume';
 let chartDataFromAPI = null;
@@ -1541,143 +1681,243 @@ async function authSignOut() {
 }
 
 // ── ONBOARDING ───────────────────────────────────────────────────
+// ── ONBOARDING ────────────────────────────────────────────────────
+let obIdentity  = {};         // capturé en phase form
+let obChatHistory = [];       // [{role, content}]
+let obTurnsRemaining = 15;
+let obChatLocked = false;     // empêche double envoi
+
 function showOnboarding() {
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('onboarding-screen').style.display = 'flex';
-  obRenderProgress();
-  obUpdateStep();
+  obRenderProgress(1, 2);
 }
 
-function obRenderProgress() {
+function obRenderProgress(current, total) {
   const el = document.getElementById('ob-progress');
-  el.innerHTML = Array.from({length: OB_STEPS}, (_,i) =>
-    `<div class="ob-progress-dot ${i <= OB_STEP ? 'active' : ''}"></div>`
+  el.innerHTML = Array.from({length: total}, (_, i) =>
+    `<div class="ob-progress-dot ${i < current ? 'active' : ''}"></div>`
   ).join('');
 }
 
-function obUpdateStep() {
-  document.querySelectorAll('.ob-step').forEach((s,i) => {
-    s.classList.toggle('visible', i === OB_STEP);
-  });
-  const isLast = OB_STEP === OB_STEPS - 1;
-  document.getElementById('ob-next-btn').textContent = isLast ? 'Commencer ✓' : 'Continuer →';
-  document.getElementById('ob-prev-btn').style.display = OB_STEP > 0 ? 'flex' : 'none';
-  document.getElementById('ob-skip-btn').style.display = OB_STEP >= 2 ? 'flex' : 'none';
-  // Clear error on step change
-  const errEl = document.getElementById('ob-step-error');
-  if (errEl) errEl.style.display = 'none';
-  obRenderProgress();
-}
-
-function obChip(el, group) {
-  if (group === 'goals') {
-    document.querySelectorAll('#ob-goals .ob-chip').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
-    obGoals = [el.textContent];
-  } else {
-    el.classList.toggle('active');
-    obEquipment = [...document.querySelectorAll('#ob-equipment .ob-chip.active')].map(c => c.textContent);
-  }
-}
-
-function obValidateStep() {
-  // Required fields per step
-  const required = {
-    0: [
-      { id: 'ob-name',   label: 'Prénom' },
-      { id: 'ob-age',    label: 'Âge' },
-      { id: 'ob-gender', label: 'Sexe' },
-    ],
-    1: [
-      { id: 'ob-level', label: 'Niveau' },
-      { id: 'ob-freq',  label: 'Séances / semaine' },
-    ],
-    2: [], // equipment optional
-    3: [], // token optional
-  };
-  const fields = required[OB_STEP] || [];
-  for (const f of fields) {
-    const el = document.getElementById(f.id);
-    if (!el || !el.value.trim()) {
-      const errEl = document.getElementById('ob-step-error');
-      if (errEl) { errEl.textContent = `⚠️ "${f.label}" est requis`; errEl.style.display = 'block'; }
-      el?.focus();
-      return false;
-    }
-  }
-  // Step 1: check at least one goal selected
-  if (OB_STEP === 1 && obGoals.length === 0) {
-    const errEl = document.getElementById('ob-step-error');
-    if (errEl) { errEl.textContent = '⚠️ Choisis un objectif'; errEl.style.display = 'block'; }
-    return false;
-  }
-  const errEl = document.getElementById('ob-step-error');
-  if (errEl) errEl.style.display = 'none';
-  return true;
-}
-
+// ── PHASE 1 : FORM IDENTITÉ ──
 function obNext() {
-  if (!obValidateStep()) return;
-  if (OB_STEP < OB_STEPS - 1) {
-    OB_STEP++;
-    obUpdateStep();
-  } else {
-    obFinish();
-  }
+  const name   = document.getElementById('ob-name').value.trim();
+  const age    = document.getElementById('ob-age').value;
+  const weight = document.getElementById('ob-weight').value;
+  const height = document.getElementById('ob-height').value;
+  const gender = document.getElementById('ob-gender').value;
+  const errEl  = document.getElementById('ob-step-error');
+
+  if (!name)   { errEl.textContent = '⚠️ Prénom requis';  errEl.style.display = 'block'; return; }
+  if (!age)    { errEl.textContent = '⚠️ Âge requis';     errEl.style.display = 'block'; return; }
+  if (!gender) { errEl.textContent = '⚠️ Sexe requis';    errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+
+  obIdentity = { name, age, weight, height, gender };
+
+  // Transition vers le chat
+  document.getElementById('ob-form-phase').style.display  = 'none';
+  document.getElementById('ob-form-footer').style.display = 'none';
+  document.getElementById('ob-chat-phase').style.display  = 'flex';
+  document.getElementById('ob-tagline').textContent = 'Ton coach IA';
+  obRenderProgress(2, 2);
+
+  // Démarrer le chat
+  obChatStart();
 }
 
-function obPrev() {
-  if (OB_STEP > 0) {
-    OB_STEP--;
-    obUpdateStep();
+// ── PHASE 2 : CHAT IA ──
+async function obChatStart() {
+  // Message d'amorce — on envoie "start" avec l'identité pour que l'IA démarre
+  obAddBubble('typing');
+  try {
+    const res = await callMake({
+      event: 'onboarding_chat',
+      user_message: 'start',
+      history: [],
+      turns_remaining: obTurnsRemaining,
+      identity: obIdentity
+    });
+    obRemoveTyping();
+    console.log('[ob] start res:', JSON.stringify(res)?.slice(0, 200));
+    const msg_text   = res?.message   ?? res?.response?.message;
+    const is_done    = res?.done      ?? res?.response?.done;
+    const ai_profile = res?.profile   ?? res?.response?.profile;
+    const turns      = res?.turns_remaining ?? res?.response?.turns_remaining;
+    if (msg_text) {
+      obAddBubble('coach', msg_text);
+      obTurnsRemaining = turns ?? (obTurnsRemaining - 1);
+      if (is_done && ai_profile) { obFinish(ai_profile); return; }
+    }
+  } catch(e) {
+    obRemoveTyping();
+    obAddBubble('coach', "Une erreur s'est produite. Réessaie.");
   }
+  document.getElementById('ob-chat-input').focus();
 }
 
-function obSkip() {
-  // Only allowed on optional steps (2+)
-  if (OB_STEP >= 2) {
-    if (OB_STEP < OB_STEPS - 1) { OB_STEP++; obUpdateStep(); }
-    else obFinish();
+async function obChatSend() {
+  const input = document.getElementById('ob-chat-input');
+  const msg   = input.value.trim();
+  if (!msg || obChatLocked) return;
+
+  obChatLocked = true;
+  input.value  = '';
+  input.style.height = 'auto';
+  document.getElementById('ob-chat-send-btn').disabled = true;
+
+  // Bulle user
+  obAddBubble('user', msg);
+  obChatHistory.push({ role: 'user', content: msg });
+
+  // Typing indicator
+  obAddBubble('typing');
+
+  try {
+    const res = await callMake({
+      event: 'onboarding_chat',
+      user_message: msg,
+      history: obChatHistory,
+      turns_remaining: obTurnsRemaining,
+      identity: obIdentity
+    });
+    obRemoveTyping();
+    console.log('[ob] res:', JSON.stringify(res)?.slice(0, 200));
+
+    // res peut être envelope.response OU l'envelope entier selon le parsing
+    const msg_text   = res?.message   ?? res?.response?.message;
+    const is_done    = res?.done      ?? res?.response?.done;
+    const ai_profile = res?.profile   ?? res?.response?.profile;
+    const turns      = res?.turns_remaining ?? res?.response?.turns_remaining;
+
+    if (msg_text) {
+      obAddBubble('coach', msg_text);
+      obChatHistory.push({ role: 'assistant', content: msg_text });
+      obTurnsRemaining = turns ?? (obTurnsRemaining - 1);
+
+      if (is_done && ai_profile) {
+        obFinish(ai_profile);
+        return;
+      }
+    }
+  } catch(e) {
+    obRemoveTyping();
+    obAddBubble('coach', "Une erreur s'est produite, réessaie.");
   }
+
+  obChatLocked = false;
+  document.getElementById('ob-chat-send-btn').disabled = false;
+  input.focus();
 }
 
-async function obFinish() {
-  const btn = document.getElementById('ob-next-btn');
-  btn.disabled = true; btn.textContent = 'Sauvegarde...';
+function obAddBubble(type, text) {
+  const container = document.getElementById('ob-chat-messages');
 
-  const obProfile = {
-    name:        document.getElementById('ob-name').value.trim(),
-    age:         document.getElementById('ob-age').value,
-    weight:      document.getElementById('ob-weight').value,
-    height:      document.getElementById('ob-height').value,
-    gender:      document.getElementById('ob-gender').value,
-    goal:        obGoals[0] || '',
-    level:       document.getElementById('ob-level').value,
-    frequency:   document.getElementById('ob-freq').value,
-    equipment:   obEquipment.join(', '),
-    constraints: document.getElementById('ob-constraints').value.trim(),
+  if (type === 'typing') {
+    const el = document.createElement('div');
+    el.className = 'ob-typing';
+    el.id = 'ob-typing-indicator';
+    el.innerHTML = `
+      <div class="ob-avatar">🧠</div>
+      <div class="ob-typing-dots">
+        <div class="ob-typing-dot"></div>
+        <div class="ob-typing-dot"></div>
+        <div class="ob-typing-dot"></div>
+      </div>`;
+    container.appendChild(el);
+  } else if (type === 'coach') {
+    const el = document.createElement('div');
+    el.className = 'ob-bubble-coach';
+    el.innerHTML = `
+      <div class="ob-avatar">🧠</div>
+      <div class="ob-bubble-text">${text.replace(/\n/g, '<br>')}</div>`;
+    container.appendChild(el);
+  } else if (type === 'user') {
+    const el = document.createElement('div');
+    el.className = 'ob-bubble-user';
+    el.innerHTML = `<div class="ob-bubble-text">${text.replace(/\n/g, '<br>')}</div>`;
+    container.appendChild(el);
+  }
+
+  // Scroll bas
+  container.scrollTop = container.scrollHeight;
+}
+
+function obRemoveTyping() {
+  const el = document.getElementById('ob-typing-indicator');
+  if (el) el.remove();
+}
+
+async function obFinish(aiProfile) {
+  // Remplacer la zone input par le bouton C'est parti
+  const inputWrap = document.getElementById('ob-chat-input-wrap');
+  inputWrap.innerHTML = `
+    <button id="ob-close-btn" style="
+      width:100%;padding:16px;background:var(--accent);color:#000;border:none;
+      border-radius:var(--radius);font-family:'Barlow Condensed',sans-serif;
+      font-size:17px;font-weight:700;letter-spacing:1px;cursor:pointer;
+    ">C'est parti 💪🏻</button>`;
+
+  // Scroll bas pour que le bouton soit visible
+  const container = document.getElementById('ob-chat-messages');
+  setTimeout(() => { container.scrollTop = container.scrollHeight; }, 50);
+
+  // Fusionner identité + profil IA
+  const fullProfile = {
+    name:                obIdentity.name,
+    age:                 obIdentity.age,
+    weight:              obIdentity.weight,
+    height:              obIdentity.height,
+    gender:              obIdentity.gender,
+    goal:                aiProfile.goal                || '',
+    level:               aiProfile.level               || '',
+    frequency:           aiProfile.weekly_availability || '',
+    equipment:           Array.isArray(aiProfile.equipment) ? aiProfile.equipment.join(', ') : (aiProfile.equipment || ''),
+    constraints:         aiProfile.constraints         || '',
+    context:             aiProfile.context             || '',
+    sport_history:       aiProfile.sport_history       || '',
+    target_event:        aiProfile.target_event        || null,
+    target_event_date:   aiProfile.target_event_date   || null,
+    specialization:      aiProfile.specialization      || 'general',
+    weekly_availability: aiProfile.weekly_availability || '',
   };
 
-  // Save profile locally immediately — Make calls are best-effort
-  profile = { ...profile, ...obProfile };
+  // Sauvegarder localement
+  profile = { ...profile, ...fullProfile };
   localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
 
-  // Fire Make calls without blocking the UI
-  (async () => {
-    try {
-      await callMake({ event: 'init_user', profile: obProfile });
-    } catch(e) { console.warn('[ob] init_user failed:', e.message); }
-  })();
+  // Clic → overlay plan + save Make + lancer app
+  document.getElementById('ob-close-btn').onclick = async () => {
+    const btn = document.getElementById('ob-close-btn');
+    btn.disabled = true;
+    btn.textContent = 'Génération en cours...';
 
-  // Transition immediately — don't wait for Make
-  document.getElementById('onboarding-screen').style.display = 'none';
-  document.getElementById('app-wrapper').style.display = 'block';
-  loadProfileFields();
-  loadDashboard();
-  checkSessionInProgress();
-  FREE_SESSIONS_REMAINING = 3;
-  updateQuotaUI();
+    // Masquer l'onboarding, afficher l'overlay plan
+    document.getElementById('onboarding-screen').style.display = 'none';
+    document.getElementById('app-wrapper').style.display = 'block';
+    showOverlay('plan');
+
+    try {
+      await callMake({ event: 'init_user', profile: fullProfile });
+    } catch(e) { console.warn('[ob] init_user failed:', e.message); }
+
+    hideOverlay();
+    loadProfileFields();
+    checkSessionInProgress();
+    FREE_SESSIONS_REMAINING = 3;
+    updateQuotaUI();
+    updateProUI();
+    showView('planning');  // Atterrir sur le planning après onboarding
+    renderCalendar();
+  };
 }
+
+// Anciennes fonctions — gardées pour compat mais plus utilisées
+function obChip() {}
+function obPrev() {}
+function obSkip() {}
+function obValidateStep() { return true; }
 
 // ── AI QUOTA ──────────────────────────────────────────────────────
 function updateQuotaUI() {
@@ -1889,6 +2129,195 @@ function toggleRecentSessions() {
   if (acc) acc.classList.toggle('open');
 }
 
+// ── CALENDRIER ────────────────────────────────────────────────────
+let _calView   = 'month';
+let _calOffset = 0;
+let _calInitialized = false;
+
+const TYPE_LABEL = { musculation:'Muscu', running:'Running', cardio:'Cardio', mobility:'Mobilité', autre:'Autre', endurance:'Endurance' };
+
+function setCalView(v) {
+  _calView = v;
+  _calOffset = 0;
+  document.getElementById('cal-btn-month').classList.toggle('active', v === 'month');
+  document.getElementById('cal-btn-week').classList.toggle('active', v === 'week');
+  renderCalendar();
+}
+
+function calNav(dir) {
+  _calOffset += dir;
+  renderCalendar();
+}
+
+function renderCalendar() {
+  // Au premier render avec un plan, centrer sur le premier mois du plan
+  if (!_calInitialized && trainingPlan.length > 0) {
+    const firstDate = new Date(_toIsoDate(trainingPlan[0].date) + 'T12:00:00');
+    const now = new Date();
+    const diffMonths = (firstDate.getFullYear() - now.getFullYear()) * 12
+      + firstDate.getMonth() - now.getMonth();
+    if (_calView === 'month') _calOffset = diffMonths;
+    _calInitialized = true;
+  }
+  if (_calView === 'month') renderCalMonth();
+  else renderCalWeek();
+}
+
+function _isoDate(d) {
+  return d.toISOString().slice(0, 10);
+}
+
+function _toIsoDate(val) {
+  if (!val) return null;
+  // String ISO déjà : "2025-06-02" ou "2025-06-02T..."
+  if (typeof val === 'string') return val.slice(0, 10);
+  // UNIX timestamp (secondes)
+  const n = Number(val);
+  if (!isNaN(n)) return new Date(n * 1000).toISOString().slice(0, 10);
+  return null;
+}
+
+function _buildDayMap() {
+  // Map date ISO → { logged: session|null, planned: placeholder|null }
+  const map = {};
+
+  // Sessions loggées
+  for (const s of allSessions) {
+    const d = _toIsoDate(s.date);
+    if (!d) continue;
+    if (!map[d]) map[d] = { logged: null, planned: null };
+    map[d].logged = s;
+  }
+
+  // Placeholders du plan
+  for (const p of trainingPlan) {
+    const d = _toIsoDate(p.date);
+    if (!d) continue;
+    if (!map[d]) map[d] = { logged: null, planned: null };
+    if (!map[d].logged) map[d].planned = p; // masqué si séance loggée ce jour
+  }
+
+  return map;
+}
+
+function _renderCellEvents(dateStr, dayData) {
+  const today = _isoDate(new Date());
+  const isPast = dateStr < today;
+  let html = '';
+
+  if (dayData?.logged) {
+    const s = dayData.logged;
+    const cls = s.mode === 'ia' ? 'ia' : 'libre';
+    const lbl = s.template_name || s.name || TYPE_LABEL[s.type] || s.type || 'Séance';
+    html += `<div class="cal-event ${cls}" title="${lbl}">${lbl}</div>`;
+  } else if (dayData?.planned) {
+    const p = dayData.planned;
+    const lbl = p.label || TYPE_LABEL[p.type] || 'Séance';
+    if (isPast) {
+      html += `<div class="cal-event skipped" title="Skipped">⚠ Skipped</div>`;
+    } else {
+      html += `<div class="cal-event planned" onclick="showView('seance')" title="${lbl}">📅 ${lbl}</div>`;
+    }
+  }
+
+  return html;
+}
+
+function renderCalMonth() {
+  const now = new Date();
+  const ref = new Date(now.getFullYear(), now.getMonth() + _calOffset, 1);
+  const year = ref.getFullYear();
+  const month = ref.getMonth();
+
+  document.getElementById('cal-nav-label').textContent =
+    ref.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+      .replace(/^\w/, c => c.toUpperCase());
+  document.getElementById('cal-period-label').textContent = 'Vue mensuelle';
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay  = new Date(year, month + 1, 0);
+  // Lundi = 0
+  const startOffset = (firstDay.getDay() + 6) % 7;
+
+  const dayMap = _buildDayMap();
+  const today = _isoDate(new Date());
+
+  let cells = '';
+
+  // Jours du mois précédent
+  for (let i = 0; i < startOffset; i++) {
+    const d = new Date(year, month, 1 - (startOffset - i));
+    cells += `<div class="cal-cell other-month"><div class="cal-cell-num">${d.getDate()}</div></div>`;
+  }
+
+  // Jours du mois
+  for (let day = 1; day <= lastDay.getDate(); day++) {
+    const d    = new Date(year, month, day);
+    const iso  = _isoDate(d);
+    const isToday = iso === today;
+    const events = _renderCellEvents(iso, dayMap[iso]);
+    cells += `<div class="cal-cell${isToday ? ' today' : ''}">
+      <div class="cal-cell-num">${day}</div>
+      ${events}
+    </div>`;
+  }
+
+  // Compléter la dernière ligne
+  const totalCells = startOffset + lastDay.getDate();
+  const remaining  = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+  for (let i = 1; i <= remaining; i++) {
+    cells += `<div class="cal-cell other-month"><div class="cal-cell-num">${i}</div></div>`;
+  }
+
+  document.getElementById('cal-grid-wrap').innerHTML = `
+    <div class="cal-weekdays">
+      <div>Lun</div><div>Mar</div><div>Mer</div><div>Jeu</div><div>Ven</div><div>Sam</div><div>Dim</div>
+    </div>
+    <div class="cal-grid">${cells}</div>`;
+}
+
+function renderCalWeek() {
+  const now = new Date();
+  // Début de la semaine courante (lundi)
+  const dayOfWeek = (now.getDay() + 6) % 7;
+  const monday    = new Date(now);
+  monday.setDate(now.getDate() - dayOfWeek + (_calOffset * 7));
+  monday.setHours(0, 0, 0, 0);
+
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+
+  const fmt = (d) => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+  document.getElementById('cal-nav-label').textContent = `${fmt(monday)} — ${fmt(sunday)}`;
+  document.getElementById('cal-period-label').textContent = 'Vue semaine';
+
+  const DAYS_FR = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  const dayMap  = _buildDayMap();
+  const today   = _isoDate(new Date());
+
+  let rows = '';
+  for (let i = 0; i < 7; i++) {
+    const d   = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    const iso = _isoDate(d);
+    const isToday = iso === today;
+    const events  = _renderCellEvents(iso, dayMap[iso]);
+
+    rows += `<div class="cal-week-row">
+      <div class="cal-week-day-label">
+        <div class="cal-week-day-name">${DAYS_FR[i]}</div>
+        <div class="cal-week-day-num${isToday ? ' today-num' : ''}">${d.getDate()}</div>
+      </div>
+      <div class="cal-week-events${events ? '' : ' cal-week-empty'}">
+        ${events || '<span style="color:var(--border)">—</span>'}
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('cal-grid-wrap').innerHTML =
+    `<div class="cal-week-grid">${rows}</div>`;
+}
+
 async function doOpenPortal() {
   const btn = document.getElementById('portal-go-btn');
   btn.disabled = true; btn.textContent = 'Chargement...';
@@ -2081,21 +2510,48 @@ document.addEventListener('DOMContentLoaded', async () => {
   const isLocal = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
   if (isLocal) {
     const devUser = { id: 'dev-user-001', email: 'dev@forge.local', sub: 'dev-user-001' };
-    const devBadge = document.getElementById('dev-badge');
-    if (!devBadge) {
+
+    // Badge DEV
+    if (!document.getElementById('dev-badge')) {
       const badge = document.createElement('div');
       badge.id = 'dev-badge';
       badge.style.cssText = 'position:fixed;top:8px;right:8px;background:#f59e0b;color:#000;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;z-index:99999;letter-spacing:.5px';
       badge.textContent = '⚡ DEV';
       document.body.appendChild(badge);
     }
-    // Check if dev wants onboarding or direct app
-    const devMode = localStorage.getItem('forge_dev_mode') || 'app';
-    if (devMode === 'onboarding') {
-      onAuthSuccess(devUser, 'dev-token', true);
-    } else {
+
+    // Écran de sélection dev
+    const devScreen = document.createElement('div');
+    devScreen.id = 'dev-screen';
+    devScreen.style.cssText = 'position:fixed;inset:0;background:var(--bg);z-index:9998;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:32px';
+    devScreen.innerHTML = `
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;letter-spacing:2px;margin-bottom:4px">FOR<span style="color:var(--accent)">GE</span></div>
+      <div style="font-size:11px;color:#f59e0b;font-weight:700;letter-spacing:.15em;text-transform:uppercase;margin-bottom:48px">⚡ Mode développement</div>
+      <div style="width:100%;max-width:320px;display:flex;flex-direction:column;gap:12px">
+        <button id="dev-btn-app" style="width:100%;padding:18px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:1px;cursor:pointer">
+          Ouvrir l'app →
+        </button>
+        <button id="dev-btn-ob" style="width:100%;padding:18px;background:transparent;color:var(--text);border:1px solid var(--border);border-radius:var(--radius);font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:1px;cursor:pointer">
+          Nouvel onboarding →
+        </button>
+      </div>
+      <div style="margin-top:24px;font-size:11px;color:var(--text3);text-align:center">
+        dev-user-001 · dev@forge.local
+      </div>`;
+    document.body.appendChild(devScreen);
+
+    document.getElementById('dev-btn-app').onclick = () => {
+      devScreen.remove();
       onAuthSuccess(devUser, 'dev-token', false);
-    }
+    };
+    document.getElementById('dev-btn-ob').onclick = () => {
+      devScreen.remove();
+      // Vider le profil local pour simuler un nouvel utilisateur
+      localStorage.removeItem('forge_profile_dev-user-001');
+      showOnboarding();
+      // Injecter CURRENT_USER pour que les calls Make fonctionnent
+      CURRENT_USER = devUser;
+    };
     return;
   }
   // ─────────────────────────────────────────────────────────────
@@ -2140,25 +2596,38 @@ async function callMake(payload) {
     method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(enriched)
   });
   const text = await res.text();
+
+  // ── Sanitize : remplace les sauts de ligne littéraux à l'intérieur
+  //    des strings JSON (entre guillemets) par \n échappé
+  function sanitizeJSON(str) {
+    // Remplace les \n et \r littéraux qui ne sont pas déjà échappés
+    return str.replace(/("(?:[^"\\]|\\.)*")/gs, m =>
+      m.replace(/\n/g, '\\n').replace(/\r/g, '\\r')
+    );
+  }
+
   let data;
   try {
     data = JSON.parse(text);
   } catch(e) {
     try {
-      const nl = String.fromCharCode(10);
-      data = JSON.parse(text.split('}' + nl + '"').join('},' + nl + '"'));
+      data = JSON.parse(sanitizeJSON(text));
     } catch(e2) {
-      console.warn('Make JSON parse failed');
-      throw e2;
+      try {
+        const nl = String.fromCharCode(10);
+        data = JSON.parse(sanitizeJSON(text.split('}' + nl + '"').join('},' + nl + '"')));
+      } catch(e3) {
+        console.warn('Make JSON parse failed', text.slice(0, 200));
+        throw e3;
+      }
     }
   }
 
   // ── Unwrap Make array wrapper if needed ──────────────────────
   let envelope = data;
   if (Array.isArray(data) && data[0]?.body) {
-    try { envelope = JSON.parse(data[0].body); } catch(e) { envelope = data; }
+    try { envelope = JSON.parse(sanitizeJSON(data[0].body)); } catch(e) { envelope = data; }
   } else if (Array.isArray(data) && data[0]?.result) {
-    // Make native OpenAI module returns [{result: {...}, ...}]
     envelope = data[0];
   }
 
@@ -2201,8 +2670,9 @@ function absorbServerState(allData) {
     try { loadProfileFields(); } catch(e) {}
 
     // If profile has no name after merge → user never filled onboarding
-    // Show onboarding instead of empty dashboard (only on init_app, not generate_session etc.)
-    if (!profile.name && allData._source === 'init_app') {
+    // Sauf en dev mode local — on reste sur l'app
+    const isLocal = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    if (!profile.name && allData._source === 'init_app' && !isLocal) {
       document.getElementById('app-wrapper').style.display = 'none';
       showOnboarding();
       return;
@@ -2213,10 +2683,22 @@ function absorbServerState(allData) {
   if (allData.dashboard) {
     window._lastAbsorbedDashboard = true;
     renderDashboardData(allData.dashboard);
-    const banner = document.getElementById('first-session-banner');
-    if (banner) banner.style.display = 'none';
+    // Le banner est géré dans renderDashboardData selon isFirstTime
   } else if (allData.hasOwnProperty('dashboard') && allData.dashboard === null) {
     window._lastAbsorbedDashboard = false;
+    // Cacher le spinner insights si user free (pas de données à montrer)
+    const isPaying = PAID_SUBSCRIPTION || (EXTRA_CREDITS_COUNT ?? 0) > 0;
+    const loader = document.getElementById('insights-loading');
+    const locked = document.getElementById('insights-locked');
+    const list   = document.getElementById('insights-list');
+    if (!isPaying) {
+      if (loader) loader.style.display = 'none';
+      if (list) list.innerHTML = '';
+      if (locked) locked.style.display = 'block';
+    } else {
+      if (loader) loader.style.display = 'none';
+      if (list) list.innerHTML = '<div style="font-size:13px;color:var(--text2);padding:8px 0">Aucune donnée — logge ta première séance !</div>';
+    }
     if (!allData.sessions || allData.sessions.length === 0) {
       const banner = document.getElementById('first-session-banner');
       if (banner) banner.style.display = 'flex';
@@ -2226,6 +2708,18 @@ function absorbServerState(allData) {
   // Sessions history
   if (allData.sessions !== undefined && allData.sessions !== null) {
     try { renderHistory(allData.sessions); } catch(e) {}
+  }
+
+  // Templates
+  if (Array.isArray(allData.templates)) {
+    TEMPLATE_IDS = allData.templates;
+    renderTemplates();
+  }
+
+  // Training plan
+  if (Array.isArray(allData.training_plan)) {
+    trainingPlan = allData.training_plan;
+    renderCalendar();
   }
 
   // User meta (quota + plan)
@@ -2243,7 +2737,7 @@ function absorbServerState(allData) {
 }
 
 // ── NAV ───────────────────────────────────────────────────────────
-const VIEW_ORDER = ['dashboard', 'seance', 'profile'];
+const VIEW_ORDER = ['dashboard', 'seance', 'planning', 'profile'];
 let _currentView = 'dashboard';
 
 function showView(name) {
@@ -2278,8 +2772,9 @@ function showView(name) {
 
   _currentView = name;
 
-  if (name === 'seance') updateQuotaUI();
+  if (name === 'seance') { updateQuotaUI(); renderTemplates(); }
   if (name === 'profile') updateProUI();
+  if (name === 'planning') renderCalendar();
 }
 
 // ── HEADER DATE ───────────────────────────────────────────────────
@@ -2334,6 +2829,29 @@ function showSeanceStep(step) {
   document.getElementById('seance-step-0').style.display  = step === 0 ? 'block' : 'none';
   document.getElementById('seance-step-ia').style.display  = step === 'ia' ? 'block' : 'none';
   document.getElementById('seance-step-log').style.display = step === 'log' ? 'block' : 'none';
+  // Réafficher le bouton template quand on revient à step-0
+  if (step === 0) {
+    const tplBtn = document.getElementById('submit-template-btn');
+    if (tplBtn) tplBtn.style.display = '';
+  }
+  // Mettre à jour l'état des boutons submit à chaque changement de step
+  if (step === 'log') updateSubmitBtns();
+}
+
+function updateSubmitBtns() {
+  const hasExos = currentSession.exos && currentSession.exos.length > 0;
+  const submitBtn = document.getElementById('submit-session-btn');
+  const tplBtn    = document.getElementById('submit-template-btn');
+  if (submitBtn) {
+    submitBtn.disabled    = !hasExos;
+    submitBtn.style.opacity = hasExos ? '' : '0.35';
+    submitBtn.style.cursor  = hasExos ? '' : 'not-allowed';
+  }
+  if (tplBtn && tplBtn.style.display !== 'none') {
+    tplBtn.disabled       = !hasExos;
+    tplBtn.style.opacity  = hasExos ? '' : '0.35';
+    tplBtn.style.cursor   = hasExos ? '' : 'not-allowed';
+  }
 }
 
 function backToStep0() {
@@ -2499,20 +3017,47 @@ function buildLiaSlotHtml(slot, state, slotIdx, loggedExo) {
       </div>
     </div>` : '';
 
-  // Input zone — only for current slot
-  const inputZone = isCurrent ? `
-    <div class="lia-input-zone">
-      <div class="lia-input-row">
-        <textarea class="lia-textarea" id="lia-textarea-${slotIdx}" rows="3">${prefilled}</textarea>
-        <button class="btn-record" id="lia-mic-btn-${slotIdx}" onclick="toggleLiaMic(${slotIdx})" style="height:100%;width:44px;border-radius:var(--radius-sm)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
-        </button>
-      </div>
-      <button class="lia-validate-btn" onclick="validateLiaSlot(${slotIdx})">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        Valider cet exercice
-      </button>
-    </div>` : '';
+  // Input zone — only for current slot, série par série
+  const inputZone = isCurrent ? (() => {
+    const ex = slot.type === 'solo' ? slot.ex : slot.members[0];
+    const sets = ex?.sets || [];
+    const setIdx = currentSession.currentSetIdx?.[slotIdx] ?? 0;
+    const completedSets = currentSession._completedSets?.[slotIdx] || [];
+
+    const setsRows = sets.map((s, si) => {
+      const loadStr = s.load > 0 ? `${s.load} kg` : 'PC';
+      const isCompleted = si < setIdx;
+      const isCurrent = si === setIdx;
+      const noteHtml = s.note ? `<span style="font-size:11px;color:var(--text3);margin-left:4px">(${s.note})</span>` : '';
+
+      if (isCompleted) {
+        const done = completedSets[si] || {};
+        return `<div class="lia-set-row done">
+          <div class="lia-set-num">Série ${si+1}</div>
+          <div class="lia-set-done-vals">${done.reps || s.reps} reps × ${done.load ?? (s.load > 0 ? s.load : 'PC')} ${s.load > 0 ? 'kg' : ''}</div>
+          <div class="lia-set-check">✓</div>
+        </div>`;
+      } else if (isCurrent) {
+        return `<div class="lia-set-row current" id="lia-set-row-${slotIdx}-${si}">
+          <div class="lia-set-num">Série ${si+1}</div>
+          <div class="lia-set-inputs">
+            <input type="number" class="lia-set-input" id="lia-reps-${slotIdx}-${si}" placeholder="${s.reps}" value="${s.reps}" min="0" max="999">
+            <span style="font-size:12px;color:var(--text3)">reps</span>
+            <input type="number" class="lia-set-input" id="lia-load-${slotIdx}-${si}" placeholder="${s.load > 0 ? s.load : '0'}" value="${s.load > 0 ? s.load : ''}" min="0" step="0.5">
+            <span style="font-size:12px;color:var(--text3)">kg${noteHtml}</span>
+          </div>
+          <button class="lia-set-validate-btn" onclick="validateSet(${slotIdx}, ${si})">✓</button>
+        </div>`;
+      } else {
+        return `<div class="lia-set-row upcoming">
+          <div class="lia-set-num">Série ${si+1}</div>
+          <div style="font-size:13px;color:var(--text3)">${s.reps} reps × ${loadStr}${s.note ? ' · '+s.note : ''}</div>
+        </div>`;
+      }
+    }).join('');
+
+    return `<div class="lia-input-zone" id="lia-sets-zone-${slotIdx}">${setsRows}</div>`;
+  })() : '';
 
   function buildBody(inner, restHtml, extraZone) {
     const extra = extraZone || inputZone;
@@ -2650,21 +3195,167 @@ function saveDoneSlot(slotIdx) {
 }
 
 // Validate a slot from the integrated IA plan input
-function validateLiaSlot(slotIdx) {
-  const textarea = document.getElementById(`lia-textarea-${slotIdx}`);
-  const text = textarea ? textarea.value.trim() : '';
-  if (!text) { showToast('Saisis les charges réalisées', true); return; }
-  const exo = { id: Date.now(), text, savedAt: new Date().toISOString() };
-  currentSession.exos.push(exo);
-  currentSession.iaExoIdx = slotIdx + 1;
+// ── REST TIMER ────────────────────────────────────────────────────
+let _restTimerInterval = null;
+let _restTimerRemaining = 0;
+const REST_RING_CIRCUMFERENCE = 502; // 2π × 80
+
+function startRestTimer(durationSec, nextName, nextDetail) {
+  // Annuler un timer précédent si actif
+  if (_restTimerInterval) clearInterval(_restTimerInterval);
+
+  _restTimerRemaining = durationSec;
+
+  const overlay   = document.getElementById('rest-overlay');
+  const secEl     = document.getElementById('rest-seconds');
+  const ringEl    = document.getElementById('rest-ring-progress');
+  const nameEl    = document.getElementById('rest-next-name');
+  const detailEl  = document.getElementById('rest-next-detail');
+
+  // Coming Next
+  nameEl.textContent   = nextName   || 'Fin de séance 🏁';
+  detailEl.textContent = nextDetail || '';
+
+  // Init ring plein
+  ringEl.style.strokeDashoffset = '0';
+  secEl.textContent = durationSec;
+
+  // Couleur selon durée
+  ringEl.style.stroke = durationSec >= 120 ? 'var(--accent2)' : durationSec >= 90 ? 'var(--accent)' : '#a3e635';
+
+  overlay.classList.add('visible');
+
+  _restTimerInterval = setInterval(() => {
+    _restTimerRemaining--;
+    secEl.textContent = _restTimerRemaining;
+
+    // Ring se vide progressivement
+    const progress = _restTimerRemaining / durationSec;
+    ringEl.style.strokeDashoffset = String(REST_RING_CIRCUMFERENCE * (1 - progress));
+
+    // Changement couleur dans les 10 dernières secondes
+    if (_restTimerRemaining <= 10) {
+      ringEl.style.stroke = 'var(--accent3)';
+      secEl.style.color   = 'var(--accent3)';
+    }
+
+    if (_restTimerRemaining <= 0) {
+      clearInterval(_restTimerInterval);
+      _restTimerInterval = null;
+      // Vibration
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+      // Bip Web Audio
+      _playRestBip();
+      // Fermer après 800ms
+      setTimeout(() => hideRestTimer(), 800);
+    }
+  }, 1000);
+}
+
+function hideRestTimer() {
+  const overlay = document.getElementById('rest-overlay');
+  overlay.classList.remove('visible');
+  // Reset couleur
+  document.getElementById('rest-seconds').style.color = '';
+  if (_restTimerInterval) { clearInterval(_restTimerInterval); _restTimerInterval = null; }
+}
+
+function skipRestTimer() {
+  hideRestTimer();
+}
+
+function _playRestBip() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, 0.15, 0.3].forEach(delay => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = 880;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0.3, ctx.currentTime + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.12);
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + 0.12);
+    });
+  } catch(e) { /* AudioContext non supporté */ }
+}
+
+function validateSet(slotIdx, setIdx) {
+  const plan  = currentSession.iaPlan;
+  const slots = getIAExoSlots(plan);
+  const slot  = slots[slotIdx];
+  if (!slot) return;
+
+  const ex   = slot.type === 'solo' ? slot.ex : slot.members[0];
+  const sets = ex?.sets || [];
+
+  const repsEl = document.getElementById(`lia-reps-${slotIdx}-${setIdx}`);
+  const loadEl = document.getElementById(`lia-load-${slotIdx}-${setIdx}`);
+  const reps = parseInt(repsEl?.value) || sets[setIdx]?.reps || 0;
+  const load = parseFloat(loadEl?.value) || (sets[setIdx]?.load || 0);
+
+  if (!currentSession._completedSets) currentSession._completedSets = {};
+  if (!currentSession._completedSets[slotIdx]) currentSession._completedSets[slotIdx] = [];
+  currentSession._completedSets[slotIdx][setIdx] = { reps, load };
+  if (!currentSession.currentSetIdx) currentSession.currentSetIdx = {};
+  currentSession.currentSetIdx[slotIdx] = setIdx + 1;
+
+  const isLastSet = setIdx >= sets.length - 1;
+
+  if (!isLastSet) {
+    // Pas la dernière série → inter_set_rest_seconds
+    const restSec = ex?.inter_set_rest_seconds || ex?.rest_seconds || 90;
+    const nextSet = sets[setIdx + 1];
+    const nextLoadStr = nextSet?.load > 0 ? `${nextSet.load} kg` : 'PC';
+    startRestTimer(restSec, `Série ${setIdx + 2} — ${ex.name}`, `${nextSet?.reps} reps × ${nextLoadStr}`);
+  } else {
+    // Dernière série → sauvegarder l'exo + rest_seconds inter-exercice
+    const completedSets = currentSession._completedSets[slotIdx] || [];
+    const text = sets.map((s, i) => {
+      const d = completedSets[i] || { reps: s.reps, load: s.load };
+      return `${d.reps} reps × ${d.load > 0 ? d.load + ' kg' : 'PC'}`;
+    }).join(' | ');
+    currentSession.exos.push({ id: Date.now(), text: `${ex.name}\n${text}`, savedAt: new Date().toISOString() });
+    currentSession.iaExoIdx = slotIdx + 1;
+    delete currentSession._completedSets[slotIdx];
+    delete currentSession.currentSetIdx[slotIdx];
+
+    saveSessionToLS();
+    renderIAPlanInLog();
+    updateSubmitBtns();
+
+    const bonusZone = document.getElementById('log-ia-bonus-zone');
+    if (bonusZone) bonusZone.style.display = currentSession.iaExoIdx >= slots.length ? 'block' : 'none';
+
+    const restSec = slot.type === 'solo'
+      ? (slot.ex?.rest_seconds || 90)
+      : (slot.members?.at(-1)?.rest_seconds || 90);
+    const { name: nextName, detail: nextDetail } = _getComingNext(slotIdx);
+    startRestTimer(restSec, nextName, nextDetail);
+    return;
+  }
+
   saveSessionToLS();
-  renderExoCards();
   renderIAPlanInLog();
-  // Show bonus zone if all IA slots done
+}
+
+function _getComingNext(slotIdx) {
   const slots = getIAExoSlots(currentSession.iaPlan);
-  const bonusZone = document.getElementById('log-ia-bonus-zone');
-  if (bonusZone) bonusZone.style.display = currentSession.iaExoIdx >= slots.length ? 'block' : 'none';
-  showToast('Exo enregistré ✓');
+  const nextSlot = slots[slotIdx + 1];
+  if (!nextSlot) return { name: 'Fin de séance 🏁', detail: 'Tu peux logger et terminer !' };
+
+  if (nextSlot.type === 'solo') {
+    const ex = nextSlot.ex;
+    const s0 = ex.sets?.[0];
+    const detail = s0 ? `Série 1 — ${s0.reps} reps × ${s0.load > 0 ? s0.load + ' kg' : 'PC'}` : '';
+    return { name: ex.name, detail };
+  } else {
+    const names = nextSlot.members.map(e => e.name).join(' + ');
+    const s0 = nextSlot.members[0]?.sets?.[0];
+    const detail = s0 ? `⚡ Superset · ${s0.reps} reps × ${s0.load > 0 ? s0.load + ' kg' : 'PC'}` : '⚡ Superset';
+    return { name: names, detail };
+  }
 }
 
 // Bonus exo (after all IA slots)
@@ -2678,6 +3369,7 @@ function saveExoBonus() {
   if (input) input.value = '';
   renderExoCards();
   showToast('Exo ajouté ✓');
+  updateSubmitBtns();
 }
 
 // Libre mode saveExo
@@ -2691,12 +3383,14 @@ function saveExo() {
   input.value = '';
   renderExoCards();
   showToast('Exo enregistré ✓');
+  updateSubmitBtns();
 }
 
 function deleteExo(id) {
   currentSession.exos = currentSession.exos.filter(e => e.id !== id);
   saveSessionToLS();
   renderExoCards();
+  updateSubmitBtns();
 }
 
 function editExo(id) {
@@ -3139,7 +3833,31 @@ function stopNotesMic() {
 }
 
 // ── SUBMIT SESSION ────────────────────────────────────────────────
-async function submitSession() {
+async function submitSession(isTemplate = false) {
+  if (!currentSession.exos || currentSession.exos.length === 0) {
+    showToast('Ajoute au moins un exercice', true); return;
+  }
+
+  // Si template → demander le nom d'abord
+  if (isTemplate) {
+    const defaultName = currentSession.iaPlan?.name || 'Ma séance';
+    document.getElementById('template-name-input').value = defaultName;
+    window._pendingTemplateSubmit = true;
+    showModal('modal-template-name');
+    return;
+  }
+
+  await _doSubmitSession(false, null);
+}
+
+async function confirmSaveTemplate() {
+  const name = document.getElementById('template-name-input').value.trim();
+  if (!name) { showToast('Saisis un nom', true); return; }
+  closeModal('modal-template-name');
+  await _doSubmitSession(true, name);
+}
+
+async function _doSubmitSession(isTemplate, templateName) {
   if (!currentSession.exos || currentSession.exos.length === 0) {
     showToast('Ajoute au moins un exercice', true); return;
   }
@@ -3153,9 +3871,12 @@ async function submitSession() {
     ia_plan: currentSession.iaPlan,
     notes: document.getElementById('final-notes').value,
     feeling: currentSession.feeling,
-    profile_id: profile.name || 'default'
+    profile_id: profile.name || 'default',
+    is_template: isTemplate,
+    template_name: templateName || null,
   };
   document.getElementById('submit-session-btn').disabled = true;
+  document.getElementById('submit-template-btn').disabled = true;
   showOverlay('log');
 
   if (!config.webhook) {
@@ -3175,6 +3896,7 @@ async function submitSession() {
 
     // Nettoyage UI séance
     document.getElementById('submit-session-btn').disabled = false;
+    document.getElementById('submit-template-btn').disabled = false;
     clearSessionLS();
     document.getElementById('resume-banner').classList.remove('visible');
     document.getElementById('final-notes').value = '';
@@ -3203,6 +3925,7 @@ async function submitSession() {
   } catch(e) {
     hideOverlay();
     document.getElementById('submit-session-btn').disabled = false;
+    document.getElementById('submit-template-btn').disabled = false;
     showToast('Erreur envoi', true);
   }
 }
@@ -3212,6 +3935,148 @@ async function _loadDashboardAfterLog() {
   await initApp();
   hideOverlay();
   showView('dashboard');
+}
+
+// ── TEMPLATES ─────────────────────────────────────────────────────
+let _templateToDelete = null;
+
+function renderTemplates() {
+  const container = document.getElementById('templates-list');
+  if (!container) return;
+
+  // Cross-reference TEMPLATE_IDS avec allSessions
+  const templates = TEMPLATE_IDS
+    .map(id => allSessions.find(s => s.key === id || s.id === id))
+    .filter(Boolean)
+    .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+
+  if (!templates.length) {
+    container.innerHTML = `<div style="font-size:13px;color:var(--text3);text-align:center;padding:16px 0">Aucun template sauvegardé</div>`;
+    return;
+  }
+
+  const typeIcons = { musculation: '🏋️', running: '🏃', cardio: '🚴', autre: '⚡' };
+
+  container.innerHTML = templates.map(t => {
+    const icon = typeIcons[t.type] || '⚡';
+    const name = t.template_name || t.name || 'Séance sans nom';
+    const date = t.date ? new Date(t.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '';
+    const duration = t.duration ? `${t.duration} min` : '';
+    const meta = [date, duration].filter(Boolean).join(' · ');
+    return `
+      <div class="template-card" onclick="loadTemplateIntoSession('${t.key || t.id}')">
+        <div class="template-card-icon">${icon}</div>
+        <div class="template-card-body">
+          <div class="template-card-name">${name}</div>
+          ${meta ? `<div class="template-card-meta">${meta}</div>` : ''}
+        </div>
+        <button class="template-card-del" onclick="event.stopPropagation();openDeleteTemplate('${t.key || t.id}')" title="Supprimer">✕</button>
+      </div>`;
+  }).join('');
+}
+
+function loadTemplateIntoSession(sessionId) {
+  const session = allSessions.find(s => s.key === sessionId || s.id === sessionId);
+  if (!session) { showToast('Template introuvable', true); return; }
+
+  const templateName = session.template_name || session.name || 'Séance template';
+
+  // Construire un plan synthétique depuis les exercices loggés
+  let syntheticPlan = null;
+
+  if (session.exercises && session.exercises.length) {
+    // Exercices parsés (musculation) → format ia_plan complet
+    syntheticPlan = {
+      name: templateName,
+      type: session.type || 'musculation',
+      duration: session.duration || 60,
+      coach_note: `Template chargé depuis ta séance du ${sessionDateLabel(session)}.`,
+      warmup: null,
+      cooldown: null,
+      exercises: session.exercises.map(ex => ({
+        name: ex.name,
+        superset_group: null,
+        rest_seconds: 90,
+        progression_note: null,
+        coaching_tip: null,
+        sets: (ex.sets || []).map(set => ({
+          reps: set.reps || 10,
+          load: set.load || 0,
+          note: set.note || null
+        }))
+      }))
+    };
+  } else if (session.exos && session.exos.length) {
+    // Séance libre — texte brut → on ouvre le log libre avec le texte pré-rempli
+    const rawText = session.exos
+      .map(e => typeof e === 'object' ? (e.text || '') : e)
+      .filter(Boolean).join('\n');
+
+    currentSession.mode      = 'libre';
+    currentSession.type      = session.type || 'musculation';
+    currentSession.iaPlan    = null;
+    currentSession.startedAt = new Date().toISOString();
+    currentSession.exos      = [];
+    currentSession.feeling   = null;
+    saveSessionToLS();
+
+    showView('seance');
+    startSeanceLibre();
+
+    // Masquer "Enregistrer comme template" — déjà un template
+    const tplBtn = document.getElementById('submit-template-btn');
+    if (tplBtn) tplBtn.style.display = 'none';
+
+    // Pré-remplir le textarea libre si disponible
+    setTimeout(() => {
+      const ta = document.getElementById('libre-input');
+      if (ta) ta.value = rawText;
+    }, 150);
+
+    showToast(`Template "${templateName}" chargé ✓`);
+    return;
+  } else {
+    showToast('Aucun exercice trouvé dans ce template', true);
+    return;
+  }
+
+  // Mode IA avec plan synthétique
+  currentSession.mode      = 'ia';
+  currentSession.type      = session.type || 'musculation';
+  currentSession.iaPlan    = syntheticPlan;
+  currentSession.iaExoIdx  = 0;
+  currentSession.startedAt = new Date().toISOString();
+  currentSession.exos      = [];
+  currentSession.feeling   = null;
+  saveSessionToLS();
+
+  showView('seance');
+  startLogFromIA();
+
+  // Masquer "Enregistrer comme template" — déjà un template
+  const tplBtn = document.getElementById('submit-template-btn');
+  if (tplBtn) tplBtn.style.display = 'none';
+
+  showToast(`Template "${templateName}" chargé ✓`);
+}
+
+function openDeleteTemplate(sessionId) {
+  _templateToDelete = sessionId;
+  showModal('modal-delete-template');
+}
+
+async function confirmDeleteTemplate() {
+  if (!_templateToDelete) return;
+  closeModal('modal-delete-template');
+  try {
+    await callMake({ event: 'delete_template', session_id: _templateToDelete });
+    TEMPLATE_IDS = TEMPLATE_IDS.filter(id => id !== _templateToDelete);
+    _templateToDelete = null;
+    renderTemplates();
+    showToast('Template supprimé');
+  } catch(e) {
+    showToast('Erreur suppression', true);
+  }
 }
 
 async function onCloseCoachModal() {
@@ -3253,8 +4118,17 @@ function renderDashboardData(data) {
   }
 
   // ── Insights ──
+  const isPaying = PAID_SUBSCRIPTION || (EXTRA_CREDITS_COUNT ?? 0) > 0;
   if (ai.insights && Array.isArray(ai.insights) && ai.insights.length) {
     renderInsights(ai.insights);
+  } else if (!isPaying) {
+    // Pas payant → afficher le lock même sans données
+    const loader = document.getElementById('insights-loading');
+    const locked = document.getElementById('insights-locked');
+    const list   = document.getElementById('insights-list');
+    if (loader) loader.style.display = 'none';
+    if (list) list.innerHTML = '';
+    if (locked) locked.style.display = 'block';
   }
 
   // ── Chart ──
@@ -3332,9 +4206,22 @@ function buildStreakBar(streak, types) {
 }
 
 function renderInsights(insights) {
-  const loader = document.getElementById('insights-loading');
+  const loader  = document.getElementById('insights-loading');
+  const locked  = document.getElementById('insights-locked');
+  const list    = document.getElementById('insights-list');
+
   if (loader) loader.style.display = 'none';
-  document.getElementById('insights-list').innerHTML = insights.map(ins=>`
+
+  // Gate : réservé aux payants (abo OU crédits ponctuels)
+  const isPaying = PAID_SUBSCRIPTION || (EXTRA_CREDITS_COUNT ?? 0) > 0;
+  if (!isPaying) {
+    list.innerHTML   = '';
+    if (locked) locked.style.display = 'block';
+    return;
+  }
+
+  if (locked) locked.style.display = 'none';
+  list.innerHTML = insights.map(ins => `
     <div class="insight-item">
       <div class="insight-dot" style="background:${ins.color}"></div>
       <div class="insight-text">${ins.text}</div>
@@ -3522,7 +4409,7 @@ function fillEditForm() {
   document.getElementById('p-height').value        = profile.height        || '';
   document.getElementById('p-level').value         = profile.level         || 'confirmé';
   document.getElementById('p-goal').value          = profile.goal          || 'prise de masse';
-  document.getElementById('p-sessions-week').value = profile.sessions_week || 4;
+  document.getElementById('p-sessions-week').value = profile.frequency || profile.sessions_week || '';
   document.getElementById('p-weight-target').value = profile.weight_target || '';
   document.getElementById('p-equipment').value     = profile.equipment     || 'salle complète';
   document.getElementById('p-constraints').value   = profile.constraints   || '';
@@ -3605,6 +4492,14 @@ const OVERLAY_MESSAGES = {
     "Activation de ton abonnement...",
     "Mise à jour de ton compte...",
     "Presque prêt..."
+  ],
+  plan: [
+    "Analyse de ton profil...",
+    "Construction de ta périodisation...",
+    "Équilibrage charge / récupération...",
+    "Placement des séances clés...",
+    "Optimisation sur 4 semaines...",
+    "Finalisation de ton plan..."
   ]
 };
 
@@ -3612,7 +4507,8 @@ const OVERLAY_CONFIG = {
   dashboard: { icon: '📊', color: '#e8ff47', sub: 'ANALYSE EN COURS' },
   log:       { icon: '💾', color: '#ff6b47', sub: 'ENREGISTREMENT' },
   generate:  { icon: '⚡', color: '#47c8ff', sub: 'GÉNÉRATION IA' },
-  pro:       { icon: '🔥', color: '#47c8ff', sub: 'ACTIVATION PRO' }
+  pro:       { icon: '🔥', color: '#47c8ff', sub: 'ACTIVATION PRO' },
+  plan:      { icon: '📅', color: '#a78bfa', sub: 'GÉNÉRATION DU PLAN' }
 };
 
 let overlayInterval = null;
